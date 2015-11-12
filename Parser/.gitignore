@@ -1,2 +1,4 @@
 EACodeTemplate*.java
+EACodeTemplate*.cs
 EACodeTemplate*.tokens
+*.class
