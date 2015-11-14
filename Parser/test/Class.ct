@@ -1,5 +1,4 @@
-Simple Text
-**** %ClassNotes% *** %ClassNotes2%
+%ClassNotes% %ClassNotes2%
 %PI="\t "%
 %ClassDeclaration%
 %ClassBody%
@@ -14,3 +13,6 @@ $interfaces=%list="ClassInterface" @separator=", "%
 %elseIf $interfaces != ""%
 : $interfaces
 %endIf%
+
+Simple Text
+		

@@ -1,3 +1,3 @@
 @echo off
 echo Executin parser in test mode...
-java org.antlr.v4.gui.TestRig EACodeTemplate file %1
+java org.antlr.v4.gui.TestRig EACodeTemplate file %*
