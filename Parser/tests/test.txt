@@ -1,0 +1,17 @@
+$bbb = "443"
+$aaa = $bbb
+$ccc = "aaaa" + $bbbb + %List%
+$aaa = $bbb + "XXXX"
+$COMMENT = "This is a just comment"
+CREATE TABLE $aaa "Anohter text" {
+	bbb+bbb
+	ccc-ccc %eq% ddd_bbb
+}
+%if%
+	text for 1st conidtion
+%elseif%
+	text for 2nd condition
+%else%
+	default text %AnotherTemplate%
+	%endTemplate%
+%endif%

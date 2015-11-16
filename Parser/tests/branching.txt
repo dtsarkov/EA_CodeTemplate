@@ -1,0 +1,8 @@
+%if%
+	text for 1st conidtion
+%elseif%
+	text for 2nd condition %dl%
+%else%
+	default text %AnotherTemplate%
+	%endTemplate%
+%endif%

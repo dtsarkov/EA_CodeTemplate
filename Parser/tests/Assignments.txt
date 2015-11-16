@@ -1,0 +1,4 @@
+$bbb = "443"
+$aaa = $bbb
+$ccc = "aaaa" + "bbbb" + "23343"
+$aaa = $bbb + "XXXX"
