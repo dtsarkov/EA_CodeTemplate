@@ -22,8 +22,10 @@ variable	: Var
 Var		: '$'ID
 ;
 expression	: expr ('+' expr)*
+//TO-DO: Add += operator
 ;
-expr		: (StringLiteral | variable | macros)
+expr		: (StringLiteral | variable | macros) 
+//TO-DO: macros has to be replaced
 ;
 
 // Branching
@@ -36,9 +38,9 @@ branching	:
 		| endtempalte_stmt
 		
 ;
-if_stmt		: '%if%'
+if_stmt		: '%if' compare_expr '%'
 ;
-elseif_stmt	: '%elseif%'
+elseif_stmt	: '%elseif' compare_expr '%'
 ;
 else_stmt	: '%else%'
 ;
@@ -46,7 +48,23 @@ endif_stmt	: '%endif%'
 ;
 endtempalte_stmt: '%endTemplate%'
 ;
-
+// ----------------------------------------------------------------------------
+compare_expr	: predicat (pred_op predicat)*
+;
+predicat	: test_expr test_op test_expr
+;
+test_expr	: string 
+		| variable 
+		| templateName
+;
+string 		: StringLiteral
+;
+templateName	: ID
+;
+pred_op     	: 'and' | 'or'
+;
+test_op		: '=='	| '!='
+;
 //
 // ============================================================================
 text		: ( 

@@ -1,6 +1,6 @@
-%if%
+%if $aaa == "bbb" %
 	text for 1st conidtion
-%elseif%
+%elseif $xName == $var and $str == "string" or "aaa" == "bbb"%
 	text for 2nd condition %dl%
 %else%
 	default text %AnotherTemplate%
