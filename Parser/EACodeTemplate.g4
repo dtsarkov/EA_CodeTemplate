@@ -15,18 +15,29 @@ comment		: '$COMMENT' EQ StringLiteral
 
 //
 // ============================================================================
-assignment	: variable EQ expression
-;
-variable	: Var
-;
-Var		: '$'ID
+assignment	: variable (op=EQ|op=AEQ) expression
 ;
 expression	: expr ('+' expr)*
 //TO-DO: Add += operator
 ;
-expr		: (StringLiteral | variable | macros) 
+expr		: stringLiteral 
+		| variable 
+		| attribute 
+		| tag
+		| macros 
 //TO-DO: macros has to be replaced
 ;
+
+variable	: VAR
+;
+attribute	: ATTR
+;
+tag		: TAG
+;
+
+ATTR		: '$.' ID;
+VAR		: '$'  ID;
+TAG		: '$#' ID;
 
 // Branching
 // ============================================================================
@@ -38,13 +49,13 @@ branching	:
 		| endtempalte_stmt
 		
 ;
-if_stmt		: '%if' compare_expr '%'
+if_stmt		: IF compare_expr '%'
 ;
-elseif_stmt	: '%elseif' compare_expr '%'
+elseif_stmt	: ELSEIF compare_expr '%'
 ;
-else_stmt	: '%else%'
+else_stmt	: ELSE
 ;
-endif_stmt	: '%endif%'
+endif_stmt	: ENDIF
 ;
 endtempalte_stmt: '%endTemplate%'
 ;
@@ -53,11 +64,11 @@ compare_expr	: predicat (pred_op predicat)*
 ;
 predicat	: test_expr test_op test_expr
 ;
-test_expr	: string 
+test_expr	: stringLiteral 
 		| variable 
-		| templateName
-;
-string 		: StringLiteral
+		| attribute
+		| tag
+//		| templateName  //TO-DO: Parser could not recognize templateName
 ;
 templateName	: ID
 ;
@@ -68,16 +79,12 @@ test_op		: '=='	| '!='
 //
 // ============================================================================
 text		: ( 
-		    FreeText 
+		    freeText  
 		  | variable 
-		  | StringLiteral 
+		  | stringLiteral  
 		  | macros
 		)+
 ;
-FreeText	: [a-zA-Z0-9_(){}\.+\-]+
-//~["$=\n\r ]+? 
-;
-
 //
 // ============================================================================
 macros		: textMacros
@@ -94,7 +101,16 @@ Template	: '%' ID '%'
 // ============================================================================
 // =
 // ============================================================================
-StringLiteral : '"' StringCharacters? '"' 
+freeText	: FreeText
+;
+FreeText	: [a-zA-Z0-9_(){}\.+\-]+
+;
+
+//string 		: StringLiteral
+//;
+stringLiteral	: StringLiteral
+;
+StringLiteral 	: '"' StringCharacters? '"' 
 ; 
   
 fragment StringCharacters : StringCharacter+ 
@@ -113,15 +129,17 @@ fragment EscapeSequence :
 
 // Keywords
 // ============================================================================
-/*
-IF	: 'if'   	;
-ELSE	: 'else'        ;
-ELSEIF	: 'elseif'      ;
-ENDIF	: 'endif'	;
-*/
+
+IF	: '%if'   	;
+ELSE	: '%else'       ;
+ELSEIF	: '%elseif'     ;
+ENDIF	: '%endif' 	;
+
 
 PC	: '%';
 EQ	: '=';
+AEQ	: '+=';
+//ADD	: '+';
 NUMBER  : [0-9]+;
 
 ID 	: [a-zA-Z_] [a-zA-Z0-9_]*; 

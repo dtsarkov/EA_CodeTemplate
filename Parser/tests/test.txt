@@ -1,7 +1,7 @@
 $bbb = "443"
 $aaa = $bbb
-$ccc = "aaaa" + $bbbb + %List%
-$aaa = $bbb + "XXXX"
+$ccc = "ccc=" + $bbb + %List%
+$aaa += $ccc + "XXXX"
 $COMMENT = "This is a just comment"
 CREATE TABLE $aaa "Anohter text" {
 	bbb+bbb
