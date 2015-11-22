@@ -25,20 +25,28 @@ import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.Li
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.PredicateContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.StringLiteralContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.TextContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.TextMacrosContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.VariableContext;
 
-public class TreeListener extends EACodeTemplateBaseListener {
+public class TemplateProcessor extends EACodeTemplateBaseListener {
+	private static Map<String,String> TextMacros;
+	static {
+		TextMacros = new HashMap<String,String>();
+		TextMacros.put("%eq%", "=");
+		TextMacros.put("%pc%", "%");
+		TextMacros.put("%dl%", "$");
+		TextMacros.put("%qt%", "\"");
+		//TextMacros.put("", "");
+	}
 	
 	private EACodeTemplateParser parser;
 	private Element 			 element;
 	private PrintStream os = System.out;
 
 	private boolean isText = false;
-	//private StringBuffer  buffer = new StringBuffer();
-	
-	private Map<String,String> variables = new HashMap<String,String>();
+	private Map<String,String> localVariables = new HashMap<String,String>();
 
-	public TreeListener(EACodeTemplateParser parser, Element element) {
+	public TemplateProcessor(EACodeTemplateParser parser, Element element) {
 		this.parser  = parser;
 		this.element = element;
 	}
@@ -50,7 +58,7 @@ public class TreeListener extends EACodeTemplateBaseListener {
 		
 		String value = "";
 		if ( ctx.op.getType() == parser.AEQ ) {
-			value = variables.getOrDefault(variable, "");
+			value = localVariables.getOrDefault(variable, "");
 		}
 		
 		for ( int i = 0; i < ctx.expression().getChildCount(); i++ ) {
@@ -59,7 +67,7 @@ public class TreeListener extends EACodeTemplateBaseListener {
 				value += calcExpression(c);
 		}
 		System.out.println(">>Assignment: " + variable + "=" + value);
-		variables.put(variable, value);
+		localVariables.put(variable, value);
 	}
 
 	private String calcExpression(ExprContext ctx ) {
@@ -71,7 +79,7 @@ public class TreeListener extends EACodeTemplateBaseListener {
 			if ( c instanceof StringLiteralContext ) {
 				s += translateStringLiteral(c.getText());
 			} else if ( c instanceof VariableContext ) {
-				s += variables.getOrDefault(c.getText(),"");
+				s += localVariables.getOrDefault(c.getText(),"");
 			} else if ( c instanceof AttributeContext ) {
 				s += getAttributeValue(c.getText());
 			}
@@ -180,19 +188,24 @@ public class TreeListener extends EACodeTemplateBaseListener {
 	/*
 	 * Text section
 	 **************************************************************************/
+	private void sendTextOut(String text) {
+		if (isText && processBranch && !isBranchProcessed)
+			os.print(text+" ");
+	}
+	
+	private void finishLine() {
+		if (isText && processBranch && !isBranchProcessed)
+			os.print("\n");
+	}
+
 	@Override
 	public void enterText(TextContext ctx) {
 		isText = true;
 	}
 
-	private void sendTextOut(String text) {
-		if (isText && processBranch && !isBranchProcessed)
-			os.print(text+" ");
-	}
-
 	@Override
 	public void exitVariable(VariableContext ctx) {
-		sendTextOut(variables.getOrDefault(ctx.VAR().getText(), ""));
+		sendTextOut(localVariables.getOrDefault(ctx.VAR().getText(), ""));
 	}
 
 	@Override
@@ -204,7 +217,6 @@ public class TreeListener extends EACodeTemplateBaseListener {
 	public void exitStringLiteral(StringLiteralContext ctx) {
 		sendTextOut(ctx.StringLiteral().getText());
 	}
-
 	
 	@Override
 	public void exitAttribute(AttributeContext ctx) {
@@ -212,10 +224,14 @@ public class TreeListener extends EACodeTemplateBaseListener {
 	}
 
 	@Override
-	public void exitLine(LineContext ctx) {
-		sendTextOut("\n");
-		isText = false;
+	public void exitTextMacros(TextMacrosContext ctx) {
+		sendTextOut(TextMacros.getOrDefault(ctx.getText(),""));
+	}
 
+	@Override
+	public void exitLine(LineContext ctx) {
+		finishLine();
+		isText = false;
 	}
 
 }

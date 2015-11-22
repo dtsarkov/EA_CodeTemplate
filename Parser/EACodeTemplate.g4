@@ -1,17 +1,24 @@
 grammar EACodeTemplate;
 
-file	: (line NL)* EOF
+//file	: (line NL)* EOF
+file	: line_text*
 ;
-line 	: comment 
-	| assignment 
-	| branching
-	| text 
+line_text: line NL
+	| line EOF
+	| emptyLine
+;	
+emptyLine	: NL
+;
+line 		: comment 
+		| assignment 
+		| branching
+		| text 
 ;
 
 //
 // ============================================================================
 comment		: '$COMMENT' EQ StringLiteral
-//comment 	: '%%' 
+//comment 	: '%%' (~[\r\n])* 
 ;
 
 //
@@ -19,7 +26,6 @@ comment		: '$COMMENT' EQ StringLiteral
 assignment	: variable (op=EQ|op=AEQ) expression
 ;
 expression	: expr ('+' expr)*
-//TO-DO: Add += operator
 ;
 expr		: stringLiteral 
 		| variable 
@@ -94,7 +100,7 @@ macros		: textMacros
 		| templateSubstitution
 		
 ;
-textMacros 	: '%dl%' | '%pc%' | '%qt%' | '%sl%' | '%eq%'
+textMacros 	: '%dl%' | '%pc%' | '%eq%' | '%qt%' //| '%sl%' 
 ;
 templateSubstitution	: Template
 ;
@@ -106,7 +112,7 @@ Template	: '%' ID '%'
 // ============================================================================
 freeText	: FreeText
 ;
-FreeText	: [a-zA-Z0-9_(){}\.+\-]+
+FreeText	: [a-zA-Z0-9_(){}\.+\-\*]+
 ;
 
 //string 		: StringLiteral

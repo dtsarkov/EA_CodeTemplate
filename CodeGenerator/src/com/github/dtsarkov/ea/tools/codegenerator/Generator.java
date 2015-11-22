@@ -40,7 +40,7 @@ public class Generator {
 		CommonTokenStream 		tokens	= new CommonTokenStream(lexer);
 		EACodeTemplateParser 	parser 	= new EACodeTemplateParser(tokens);
 
-		TreeListener			listener = new TreeListener(parser,element);
+		TemplateProcessor			listener = new TemplateProcessor(parser,element);
 		
 		parser.addParseListener(listener);
 		ParseTree				tree	= parser.file();	
