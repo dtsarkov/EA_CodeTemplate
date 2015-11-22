@@ -1,15 +1,26 @@
-$bbb = "443"
-$aaa = $bbb
-$ccc = "ccc=" + $bbb + %List%
+Current Object {
+	Type 		%eq% $.Type
+	Name 		%eq% $.Name
+	Subtype 	%eq% $.Subtype
+	Stereotype 	%eq% $.Stereotype
+	ObjectType 	%eq% $.ObjectType
+	modified   	%eq% $.Modified
+}
+%if $.Type == "Package"%
+	%exit%
+%endif%
 $aaa += $ccc + "XXXX"
+
 $COMMENT = "This is a just comment"
+
 CREATE TABLE $aaa "Anohter text" {
 	bbb+bbb
 	ccc-ccc %eq% ddd_bbb
 }
-%if%
+
+%if $.Type == "Activity" and $.Stereotype == "TCF Job"%
 	text for 1st conidtion
-%elseif%
+%elseif $aaa != $.Name%
 	text for 2nd condition
 %else%
 	default text %AnotherTemplate%

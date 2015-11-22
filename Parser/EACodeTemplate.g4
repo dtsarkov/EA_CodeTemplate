@@ -11,6 +11,7 @@ line 	: comment
 //
 // ============================================================================
 comment		: '$COMMENT' EQ StringLiteral
+//comment 	: '%%' 
 ;
 
 //
@@ -53,16 +54,16 @@ if_stmt		: IF compare_expr '%'
 ;
 elseif_stmt	: ELSEIF compare_expr '%'
 ;
-else_stmt	: ELSE
+else_stmt	: '%else%'
 ;
-endif_stmt	: ENDIF
+endif_stmt	: '%endif%'
 ;
-endtempalte_stmt: '%endTemplate%'
+endtempalte_stmt: '%exit%'
 ;
 // ----------------------------------------------------------------------------
-compare_expr	: predicat (pred_op predicat)*
+compare_expr	: predicate (pred_op predicate)*
 ;
-predicat	: test_expr test_op test_expr
+predicate	: expr test_op expr
 ;
 test_expr	: stringLiteral 
 		| variable 
@@ -81,6 +82,8 @@ test_op		: '=='	| '!='
 text		: ( 
 		    freeText  
 		  | variable 
+		  | attribute
+		  | tag
 		  | stringLiteral  
 		  | macros
 		)+
@@ -131,9 +134,9 @@ fragment EscapeSequence :
 // ============================================================================
 
 IF	: '%if'   	;
-ELSE	: '%else'       ;
+//ELSE	: '%else%'      ;
 ELSEIF	: '%elseif'     ;
-ENDIF	: '%endif' 	;
+//ENDIF	: '%endif%' 	;
 
 
 PC	: '%';
