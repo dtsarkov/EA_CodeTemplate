@@ -4,5 +4,5 @@
 	text for 2nd condition %dl%
 %else%
 	default text %AnotherTemplate%
-	%endTemplate%
+	%exit%
 %endif%

@@ -5,24 +5,10 @@ Current Object {
 	Stereotype 	%eq% $.Stereotype
 	ObjectType 	%eq% $.ObjectType
 	modified   	%eq% $.Modified
+	GUID		%eq% $.ElementGUID
 }
-%if $.Type == "Package"%
-	%branching%
-	%exit%
-%endif%
-$aaa += $ccc + "XXXX"
+$$prefix=$."AS::Prefix"
+$$streamID=$."TCF::Stream ID"
+%list=$.Elements 	 @template="activity"%
 
-$COMMENT = "This is a just comment"
 
-CREATE TABLE $aaa "Anohter text" {
-	bbb+bbb
-	ccc-ccc %eq% ddd_bbb
-}
-
-%if $.Type == "Activity" and $.Stereotype == "TCF Job"%
-	text for 1st conidtion
-%elseif $aaa != $.Name%
-	text for 2nd condition
-%else%
-	default text %Assignments%
-%endif%

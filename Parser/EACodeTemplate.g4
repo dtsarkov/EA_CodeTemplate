@@ -35,7 +35,7 @@ expr		: stringLiteral
 //TO-DO: macros has to be replaced
 ;
 
-variable	: VAR
+variable	: VAR //| GVAR
 ;
 attribute	: ATTR
 ;
@@ -43,8 +43,9 @@ tag		: TAG
 ;
 
 ATTR		: '$.' ID;
-VAR		: '$'  ID;
-TAG		: '$#' ID;
+VAR		: '$''$'?  ID;
+//GVAR		: '$$' ID;
+TAG		: '$.' StringLiteral;
 
 // Branching
 // ============================================================================
@@ -97,14 +98,24 @@ text		: (
 //
 // ============================================================================
 macros		: textMacros
+		| listMacro
 		| templateSubstitution
-		
 ;
-textMacros 	: '%dl%' | '%pc%' | '%eq%' | '%qt%' //| '%sl%' 
+textMacros 		: '%dl%' | '%pc%' | '%eq%' | '%qt%' | '%us%' //| '%sl%' 
+;
+listMacro		: List '=' attribute 
+				templateParameter 
+			'%'
+;
+List			: '%list'
+;
+templateParameter 	: TemplateParameter '=' stringLiteral
+;
+TemplateParameter	: '@template'
 ;
 templateSubstitution	: Template
 ;
-Template	: '%' ID '%'
+Template		: '%' ID '%'
 ;
 
 // ============================================================================
@@ -112,7 +123,7 @@ Template	: '%' ID '%'
 // ============================================================================
 freeText	: FreeText
 ;
-FreeText	: [a-zA-Z0-9_(){}\.+\-\*]+
+FreeText	: [a-zA-Z0-9_(){}\.+\-\*\:\/]+
 ;
 
 //string 		: StringLiteral

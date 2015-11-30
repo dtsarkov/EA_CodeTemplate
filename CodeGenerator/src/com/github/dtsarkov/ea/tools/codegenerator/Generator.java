@@ -1,8 +1,8 @@
 package com.github.dtsarkov.ea.tools.codegenerator;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.lang.reflect.Method;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -20,20 +20,57 @@ public class Generator {
 
 		if (args.length == 0 ) return;
 		
-		String modelFile	 = args[0];
-		String elementName	 = args[1];
-		String inputFileName = args[2];
+		String modelFile	 	= args[0];
+		String elementName	 	= args[1];
+		String templateFileName = args[2];
 		
+		File templateFile = new File(templateFileName);
+		String templateName = templateFile.getName();
+		String templateExt  = "";
+		
+		int idx = templateName.lastIndexOf(".");
+		
+		if ( idx != -1 ) {
+			templateExt = templateName.substring(idx+1);
+			templateName = templateName.substring(0, idx);
+		}
+		System.out.printf("File:\n\tName = [%s]\n\tPath=[%s]\n---\nIndex=[%d]\nName=%s\nExt=%s\n"
+				,templateFile.getName()
+				,templateFile.getParent()
+				,idx
+				,templateName
+				,templateExt
+				//,templateFile.getPath()
+		);
 		Repository model = openModel(modelFile);
+
+		TemplateProcessor.setTemplateFolder(templateFile.getParent());
+		TemplateProcessor.setTemplateExtention(templateExt);
+		TemplateProcessor.setEAModel(model);
+		
 		Collection elements = model.GetElementsByQuery("Element Name", elementName);
 		if ( elements.GetCount() == 0 ) {
 			System.out.printf("Could not find any elments with name \"%f\"\n", elementName);
 			model.CloseFile();
 			return;
 		}
-		Element element = (Element)elements.GetAt((short)0);
+		TemplateProcessor tp = new TemplateProcessor(templateName);
 		
-		InputStream 			is 		= new FileInputStream(inputFileName);
+		Element element = (Element)elements.GetAt((short)0);
+
+		tp.setElement(element);
+		System.out.println("===============================================");
+		System.out.println("First Execution");
+		System.out.println("===============================================");
+		tp.execute();
+
+//		System.out.println("===============================================");
+//		System.out.println("Second Execution");
+//		System.out.println("===============================================");
+//		tp.execute();
+
+/*		
+		InputStream 			is 		= new FileInputStream(templateFileName);
 		
 		ANTLRInputStream  		input 	= new ANTLRInputStream(is);
 		EACodeTemplateLexer 	lexer 	= new EACodeTemplateLexer(input);
@@ -44,7 +81,7 @@ public class Generator {
 		
 		parser.addParseListener(listener);
 		ParseTree				tree	= parser.file();	
-		
+*/		
 		
 		//TODO: Figure out how to close EA application
 		System.out.printf("Closing model file \"%s\"...", modelFile);

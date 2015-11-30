@@ -1,0 +1,11 @@
+%if $.Type != "Activity"%
+	%exit%
+%endif%
+/*
+ * Job $.Name
+ *****************************************************************************/ 
+insert_job: $$prefix%us%$.Name
+Type %eq% $.Type
+Stereotype %eq% $.Stereotype
+/*****************************************************************************/ 
+%list=$.Elements @template="activity"%
