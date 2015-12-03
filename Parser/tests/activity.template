@@ -1,11 +1,22 @@
+%%*****************************************************************************
+%% Autosys job definition template
+%%  
+%%*****************************************************************************
+
 %if $.Type != "Activity"%
 	%exit%
 %endif%
+
+$JobName = $.Name
+%if $$prefix != ""%
+	$JobName = $$prefix + "_" +$JobName
+%endif%
+
 /*
- * Job $.Name
+ * Job $JobName
  *****************************************************************************/ 
-insert_job: $$prefix%us%$.Name
-Type %eq% $.Type
+insert_job: $JobName
+Type       %eq% $.Type
 Stereotype %eq% $.Stereotype
 /*****************************************************************************/ 
 %list=$.Elements @template="activity"%

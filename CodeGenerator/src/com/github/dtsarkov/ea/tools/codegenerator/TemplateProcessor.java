@@ -12,6 +12,8 @@ import java.util.Map;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.sparx.Collection;
 import org.sparx.Element;
@@ -93,6 +95,8 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	private String 					templateName;
 	private boolean					isOpen;
 	private EACodeTemplateParser 	parser;
+	private CommonTokenStream 		tokens;
+	private EACodeTemplateLexer 	lexer;
 	private Object 			 		element;
 
 	private boolean isText = false;
@@ -117,10 +121,11 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		try {
 			InputStream 			is 		= new FileInputStream(fileName);
 			ANTLRInputStream  		input 	= new ANTLRInputStream(is);
-			EACodeTemplateLexer 	lexer 	= new EACodeTemplateLexer(input);
-			CommonTokenStream 		tokens	= new CommonTokenStream(lexer);
 			
+			lexer 	= new EACodeTemplateLexer(input);
+			tokens	= new CommonTokenStream(lexer);
 			parser 	= new EACodeTemplateParser(tokens);
+
 			success = true;
 			
 		} catch ( FileNotFoundException e ) {
@@ -429,9 +434,25 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	/*
 	 * Text section
 	 **************************************************************************/
-	private void sendTextOut(String text) {
-		if (isText && processBranch && !isBranchProcessed && text != null)
-			os.print(text+" ");
+	private void sendTextOut(String text, ParserRuleContext ctx) {
+		if (isText && processBranch && !isBranchProcessed && text != null) {
+			Token token = ctx.getStart();
+			int   idx  = token.getTokenIndex();
+			List<Token> channel = tokens.getHiddenTokensToLeft(idx, 1);
+			String ws = "";
+			if (channel != null ) {
+				//ws += "|";
+				for(int i = 0; i < channel.size(); i++) {
+					//System.out.printf(">> i = %d\n",i);
+					token = channel.get(i);
+					if ( token == null ) break;
+					ws += token.getText();
+					i++;
+				};
+				//ws += "|";
+			}
+			os.print(ws+text);
+		}
 	}
 	
 	private void finishLine() {
@@ -446,7 +467,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 
 	@Override
 	public void exitVariable(VariableContext ctx) {
-		sendTextOut(getVariableValue(ctx.VAR().getText()));
+		sendTextOut(getVariableValue(ctx.VAR().getText()),ctx);
 	}
 
 	@Override
@@ -455,22 +476,22 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	
 	@Override
 	public void exitFreeText(FreeTextContext ctx) {
-		sendTextOut(ctx.FreeText().getText());
+		sendTextOut(ctx.FreeText().getText(),ctx);
 	}
 
 	@Override
 	public void exitStringLiteral(StringLiteralContext ctx) {
-		sendTextOut(ctx.StringLiteral().getText());
+		sendTextOut(ctx.StringLiteral().getText(),ctx);
 	}
 	
 	@Override
 	public void exitAttribute(AttributeContext ctx) {
-		if (isText) sendTextOut(getAttributeValue(ctx.getText()));
+		if (isText) sendTextOut(getAttributeValue(ctx.getText()),ctx);
 	}
 
 	@Override
 	public void exitTextMacros(TextMacrosContext ctx) {
-		sendTextOut(TextMacros.getOrDefault(ctx.getText(),""));
+		sendTextOut(TextMacros.getOrDefault(ctx.getText(),""),ctx);
 	}
 
 	@Override

@@ -17,7 +17,7 @@ import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser;
 public class Generator {
 
 	public static void main(String[] args) throws Exception {
-
+		System.out.println("EACodeGenerator <EA Model File> <EA Element> <Template File> <Output File>");
 		if (args.length == 0 ) return;
 		
 		String modelFile	 	= args[0];
@@ -91,8 +91,9 @@ public class Generator {
 		model = null;
 		System.out.println("done.");
 		
+		Runtime.getRuntime().runFinalization();
+		System.gc();
 		
-		Runtime.getRuntime().gc();
 	}
 	
 	private static Repository openModel( String fileName ) {
