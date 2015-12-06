@@ -9,8 +9,7 @@ line_text: line NL
 ;	
 emptyLine	: NL
 ;
-line 		: comment 
-		| assignment 
+line 		: assignment 
 		| branching
 		| text 
 ;
@@ -18,8 +17,6 @@ line 		: comment
 //
 // ============================================================================
 //comment		: '$COMMENT' EQ StringLiteral
-comment 	: '%%' .*? NL 
-;
 
 //
 // ============================================================================
@@ -31,21 +28,26 @@ expr		: stringLiteral
 		| variable 
 		| attribute 
 		| tag
-		| macros 
+		| functions 
 //TO-DO: macros has to be replaced
 ;
 
-variable	: VAR //| GVAR
+variable	: VAR
 ;
-attribute	: ATTR
+attribute	: ATTR  
 ;
 tag		: TAG
 ;
 
-ATTR		: '$.' ID;
-VAR		: '$''$'?  ID;
-//GVAR		: '$$' ID;
-TAG		: '$.' StringLiteral;
+ATTR		: (THIS | PARN | PCKG | SRCE | TRGT ) ID;
+TAG		: (THIS | PARN | PCKG | SRCE | TRGT ) StringLiteral;
+VAR		: '$''$'?  	ID;
+
+THIS		: '$.' | '$this.';
+PARN		: '$parent.'	;
+PCKG		: '$package.'	;
+SRCE		: '$source.'	;
+TRGT		: '$target.'	; 
 
 // Branching
 // ============================================================================
@@ -99,6 +101,7 @@ text		: (
 // ============================================================================
 macros		: textMacros
 		| listMacro
+		| functions
 		| templateSubstitution
 ;
 textMacros 		: '%dl%' | '%pc%' | '%eq%' | '%qt%' | '%us%' //| '%sl%' 
@@ -117,13 +120,18 @@ templateSubstitution	: Template
 ;
 Template		: '%' ID '%'
 ;
+functions		: Function '(' expr (',' expr)* ')%'
+;
+Function		: '%UPPER' | '%LOWER' | '%REPLACE'
+;
+
 
 // ============================================================================
 // =
 // ============================================================================
 freeText	: FreeText
 ;
-FreeText	: [a-zA-Z0-9_(){}\.+\-\*\:\/]+
+FreeText	: [a-zA-Z0-9_(){}\.+\-\*\:\/\[\]<>\~!@#^&\|]+
 ;
 
 //string 		: StringLiteral
@@ -165,5 +173,7 @@ NUMBER  : [0-9]+;
 ID 	: [a-zA-Z_] [a-zA-Z0-9_]*; 
 
 NL 	: '\r'?'\n';
+COMMENT	: '%%' .*? (NL|EOF)	-> skip;	 
 WS 	: [ \t] -> channel(1);
+
 	

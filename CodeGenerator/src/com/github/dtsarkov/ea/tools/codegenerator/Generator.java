@@ -1,28 +1,23 @@
 package com.github.dtsarkov.ea.tools.codegenerator;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTree;
 import org.sparx.Collection;
 import org.sparx.Element;
 import org.sparx.Repository;
-
-import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateLexer;
-import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser;
 
 public class Generator {
 
 	public static void main(String[] args) throws Exception {
 		System.out.println("EACodeGenerator <EA Model File> <EA Element> <Template File> <Output File>");
-		if (args.length == 0 ) return;
+		if (args.length < 4 ) return;
 		
 		String modelFile	 	= args[0];
 		String elementName	 	= args[1];
 		String templateFileName = args[2];
+		String outputFileName	= args[3];
 		
 		File templateFile = new File(templateFileName);
 		String templateName = templateFile.getName();
@@ -34,36 +29,37 @@ public class Generator {
 			templateExt = templateName.substring(idx+1);
 			templateName = templateName.substring(0, idx);
 		}
-		System.out.printf("File:\n\tName = [%s]\n\tPath=[%s]\n---\nIndex=[%d]\nName=%s\nExt=%s\n"
-				,templateFile.getName()
-				,templateFile.getParent()
-				,idx
-				,templateName
-				,templateExt
-				//,templateFile.getPath()
-		);
+
 		Repository model = openModel(modelFile);
 
+		Collection elements = model.GetElementsByQuery("Element Name", elementName);
+		if ( elements.GetCount() == 0 ) {
+			System.err.printf("Could not find any elments with name \"%s\"\n", elementName);
+			model.CloseFile();
+			return;
+		}
+		Element element = (Element)elements.GetAt((short)0);
+
+		FileWriter fw = null; 
+		try { 
+			fw = new FileWriter(outputFileName);
+		} catch ( IOException e ) {
+			System.err.printf("Could not create output file \"%s\"\n", outputFileName);
+			model.CloseFile();
+		}
+		
 		TemplateProcessor.setTemplateFolder(templateFile.getParent());
 		TemplateProcessor.setTemplateExtention(templateExt);
 		TemplateProcessor.setEAModel(model);
 		
-		Collection elements = model.GetElementsByQuery("Element Name", elementName);
-		if ( elements.GetCount() == 0 ) {
-			System.out.printf("Could not find any elments with name \"%f\"\n", elementName);
-			model.CloseFile();
-			return;
-		}
-		TemplateProcessor tp = new TemplateProcessor(templateName);
 		
-		Element element = (Element)elements.GetAt((short)0);
-
+		TemplateProcessor tp = new TemplateProcessor(templateName);
+		tp.setOutput(fw);
 		tp.setElement(element);
-		System.out.println("===============================================");
-		System.out.println("First Execution");
-		System.out.println("===============================================");
 		tp.execute();
 
+		fw.flush();
+		fw.close();
 //		System.out.println("===============================================");
 //		System.out.println("Second Execution");
 //		System.out.println("===============================================");

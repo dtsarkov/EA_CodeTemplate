@@ -1,22 +1,30 @@
-%%*****************************************************************************
+%%=============================================================================
 %% Autosys job definition template
 %%  
-%%*****************************************************************************
+%%=============================================================================
 
 %if $.Type != "Activity"%
 	%exit%
 %endif%
 
-$JobName = $.Name
+$type="cmd"
+$suffix="_c"
+%if $.Stereotype == "Box Job"%
+	$type="box"
+	$suffix="_b"
+%endif%
+$JobName = $this.Name + $suffix
 %if $$prefix != ""%
 	$JobName = $$prefix + "_" +$JobName
 %endif%
+%%=============================================================================
 
-/*
- * Job $JobName
+/* $.Stereotype: $JobName  
+ * Description: $.Notes
  *****************************************************************************/ 
-insert_job: $JobName
-Type       %eq% $.Type
-Stereotype %eq% $.Stereotype
+insert_job: %REPLACE(%LOWER($JobName)%," ","_")% type:$type
+%list=$.Connectors @template="jobConnector"%
 /*****************************************************************************/ 
-%list=$.Elements @template="activity"%
+
+%%=============================================================================
+%%list=$.Elements @template="activity"%

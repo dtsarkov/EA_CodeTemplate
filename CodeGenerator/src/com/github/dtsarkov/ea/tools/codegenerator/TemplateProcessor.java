@@ -4,7 +4,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +32,9 @@ import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.El
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.Endif_stmtContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.Endtempalte_stmtContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.ExprContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.FileContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.FreeTextContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.FunctionsContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.If_stmtContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.LineContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.ListMacroContext;
@@ -49,7 +52,6 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	private static String 		templateFolder;
 	private static String 		templateExtention;
 	private static Repository 	EA_Model;
-	private static PrintStream 	os = System.out;
 	
 	private static Map<String,String> TextMacros;
 	private static Map<String,String> globalVariables;
@@ -98,12 +100,14 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	private CommonTokenStream 		tokens;
 	private EACodeTemplateLexer 	lexer;
 	private Object 			 		element;
+	private int						textLevel 	= 0;
+	private Writer 					writer;
 
-	private boolean isText = false;
 	private Map<String,String> localVariables = new HashMap<String,String>();
 
 	public TemplateProcessor( String templateName ) {
 		this.templateName = templateName;
+		writer = new PrintWriter(System.out);
 	}
 	
 	/*
@@ -112,6 +116,14 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		this.element = element;
 	}
 	*/
+	
+	public void setOutput(Writer writer) {
+		this.writer = writer;
+	}
+	
+	public Writer getOutput() {
+		return writer;
+	}
 	/*
 	 * 
 	 **************************************************************************/
@@ -155,17 +167,98 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 				this.element = EA_Model.GetPackageByGuid(((Element)element).GetElementGUID());
 			}
 		} 
+		Parent 		= null;
+		hasParent 	= true;
+		Package 	= null;
+		hasPackage	= true;
+		Source 		= null;
+		hasSource	= true;
+		Target 		= null;
+		hasTarget	= true;
 	}
 	
 	public Object getElement() {
 		return element;
 	}
 	
+	private Object 	Parent 		= null;
+	private boolean	hasParent 	= true;
+	private Object getParent() {
+		if ( Parent == null && hasParent ) {
+			try {
+				Method m = element.getClass().getMethod("GetParentID", null);
+				Parent = EA_Model.GetElementByID(Integer.parseInt(m.invoke(element,null).toString()));
+			} catch (NoSuchMethodException e ) {
+				hasParent = false;
+			} catch (Exception e ) {
+				e.printStackTrace(System.err);
+			}
+		}
+		
+		return Parent;
+	}
+
+	private Object 	Package 		= null;
+	private boolean	hasPackage 		= true;
+	private Object getPackage() {
+		if ( Package == null && hasPackage ) {
+			try {
+				Method m = element.getClass().getMethod("GetPackageID", null);
+				Package = EA_Model.GetPackageByID(Integer.parseInt(m.invoke(element,null).toString()));
+			} catch (NoSuchMethodException e ) {
+				hasPackage = false;
+			} catch (Exception e ) {
+				e.printStackTrace(System.err);
+			}
+		}
+		return Package;
+	}
+
+	private Object Source	  = null;
+	private boolean hasSource = true;
+	private Object getSource() {
+		if ( Source == null && hasSource ) {
+			try {
+				Method m = element.getClass().getMethod("GetClientID", null);
+				Source = EA_Model.GetElementByID(Integer.parseInt(m.invoke(element,null).toString()));
+			} catch (NoSuchMethodException e ) {
+				hasSource = false;
+			} catch (Exception e ) {
+				e.printStackTrace(System.err);
+			}
+		}
+		return Source;
+	}
+
+	private Object  Target	  = null;
+	private boolean hasTarget = true;
+	private Object getTarget() {
+		if ( Target == null && hasTarget ) {
+			try {
+				Method m = element.getClass().getMethod("GetSupplierID", null);
+				Target = EA_Model.GetElementByID(Integer.parseInt(m.invoke(element,null).toString()));
+			} catch (NoSuchMethodException e ) {
+				hasTarget = false;
+			} catch (Exception e ) {
+				e.printStackTrace(System.err);
+			}
+		}
+		return Target;
+	}
 	/*
 	 * 
 	 **************************************************************************/
 	@Override
+	public void enterAssignment(AssignmentContext ctx) {
+		if ( !canExecute() ) return;
+		
+		textLevel = -1000;
+	}
+	
+	@Override
 	public void exitAssignment(AssignmentContext ctx) {
+		if ( !canExecute() ) return;
+		
 		String variable = ctx.variable().getText();
 		Map<String,String> scope;
 		
@@ -177,7 +270,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		
 		
 		String value = "";
-		if ( ctx.op.getType() == parser.AEQ ) {
+		if ( ctx.op.getType() == EACodeTemplateParser.AEQ ) {
 			value = scope.getOrDefault(variable, "");
 		}
 		
@@ -187,8 +280,10 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			if ( c != null )
 				value += calcExpression(c);
 		}
-		System.out.println(">>Assignment: " + variable + "=" + value);
+		System.out.printf(">>Assignment (%d): %s=%s\n",textLevel, variable,value);
 		scope.put(variable, value);
+		
+		textLevel = 0;
 	}
 
 	private String calcExpression(ExprContext ctx ) {
@@ -205,6 +300,8 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 				v = getAttributeValue(c.getText());
 			} else if ( c instanceof TagContext ) {
 				v = getTagValue(c.getText());
+			} else if ( c instanceof FunctionsContext ) {
+				v = calcFunction((FunctionsContext)c);
 			}
 			if ( v == null ) {
 				s = null;
@@ -213,6 +310,37 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			}
 		}
 		return s;
+	}
+	
+	private String calcFunction(FunctionsContext ctx ) {
+		String value = "";
+		String function = ctx.getChild(0).getText();
+		int parmCount = ctx.expr().size();
+		
+		System.out.printf(">>Function call [%s] with [%d] parameter(s)\n",function,parmCount);
+		if ( parmCount < 1 ) {
+			System.err.println("Function call should have at lease one parameter");
+			return value;
+		}
+		String firstParameter = calcExpression(ctx.expr(0)); 
+
+		if (function.equalsIgnoreCase("%LOWER") ) {
+			value = firstParameter.toLowerCase();
+		} else if (function.equalsIgnoreCase("%UPPER") ) {
+			value = firstParameter.toUpperCase();
+		} else if (function.equalsIgnoreCase("%REPLACE") ) {
+			if (parmCount < 3 ) {
+				System.err.println("Incorrect function call %REPLACE( string, regexp, replacement )%\n");
+				return value;
+			}
+			value = firstParameter.replaceAll(
+						calcExpression(ctx.expr(1))
+					   ,calcExpression(ctx.expr(2))
+					);
+		} else {
+			System.err.printf("Unknown function %s\n", function);
+		}
+		return value;
 	}
 	
 	private String translateStringLiteral( String s ) {
@@ -236,10 +364,25 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	}
 	
 	private Object getAttribute(String attributeName) {
+		Object element	 = null; 
 		Object attribute = null;
 		
-		try {
-			Method m = element.getClass().getMethod("Get"+attributeName.substring(2));
+		String name[] = attributeName.split("\\.");
+		System.out.printf(">>getAttribute([%s] [%s]\n",name[0],name[1]);
+		if ( name[0].equalsIgnoreCase("$") || name[0].equalsIgnoreCase("$this") ) {
+			element = getElement();
+		} else if ( name[0].equalsIgnoreCase("$parent") ) {
+			element = getParent();
+		} else if ( name[0].equalsIgnoreCase("$package") ) {
+			element = getPackage();
+		} else if ( name[0].equalsIgnoreCase("$source") ) {
+			element = getSource();
+		} else if ( name[0].equalsIgnoreCase("$target") ) {
+			element = getTarget();
+		}
+		
+		if ( element != null ) try {
+			Method m = element.getClass().getMethod("Get"+name[1]);
 			attribute = m.invoke(element, null);
 			//System.out.printf("Attribute value = [%s]\n", value);
 		} catch (NoSuchMethodException e) {
@@ -290,11 +433,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		}
 		return value;
 	}
-	
-	/*
-	 * TAG section
-	 **************************************************************************/
-	
+
 	/*
 	 * IF section
 	 **************************************************************************/
@@ -331,6 +470,9 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		branchLevel--;
 	}
 	
+	private boolean canExecute() {
+		return (processBranch && !isBranchProcessed );
+	}
 	
 	private boolean evalCompareExpr( Compare_exprContext ctx ) {
 		String op = null;
@@ -361,6 +503,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	public void exitEndtempalte_stmt(Endtempalte_stmtContext ctx) {
 		if (processBranch) {
 			System.out.println(">>Removing listener...");
+			flashOutput();
 			parser.removeParseListener(this);
 		}
 	}
@@ -391,11 +534,14 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	 **************************************************************************/
 	@Override
 	public void enterListMacro(ListMacroContext ctx) {
-		isText = false;
+		if ( !canExecute() ) return;
+		textLevel++;
 	}
 	
 	@Override
 	public void exitListMacro(ListMacroContext ctx) {
+		if ( !canExecute() ) return;
+		textLevel--;
 		String attr = ctx.attribute().getText();
 		String name = ctx.templateParameter().stringLiteral().getText();
 		//Remove surrounding double quotes
@@ -416,6 +562,8 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		}
 		
 		TemplateProcessor tp 	= new TemplateProcessor(name);
+		tp.setOutput(this.writer);
+
 		Collection 		  ec 	= (Collection)attribute;
 		Object			  obj	= null;
 
@@ -429,73 +577,116 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			obj = null;
 		}
 		ec = null;
+		System.gc();
 	}
 	
 	/*
+	 * Functions section
+	 **************************************************************************/
+	@Override
+	public void enterFunctions(FunctionsContext ctx) {
+		if ( !canExecute() ) return;
+		
+		textLevel++;
+	}
+	
+	@Override
+	public void exitFunctions(FunctionsContext ctx) {
+		if ( !canExecute() ) return;
+		
+		textLevel--;
+		if ( isTextMode() ) sendTextOut(calcFunction(ctx), ctx);
+	}
+
+	/*
 	 * Text section
 	 **************************************************************************/
+	private boolean isTextMode() {
+		return (textLevel == 1 );
+	}
 	private void sendTextOut(String text, ParserRuleContext ctx) {
-		if (isText && processBranch && !isBranchProcessed && text != null) {
-			Token token = ctx.getStart();
-			int   idx  = token.getTokenIndex();
-			List<Token> channel = tokens.getHiddenTokensToLeft(idx, 1);
-			String ws = "";
-			if (channel != null ) {
-				//ws += "|";
-				for(int i = 0; i < channel.size(); i++) {
-					//System.out.printf(">> i = %d\n",i);
-					token = channel.get(i);
-					if ( token == null ) break;
-					ws += token.getText();
-					i++;
-				};
-				//ws += "|";
+			if (isTextMode() && text != null) {
+				Token token = ctx.getStart();
+				int   idx  = token.getTokenIndex();
+				List<Token> channel = tokens.getHiddenTokensToLeft(idx, 1);
+				if (channel != null ) {
+					String ws = "";
+					for(int i = 0; i < channel.size(); i++) {
+						//System.out.printf(">> i = %d\n",i);
+						token = channel.get(i);
+						if ( token == null ) break;
+						ws += token.getText();
+						i++;
+					};
+					writeText(ws);
+				}
+				writeText(text);
 			}
-			os.print(ws+text);
-		}
 	}
 	
 	private void finishLine() {
-		if (isText && processBranch && !isBranchProcessed)
-			os.print("\n");
+		if (isTextMode())
+			writeText("\n");
 	}
 
+	private void writeText(String text) {
+		try {
+			writer.write(text);
+		} catch(IOException e) {
+			System.err.println("Cannot write to output stream!");
+			parser.removeParseListener(this);
+		}
+	}
+	
+	private void flashOutput() {
+		try {
+			writer.flush();
+		} catch(IOException e) {
+			
+		}
+	}
+	
 	@Override
 	public void enterText(TextContext ctx) {
-		isText = true;
+		if ( !canExecute() ) return;
+		textLevel++;
 	}
 
 	@Override
 	public void exitVariable(VariableContext ctx) {
+		if ( !canExecute() || !isTextMode() ) return;
 		sendTextOut(getVariableValue(ctx.VAR().getText()),ctx);
 	}
 
 	@Override
-	public void exitTag(TagContext ctx) {
-	}
-	
-	@Override
 	public void exitFreeText(FreeTextContext ctx) {
+		if ( !canExecute() || !isTextMode() ) return;
 		sendTextOut(ctx.FreeText().getText(),ctx);
 	}
 
 	@Override
 	public void exitStringLiteral(StringLiteralContext ctx) {
+		if ( !canExecute() || !isTextMode() ) return;
 		sendTextOut(ctx.StringLiteral().getText(),ctx);
 	}
 	
 	@Override
 	public void exitAttribute(AttributeContext ctx) {
-		if (isText) sendTextOut(getAttributeValue(ctx.getText()),ctx);
+		if ( !canExecute() || !isTextMode() ) return;
+		System.out.printf(">>Exit attribute (%d) [%s]\n",textLevel,ctx.getText());
+		if (isTextMode()) sendTextOut(getAttributeValue(ctx.getText()),ctx);
 	}
 
 	@Override
 	public void exitTextMacros(TextMacrosContext ctx) {
+		if ( !canExecute() || !isTextMode() ) return;
 		sendTextOut(TextMacros.getOrDefault(ctx.getText(),""),ctx);
 	}
 
 	@Override
 	public void exitTemplateSubstitution(TemplateSubstitutionContext ctx) {
+		if ( !canExecute() || !isTextMode() ) return;
+
 		String name = ctx.getText();
 		//Remove surrounding '%' characters
 		name = name.substring(1,name.length()-1);
@@ -509,7 +700,14 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	@Override
 	public void exitLine(LineContext ctx) {
 		finishLine();
-		isText = false;
+		textLevel = 0;
 	}
+	
+	@Override
+	public void exitFile(FileContext ctx) {
+		flashOutput();
+	}
+	
+	
 
 }

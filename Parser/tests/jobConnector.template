@@ -1,0 +1,6 @@
+%%=============================================================================
+%% JobConnector template
+%%=============================================================================
+%%
+%%
+Connector: [$.Type.$.Name] Source($.ClientID): [$source.Type.$source.Name] -> Target($.SupplierID): [$target.Type.$target.Name]
