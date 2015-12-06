@@ -5,8 +5,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +28,7 @@ import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateLexer;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.AssignmentContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.AttributeContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.CallMacroContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.Compare_exprContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.Else_stmtContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.Elseif_stmtContext;
@@ -36,12 +39,12 @@ import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.Fi
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.FreeTextContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.FunctionsContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.If_stmtContext;
-import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.LineContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.Line_textContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.ListMacroContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.ParameterContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.PredicateContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.StringLiteralContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.TagContext;
-import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.TemplateSubstitutionContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.TextContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.TextMacrosContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.VariableContext;
@@ -100,9 +103,11 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	private CommonTokenStream 		tokens;
 	private EACodeTemplateLexer 	lexer;
 	private Object 			 		element;
+	private String					lineSeparator = System.lineSeparator();
 	private int						textLevel 	= 0;
 	private Writer 					writer;
 
+	private List<String>	   parameters	  = new ArrayList<String>(9);
 	private Map<String,String> localVariables = new HashMap<String,String>();
 
 	public TemplateProcessor( String templateName ) {
@@ -110,12 +115,25 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		writer = new PrintWriter(System.out);
 	}
 	
-	/*
-	public TemplateProcessor(EACodeTemplateParser parser, Element element) {
-		this.parser  = parser;
-		this.element = element;
+
+	public void addParameter(String value) {
+		parameters.add(value);
 	}
-	*/
+	public String getParameter(String parameter ) {
+		//Parameter is $[0-9]. $0 contains number of parameters passed to template.
+		int index = Integer.valueOf(parameter.substring(1));
+		return getParameter(index);
+	}
+	public String getParameter(int index ) {
+		String value = "";
+		if (index == 0 ) {
+			value = String.valueOf(parameters.size());
+		} else if ( index >= 1 && index <= parameters.size() ) {
+			value = parameters.get(index-1);
+		}
+		
+		return value;
+	}
 	
 	public void setOutput(Writer writer) {
 		this.writer = writer;
@@ -124,6 +142,14 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	public Writer getOutput() {
 		return writer;
 	}
+
+	public String getLineSeparator() {
+		return lineSeparator;
+	}
+	public void setLineSeparator(String lineSeparator) {
+		this.lineSeparator = lineSeparator;
+	}
+
 	/*
 	 * 
 	 **************************************************************************/
@@ -302,6 +328,8 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 				v = getTagValue(c.getText());
 			} else if ( c instanceof FunctionsContext ) {
 				v = calcFunction((FunctionsContext)c);
+			} else if ( c instanceof ParameterContext ) {
+				v = getParameter(c.getText());
 			}
 			if ( v == null ) {
 				s = null;
@@ -315,14 +343,14 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	private String calcFunction(FunctionsContext ctx ) {
 		String value = "";
 		String function = ctx.getChild(0).getText();
-		int parmCount = ctx.expr().size();
+		int parmCount = ctx.parameters().expr().size();
 		
 		System.out.printf(">>Function call [%s] with [%d] parameter(s)\n",function,parmCount);
 		if ( parmCount < 1 ) {
 			System.err.println("Function call should have at lease one parameter");
 			return value;
 		}
-		String firstParameter = calcExpression(ctx.expr(0)); 
+		String firstParameter = calcExpression(ctx.parameters().expr(0)); 
 
 		if (function.equalsIgnoreCase("%LOWER") ) {
 			value = firstParameter.toLowerCase();
@@ -334,8 +362,8 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 				return value;
 			}
 			value = firstParameter.replaceAll(
-						calcExpression(ctx.expr(1))
-					   ,calcExpression(ctx.expr(2))
+						calcExpression(ctx.parameters().expr(1))
+					   ,calcExpression(ctx.parameters().expr(2))
 					);
 		} else {
 			System.err.printf("Unknown function %s\n", function);
@@ -543,7 +571,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		if ( !canExecute() ) return;
 		textLevel--;
 		String attr = ctx.attribute().getText();
-		String name = ctx.templateParameter().stringLiteral().getText();
+		String name = ctx.templateName().stringLiteral().getText();
 		//Remove surrounding double quotes
 		name = name.substring(1,name.length()-1);
 
@@ -562,18 +590,44 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		}
 		
 		TemplateProcessor tp 	= new TemplateProcessor(name);
-		tp.setOutput(this.writer);
 
-		Collection 		  ec 	= (Collection)attribute;
-		Object			  obj	= null;
-
+		Collection	ec 			= (Collection)attribute;
+		short		ecCount	 	= ec.GetCount();
+		Object		obj			= null;
 		System.out.printf(">>\tCount = [%d]\n"
-				,ec.GetCount()
+				,ecCount
 		);
-		for ( short i = 0; i < ec.GetCount(); i++ ) {
+
+		
+		if ( ctx.templateParameters(0) != null ) {
+			String value = "";
+			List<ExprContext> parms = ctx.templateParameters(0).parameters().expr();
+			for ( int i = 0; i < parms.size(); i++ ) {
+				value = calcExpression(parms.get(i));
+				System.out.printf(">>\t\tset parameter $%d = [%s]\n",i,value);
+				tp.addParameter(value);
+			}
+		}
+		String separator = getLineSeparator();
+		if (ctx.separator(0) != null ) {
+			separator = calcExpression(ctx.separator(0).expr());
+			//tp.setLineSeparator(separator);
+		}
+		
+		StringWriter sw;
+		StringBuffer sb;
+		for ( short i = 0; i < ecCount; i++ ) {
 			obj = ec.GetAt(i);
+			sw = new StringWriter();
+			tp.setOutput(sw);
 			tp.setElement(obj);
 			tp.execute();
+			sb = sw.getBuffer();
+			if ( sb.length() > 0 ) {
+				writeText(sb.toString());
+				if ( i < ecCount - 1 )
+					writeText(separator);
+			}
 			obj = null;
 		}
 		ec = null;
@@ -626,7 +680,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	
 	private void finishLine() {
 		if (isTextMode())
-			writeText("\n");
+			writeText(lineSeparator);
 	}
 
 	private void writeText(String text) {
@@ -677,18 +731,26 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		if (isTextMode()) sendTextOut(getAttributeValue(ctx.getText()),ctx);
 	}
 
+	
+	@Override
+	public void exitParameter(ParameterContext ctx) {
+		if ( !canExecute() || !isTextMode() ) return;
+		sendTextOut(getParameter(ctx.getText()),ctx);
+	}
+	
 	@Override
 	public void exitTextMacros(TextMacrosContext ctx) {
 		if ( !canExecute() || !isTextMode() ) return;
 		sendTextOut(TextMacros.getOrDefault(ctx.getText(),""),ctx);
 	}
 
+	
 	@Override
-	public void exitTemplateSubstitution(TemplateSubstitutionContext ctx) {
+	public void exitCallMacro(CallMacroContext ctx) {
 		if ( !canExecute() || !isTextMode() ) return;
 
-		String name = ctx.getText();
-		//Remove surrounding '%' characters
+		String name = ctx.stringLiteral().getText();
+		//Remove surrounding double quotes
 		name = name.substring(1,name.length()-1);
 		
 		System.out.printf(">>Opening template [%s]...\n", name);
@@ -698,8 +760,9 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	}
 	
 	@Override
-	public void exitLine(LineContext ctx) {
-		finishLine();
+	public void exitLine_text(Line_textContext ctx) {
+		if ( ctx.NL() != null )
+			finishLine();
 		textLevel = 0;
 	}
 	

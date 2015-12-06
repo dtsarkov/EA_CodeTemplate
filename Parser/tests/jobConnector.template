@@ -1,6 +1,21 @@
 %%=============================================================================
 %% JobConnector template
 %%=============================================================================
-%%
-%%
-Connector: [$.Type.$.Name] Source($.ClientID): [$source.Type.$source.Name] -> Target($.SupplierID): [$target.Type.$target.Name]
+
+$JobID=$1
+
+%%Exclecude non ControlFlow connectors and connectors coming out from the Activity
+%if $.Type != "ControlFlow"%
+	%exit%
+%endif%
+%if $source.ElementID == $JobID%
+	%exit%
+%endif%
+
+%if $source.Type == "Synchronization"%
+[%list=$source.Connectors @template="jobConnector" @parameters=$source.ElementID @separator=" and " %]
+%exit%
+%endif%
+%%=============================================================================
+%%Connector $1: [$.Type.$.Name] Source($.ClientID): [$source.Type.$source.Name] -> Target($.SupplierID): [$target.Type.$target.Name]
+s($source.Name)

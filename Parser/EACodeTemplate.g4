@@ -28,7 +28,8 @@ expr		: stringLiteral
 		| variable 
 		| attribute 
 		| tag
-		| functions 
+		| functions
+		| parameter 
 //TO-DO: macros has to be replaced
 ;
 
@@ -38,10 +39,12 @@ attribute	: ATTR
 ;
 tag		: TAG
 ;
-
+parameter	: PARM
+;
+PARM		: '$' DIGIT	;
 ATTR		: (THIS | PARN | PCKG | SRCE | TRGT ) ID;
 TAG		: (THIS | PARN | PCKG | SRCE | TRGT ) StringLiteral;
-VAR		: '$''$'?  	ID;
+VAR		: '$''$'?  ID	;
 
 THIS		: '$.' | '$this.';
 PARN		: '$parent.'	;
@@ -74,14 +77,13 @@ compare_expr	: predicate (pred_op predicate)*
 ;
 predicate	: expr test_op expr
 ;
-test_expr	: stringLiteral 
-		| variable 
-		| attribute
-		| tag
+//test_expr	: stringLiteral 
+//		| variable 
+//		| attribute
+//		| tag
+//		| parameter
 //		| templateName  //TO-DO: Parser could not recognize templateName
-;
-templateName	: ID
-;
+//;
 pred_op     	: 'and' | 'or'
 ;
 test_op		: '=='	| '!='
@@ -93,6 +95,7 @@ text		: (
 		  | variable 
 		  | attribute
 		  | tag
+		  | parameter
 		  | stringLiteral  
 		  | macros
 		)+
@@ -102,36 +105,43 @@ text		: (
 macros		: textMacros
 		| listMacro
 		| functions
-		| templateSubstitution
+		| callMacro
 ;
 textMacros 		: '%dl%' | '%pc%' | '%eq%' | '%qt%' | '%us%' //| '%sl%' 
 ;
-listMacro		: List '=' attribute 
-				templateParameter 
+listMacro		: List 	attribute templateName (
+					templateParameters
+				| 	separator
+				)* 
 			'%'
 ;
-List			: '%list'
+templateName 		: TemplateName stringLiteral
 ;
-templateParameter 	: TemplateParameter '=' stringLiteral
+templateParameters	: Parameters parameters
 ;
-TemplateParameter	: '@template'
+separator		: Separator expr
 ;
-templateSubstitution	: Template
+functions		: Function '(' parameters ')%'
 ;
-Template		: '%' ID '%'
+parameters		: expr (',' expr)*
 ;
-functions		: Function '(' expr (',' expr)* ')%'
+callMacro		: Call stringLiteral
+				templateParameters* 
+			'%'
 ;
-Function		: '%UPPER' | '%LOWER' | '%REPLACE'
-;
+List			: '%list=';
+Call			: '%call=';
+Function		: '%UPPER' | '%LOWER' | '%REPLACE';
 
-
+TemplateName		: '@template=';
+Parameters		: '@parameters=';
+Separator		: '@separator=';
 // ============================================================================
 // =
 // ============================================================================
 freeText	: FreeText
 ;
-FreeText	: [a-zA-Z0-9_(){}\.+\-\*\:\/\[\]<>\~!@#^&\|]+
+FreeText	: [a-zA-Z0-9_\(\){}\.+\-\*\:\/\[\]<>\~!@#^&\|]+
 ;
 
 //string 		: StringLiteral
@@ -168,7 +178,9 @@ PC	: '%';
 EQ	: '=';
 AEQ	: '+=';
 //ADD	: '+';
-NUMBER  : [0-9]+;
+
+fragment DIGIT : [0-9];
+NUMBER  : DIGIT+;
 
 ID 	: [a-zA-Z_] [a-zA-Z0-9_]*; 
 
