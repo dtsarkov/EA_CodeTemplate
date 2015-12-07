@@ -23,7 +23,7 @@ $JobName = $this.Name + $suffix
  * Description: $.Notes
  *****************************************************************************/ 
 insert_job: %REPLACE(%LOWER($JobName)%," ","_")% type:$type
-%list=$.Connectors @template="jobConnector" @parameters=$.ElementID @separator=" !and "%
+%list=$.Connectors @template="jobConnector" @parameters=$.ElementID @separator=" and "%
 /*****************************************************************************/ 
 
 %%=============================================================================

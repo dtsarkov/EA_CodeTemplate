@@ -12,6 +12,7 @@ $JobID=$1
 	%exit%
 %endif%
 
+%PI=""%
 %if $source.Type == "Synchronization"%
 [%list=$source.Connectors @template="jobConnector" @parameters=$source.ElementID @separator=" and " %]
 %exit%

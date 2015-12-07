@@ -51,7 +51,9 @@ public class Generator {
 		TemplateProcessor.setTemplateFolder(templateFile.getParent());
 		TemplateProcessor.setTemplateExtention(templateExt);
 		TemplateProcessor.setEAModel(model);
-		
+		if (args.length == 5 && args[4].equalsIgnoreCase("debug")) {
+			TemplateProcessor.setDebug(true);
+		}
 		
 		TemplateProcessor tp = new TemplateProcessor(templateName);
 		tp.setOutput(fw);

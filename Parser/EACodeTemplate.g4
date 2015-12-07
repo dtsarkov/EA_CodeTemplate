@@ -106,6 +106,7 @@ macros		: textMacros
 		| listMacro
 		| functions
 		| callMacro
+		| piMacro
 ;
 textMacros 		: '%dl%' | '%pc%' | '%eq%' | '%qt%' | '%us%' //| '%sl%' 
 ;
@@ -129,8 +130,12 @@ callMacro		: Call stringLiteral
 				templateParameters* 
 			'%'
 ;
+piMacro			:  PI stringLiteral '%'
+;
+
 List			: '%list=';
 Call			: '%call=';
+PI			: '%PI=';
 Function		: '%UPPER' | '%LOWER' | '%REPLACE';
 
 TemplateName		: '@template=';
