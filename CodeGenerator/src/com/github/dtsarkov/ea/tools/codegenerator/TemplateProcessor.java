@@ -324,7 +324,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		
 		String value = "";
 		if ( ctx.op.getType() == EACodeTemplateParser.AEQ ) {
-			value = scope.getOrDefault(variable, "");
+			value = scope.get(variable);
 		}
 		
 		ExprContext c;
@@ -783,7 +783,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	@Override
 	public void exitTextMacros(TextMacrosContext ctx) {
 		if ( !canExecute() || !isTextMode() ) return;
-		sendTextOut(TextMacros.getOrDefault(ctx.getText(),""),ctx);
+		sendTextOut(TextMacros.get(ctx.getText()),ctx);
 	}
 
 	
