@@ -202,7 +202,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			if ( !isOpen ) return;
 		}
 		message("Processing [%-30s] type [%-20s] using [%s]"
-				,this.getAttribute("$.Name").toString()
+				,this.getAttribute("$.Name")
 				,this.getAttribute("$.Type")
 				,this.templateName
 		);

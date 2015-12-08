@@ -1,0 +1,5 @@
+Activity: $.Name
+
+Embeded Elements
+------------------------------------
+%list=$.EmbeddedElements @template="activity-parameter"%
