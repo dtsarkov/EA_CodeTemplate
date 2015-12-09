@@ -152,7 +152,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		} else if ( index >= 1 && index <= parameters.size() ) {
 			value = parameters.get(index-1);
 		}
-		
+		debug(">> Get Template Parameter [%d] = [%s]", index, value);		
 		return value;
 	}
 	
@@ -344,7 +344,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		String 		s = "", v = null;
 		for ( int i = 0; i < ctx.getChildCount(); i++ ) {
 			c = ctx.getChild(i);
-			debug("Calc expression for class [%s]",getClass().toString());
+			debug("Calc expression for class [%s]",c.getClass().toString());
 			if ( c instanceof StringLiteralContext ) {
 				v = translateStringLiteral(c.getText());
 			} else if ( c instanceof VariableContext ) {
@@ -352,11 +352,14 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			} else if ( c instanceof AttributeContext ) {
 				v = getAttributeValue(c.getText());
 			} else if ( c instanceof TagContext ) {
+				debug(">> Processing Tag [%s]", c.getText());
 				v = getTagValue(c.getText());
 			} else if ( c instanceof FunctionsContext ) {
 				v = calcFunction((FunctionsContext)c);
 			} else if ( c instanceof ParameterContext ) {
 				v = getParameter(c.getText());
+			} else {
+				debug(">> Unknown Expression context [%]",c.getClass().toString()); 
 			}
 			if ( v == null ) {
 				s = null;
@@ -773,6 +776,11 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		if (isTextMode()) sendTextOut(getAttributeValue(ctx.getText()),ctx);
 	}
 
+	@Override
+	public void exitTag(TagContext ctx) {
+		if ( !canExecute() || !isTextMode() ) return;
+		if (isTextMode()) sendTextOut(getTagValue(ctx.getText()),ctx);
+	}
 	
 	@Override
 	public void exitParameter(ParameterContext ctx) {
@@ -799,14 +807,32 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	}
 	
 	@Override
+	public void enterCallMacro(CallMacroContext ctx) {
+		textLevel++;
+	}
+
+	@Override
 	public void exitCallMacro(CallMacroContext ctx) {
+		textLevel--;
 		if ( !canExecute() || !isTextMode() ) return;
 
 		String name = translateStringLiteral(ctx.stringLiteral().getText());
 		
-		debug("Opening template [%s]...", name);
+		debug(">> Opening template [%s]...", name);
 		TemplateProcessor tp = new TemplateProcessor(name);
+		tp.setOutput(writer);
 		tp.setElement(element);
+
+		if ( ctx.templateParameters(0) != null ) {
+			String value = "";
+			List<ExprContext> parms = ctx.templateParameters(0).parameters().expr();
+			for ( int i = 0; i < parms.size(); i++ ) {
+				value = calcExpression(parms.get(i));
+				debug("\t\tset parameter $%d = [%s]",i,value);
+				tp.addParameter(value);
+			}
+		}
+
 		tp.execute();
 	}
 	
