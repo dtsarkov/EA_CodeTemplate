@@ -1,0 +1,11 @@
+%%
+%% Description: Template to generate Autosys Job
+%% 
+%% History
+%%
+%% Version Date    Developer           Description
+%% ------- ------- ------------------- ----------------------------------------
+%% ============================================================================
+%if $.Stereotype != "EndStream"%
+	%exit%
+%endif%

@@ -1,0 +1,12 @@
+%%
+%% Description: Template to generate BTEQ Job Command
+%% 
+%% History
+%%
+%% Version Date    Developer           Description
+%% ------- ------- ------------------- ----------------------------------------
+%% ============================================================================
+%if $.Stereotype != "BTEQ Job"%
+	%exit%
+%endif%
+

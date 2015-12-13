@@ -29,8 +29,9 @@ expr		: stringLiteral
 		| attribute 
 		| tag
 		| functions
-		| parameter 
-//TO-DO: macros has to be replaced
+		| parameter
+		| callMacro
+		| listMacro 
 ;
 
 variable	: VAR
@@ -146,7 +147,7 @@ Separator		: '@separator=';
 // ============================================================================
 freeText	: FreeText
 ;
-FreeText	: [a-zA-Z0-9_\(\){}\.+\-\*\:\/\[\]<>\~!?@#^&\|'`]+
+FreeText	: [a-zA-Z0-9_(){}\.+\-\*\:\/\[\]<>\~!?@#^&\|'`,]+
 ;
 
 //string 		: StringLiteral

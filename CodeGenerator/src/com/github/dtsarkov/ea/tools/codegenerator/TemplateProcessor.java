@@ -201,7 +201,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			isOpen = openTemplateFile();
 			if ( !isOpen ) return;
 		}
-		message("Processing [%-30s] type [%-20s] using [%s]"
+		message("%-30s|%-20s|%-30s"
 				,this.getAttribute("$.Name")
 				,this.getAttribute("$.Type")
 				,this.templateName
@@ -352,12 +352,19 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			} else if ( c instanceof AttributeContext ) {
 				v = getAttributeValue(c.getText());
 			} else if ( c instanceof TagContext ) {
-				debug(">> Processing Tag [%s]", c.getText());
 				v = getTagValue(c.getText());
 			} else if ( c instanceof FunctionsContext ) {
 				v = calcFunction((FunctionsContext)c);
 			} else if ( c instanceof ParameterContext ) {
 				v = getParameter(c.getText());
+			} else if ( c instanceof CallMacroContext ) {
+				StringWriter sw = new StringWriter(255);
+				executeCallMacro((CallMacroContext)c, sw);
+				v = sw.toString();
+			} else if ( c instanceof ListMacroContext ) {
+				StringWriter sw = new StringWriter(255);
+				executeListMacro((ListMacroContext)c, sw);
+				v = sw.toString();
 			} else {
 				debug(">> Unknown Expression context [%]",c.getClass().toString()); 
 			}
@@ -429,34 +436,45 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		}
 		return value;
 	}
+
+	private Object[] getElementSet(String scope) {
+		Object[] elements = new Object[2];
+		if ( scope.equalsIgnoreCase("$") || scope.equalsIgnoreCase("$this") ) {
+			elements[0]	= this.element;
+			elements[1]	= this.packageElement;
+		} else if ( scope.equalsIgnoreCase("$parent") ) {
+			elements[0] = getParent();
+		} else if ( scope.equalsIgnoreCase("$package") ) {
+			elements[0] 	= getPackage();
+			elements[1] = ((org.sparx.Package)elements[0]).GetElement();
+		} else if ( scope.equalsIgnoreCase("$source") ) {
+			elements[0] = getSource();
+		} else if ( scope.equalsIgnoreCase("$target") ) {
+			elements[0] = getTarget();
+		}
+		
+		
+		return elements;
+	}
 	
 	private Object getAttribute(String attributeName) {
-		Object element	 = null; 
-		Object attribute = null;
 		
 		String name[] = attributeName.split("\\.");
 		debug("getAttribute([%s] [%s]",name[0],name[1]);
-		if ( name[0].equalsIgnoreCase("$") || name[0].equalsIgnoreCase("$this") ) {
-			element = getElement();
-		} else if ( name[0].equalsIgnoreCase("$parent") ) {
-			element = getParent();
-		} else if ( name[0].equalsIgnoreCase("$package") ) {
-			element = getPackage();
-		} else if ( name[0].equalsIgnoreCase("$source") ) {
-			element = getSource();
-		} else if ( name[0].equalsIgnoreCase("$target") ) {
-			element = getTarget();
-		}
 		
-		String methodName = "Get"+name[1];
-		if ( element != null ) try {
-			Method m = element.getClass().getMethod(methodName);
-			attribute = m.invoke(element, null);
+		Object[] elements	= getElementSet(name[0]);
+		String methodName 	= "Get"+name[1];
+
+		Object attribute 		= null;
+		
+		if ( elements[0] != null ) try {
+			Method m = elements[0].getClass().getMethod(methodName);
+			attribute = m.invoke(elements[0], null);
 		} catch (NoSuchMethodException e) {
-			if ( packageElement != null ) {
+			if ( elements[1] != null ) {
 				try {
-					Method pm = packageElement.getClass().getMethod(methodName);
-					attribute = pm.invoke(packageElement, null);
+					Method pm = elements[1].getClass().getMethod(methodName);
+					attribute = pm.invoke(elements[1], null);
 				} catch (NoSuchMethodException pe) {
 					error("Could not find \"%s\" attribute",attributeName);
 				} catch (Exception pe ) {
@@ -484,31 +502,35 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	
 	private String getTagValue( String tagName ) {
 		String value 	= null;
+		debug("Processing tag value experession [%s]", tagName);
 
-		tagName = tagName.substring(3,tagName.length()-1);
-		debug("Getting tag [%s] value", tagName);
+		String name[] = tagName.split("\\.");
+		tagName = name[1].substring(1, name[1].length()-1);
+		Object[] elements = getElementSet(name[0]);
 		
-		Object obj 		= element;
-		if ( element instanceof org.sparx.Package ) {
-			debug("\tSwitch to Package.Element");
-			obj = ((org.sparx.Package)element).GetElement();
-		}
-
-		try {
-			Method m = obj.getClass().getMethod("GetTaggedValues");
-			Object tags = m.invoke(obj, null);
-			debug(">>\t class name = %s", tags.getClass().getName());
-			TaggedValue tag = (TaggedValue)(((Collection)tags).GetByName(tagName));
-			if ( tag != null ) {
-				value = tag.GetValue();
-			} else {
-				error("Tag \"%s\" not found",tagName);
+		Method m	= null;
+		Object tags = null;
+		for ( int i = 0; i < elements.length; i++ ) {
+			debug(">>\t class name = %s", elements[i].getClass().getName());
+			try {
+				m 		= elements[i].getClass().getMethod("GetTaggedValues");
+				tags 	= m.invoke(elements[i], null);
+				TaggedValue tag = (TaggedValue)(((Collection)tags).GetByName(tagName));
+				if ( tag != null ) {
+					value = tag.GetValue();
+				} else {
+					error("Tag \"%s\" not found",tagName);
+				}
+				break;
+			} catch (NoSuchMethodException e) {
+				debug("\t\t No Such Method Exception");
+			} catch (Exception e ) {
+				e.printStackTrace(System.err);;
 			}
-		} catch (NoSuchMethodException e) {
-			error("Element does not support tags.");
-		} catch (Exception e ) {
-			e.printStackTrace(System.err);;
 		}
+		if ( m == null )
+			error("Element does not support tags.");
+		
 		return value;
 	}
 
@@ -618,15 +640,21 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	
 	@Override
 	public void exitListMacro(ListMacroContext ctx) {
-		if ( !canExecute() ) return;
 		textLevel--;
+		if ( canExecute() && isTextMode() ) 
+			executeListMacro(ctx,writer);
+	}
+
+	private void executeListMacro(ListMacroContext ctx, Writer writer ) {
 		String attr = ctx.attribute().getText();
 		String name = translateStringLiteral(ctx.templateName().stringLiteral().getText());
 
 		debug("List macro: attribute=[%s] template=[%s]",attr,name);
 
 		Object attribute = getAttribute(attr);
-		if (attribute == null)  return;
+		if (attribute == null)  { 
+			return;
+		}
 
 		debug("\tattribute.Class = [%s]"
 				,attribute.getClass().getName()
@@ -644,7 +672,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		Object		obj			= null;
 		debug("\tCount = [%d]",ecCount);
 
-		
+		//Set parameters
 		if ( ctx.templateParameters(0) != null ) {
 			String value = "";
 			List<ExprContext> parms = ctx.templateParameters(0).parameters().expr();
@@ -659,6 +687,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			separator = calcExpression(ctx.separator(0).expr());
 		}
 		
+		//Execute template for each element
 		StringWriter sw;
 		StringBuffer sb;
 		for ( short i = 0; i < ecCount; i++ ) {
@@ -668,17 +697,22 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			tp.setElement(obj);
 			tp.execute();
 			sb = sw.getBuffer();
-			if ( sb.length() > 0 ) {
-				writeText(sb.toString());
-				if ( i < ecCount - 1 )
-					writeText(separator);
+			try {
+				if ( sb.length() > 0 ) {
+					writer.write(sb.toString());
+					if ( i < ecCount - 1 )
+						writer.write(separator);
+				}
+			} catch (IOException e ) {
+				error("Cannot write to output stream");
+				break;
 			}
 			obj = null;
 		}
-		ec = null;
-		System.gc();
+		obj = null;
+		ec 	= null;
+		System.gc();		
 	}
-	
 	/*
 	 * Functions section
 	 **************************************************************************/
@@ -724,7 +758,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	
 	private void finishLine() {
 		if (isTextMode()) {
-			debug("Finish line with [%s]", lineSeparator);
+			//debug("Finish line with [%s]", lineSeparator);
 			writeText(lineSeparator);
 		}
 	}
@@ -805,7 +839,10 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		setLineSeparator(translateStringLiteral(ctx.stringLiteral().getText()));
 		textLevel--;
 	}
-	
+
+	/*
+	 * Call Macro Section 
+	 **************************************************************************/
 	@Override
 	public void enterCallMacro(CallMacroContext ctx) {
 		textLevel++;
@@ -814,7 +851,11 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	@Override
 	public void exitCallMacro(CallMacroContext ctx) {
 		textLevel--;
-		if ( !canExecute() || !isTextMode() ) return;
+		if ( canExecute() && isTextMode() ) 		
+			executeCallMacro(ctx,writer);
+	}
+	
+	private void executeCallMacro( CallMacroContext ctx, Writer writer ) {
 
 		String name = translateStringLiteral(ctx.stringLiteral().getText());
 		

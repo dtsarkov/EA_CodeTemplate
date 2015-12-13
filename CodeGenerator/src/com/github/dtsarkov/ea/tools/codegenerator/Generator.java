@@ -54,7 +54,14 @@ public class Generator {
 		if (args.length == 5 && args[4].equalsIgnoreCase("debug")) {
 			TemplateProcessor.setDebug(true);
 		}
-		
+
+		TemplateProcessor.message("Processing Elements...");
+		TemplateProcessor.message("%-30s|%-20s|%-30s","Name","Type","Template");
+		TemplateProcessor.message("%-30s %-20s %-30s"
+				,"------------------------------"
+				,"--------------------"
+				,"------------------------------"
+		);
 		TemplateProcessor tp = new TemplateProcessor(templateName);
 		tp.setOutput(fw);
 		tp.setElement(element);

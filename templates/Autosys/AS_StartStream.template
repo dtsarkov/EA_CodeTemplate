@@ -1,0 +1,96 @@
+%%
+%% Description: Template to generate Autosys Job
+%% 
+%% History
+%%
+%% Version Date    Developer           Description
+%% ------- ------- ------------------- ----------------------------------------
+%% ============================================================================
+%if $.Stereotype != "StartStream"%
+	%exit%
+%endif%
+
+$StreamID  = $package."TCF::Stream ID"
+$Profile   = $package."AS::profile"
+$JobPrefix = $package."AS::Prefix"
+$SQLScript = %list=$.Connectors @template="getConnectorTarget" @parameters=$.ElementID, "call"%
+
+%% ============================================================================
+/* 
+ * Start: $.Stereotype - $.Name 
+ *****************************************************************************/
+
+/* ---------- $JobPrefix%us%00_mst_schd_cmd -------------------------- */
+insert_job:$JobPrefix%us%00_mst_schd_cmd job_type:CMD 
+command: %dl%{scriptdir}/TCF_Master_Schedule.sh -m RUN -s $StreamID -f 0 -j $JobPrefix%us%05_prev_run_fin_cmd -v $SQLScript
+machine: au_cba_bidseng_91_buh
+owner: rbsbusprod@au_cba_bidseng_91_buh
+permission: gx,ge,wx
+date_conditions: 1
+days_of_week: %qt%$package."AS::days_of_week"%qt%
+start_times: %qt%$package."AS::start_times"%qt%
+description: %qt%Executes TCF_Master_Schedule.sh shell scripts for $StreamID%qt%
+std_out_file: %dl%{log}/%dl%AUTO_JOB_NAME.log
+std_err_file: %dl%{log}/%dl%AUTO_JOB_NAME.err
+alarm_if_fail: 1
+profile: $profile
+
+/* ---------- $JobPrefix%us%05_prev_run_fin_cmd -------------------------- */
+insert_job:$JobPrefix%us%05_prev_run_fin_cmd job_type:CMD 
+command: %dl%{scriptdir}/Check_Prev_Run.sh $StremaID
+machine: au_cba_bidseng_91_buh
+owner: rbsbusprod@au_cba_bidseng_91_buh
+permission: gx,ge,wx
+description: %qt%Command job to check $StreamID stream's previous run completion.%qt%
+std_out_file: %dl%{log}/%dl%AUTO_JOB_NAME.log
+std_err_file: %dl%{log}/%dl%AUTO_JOB_NAME.err
+alarm_if_fail: 1
+profile: $profile
+
+$InitiateSeq = "BD_"+ $StreamID + "_10"
+/* ---------- $JobPrefix%us%10_get_business_start_cmd -------------------------- */
+insert_job:$JobPrefix%us%10_get_business_start_cmd job_type:CMD 
+command: %dl%{scriptdir}/initiate_job $InitiateSeq CTLFW_Stream_BusDate_Start_Seq.$InitiateSeq %dl%{ds_common_project}
+machine: au_cba_bidseng_91_buh
+owner: rbsbusprod@au_cba_bidseng_91_buh
+permission: gx,ge,wx
+condition: s($JobPrefix%us%05_prev_run_fin_cmd)
+description: %qt%Job to initiate Business date for TCF Stream $StreamID%qt%
+std_out_file: %dl%{log}/%dl%AUTO_JOB_NAME.log
+std_err_file: %dl%{log}/%dl%AUTO_JOB_NAME.err
+alarm_if_fail: 1
+profile: $profile
+
+
+$StreamStartSeq = "SS_"+ $StreamID + "_20"
+/* ---------- $JobPrefix%us%20_stream_start_cmd -------------------------- */
+insert_job:$JobPrefix%us%20_stream_start_cmd job_type:CMD 
+command: %dl%{scriptdir}/initiate_job $StreamStartSeq CTLFW_Stream_Start_Seq.$StreamStartSeq %dl%{ds_common_project}
+machine: au_cba_bidseng_91_buh
+owner: rbsbusprod@au_cba_bidseng_91_buh
+permission: gx,ge,wx
+condition: s($JobPrefix%us%10_get_business_start_cmd)
+description: %qt%Job to initiate TCF stream 415%qt%
+std_out_file: %dl%{log}/%dl%AUTO_JOB_NAME.log
+std_err_file: %dl%{log}/%dl%AUTO_JOB_NAME.err
+alarm_if_fail: 1
+profile: $profile 
+
+/* ---------- $JobPrefix%us%check_busn_week_days_cmd -------------------------- */
+insert_job:$JobPrefix%us%check_busn_week_days_cmd job_type:CMD 
+#box_name: N/A
+command: %dl%{scriptdir}/gdw2_bteq_common.sh -k $StreamID -p CHECK_BUSN_WEEK_DAYS  %dl%{scriptdir}/check_busn_week_day.sql
+machine: au_cba_bidseng_91_buh
+owner: rbsbusprod@au_cba_bidseng_91_buh
+permission: gx,ge,wx
+condition: s($JobPrefix%us%20_stream_start_cmd)
+success_codes: 0,11,12,13,14,15,16,17
+description: %qt%Job to determine day of week%qt%
+std_out_file: %dl%{log}/%dl%AUTO_JOB_NAME.log
+std_err_file: %dl%{log}/%dl%AUTO_JOB_NAME.err
+alarm_if_fail: 1
+profile: $profile 
+
+/******************************************************************************/
+ * End: $.Stereotype - $.Name 
+ */

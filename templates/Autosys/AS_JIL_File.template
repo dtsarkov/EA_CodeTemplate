@@ -1,0 +1,22 @@
+%%
+%% Description: Template to generate Autosys JIL file
+%% 
+%% History
+%%
+%% Version Date    Developer           Description
+%% ------- ------- ------------------- ----------------------------------------
+%% ============================================================================
+%if $.Stereotype != "AutoSys Schedule"%
+	%exit%
+%endif%
+
+/* ----------------------------------------------------------------------------
+ * TCF Stream   : $.Stereotype
+ * Name		: $.Name
+ * Stream ID	: $."TCF::Stream ID"
+ * Executes	: $."AS::days_of_week" @ $."AS::start_times"
+ * Description	: $.Notes
+ * ----------------------------------------------------------------------------
+ */
+%list=$.Elements @template="AS_Job"%
+

@@ -1,0 +1,38 @@
+%%
+%% Description: Template to generate Autosys Job
+%% Parameters:
+	$JobID		= $1
+%% 
+%% History:
+%%
+%% Version Date    Developer           Description
+%% ------- ------- ------------------- ----------------------------------------
+%% ============================================================================
+
+%% Exclecude non ControlFlow connectors and connectors coming out from the job
+%% ----------------------------------------------------------------------------
+%if $.Type != "ControlFlow"%
+	%exit%
+%endif%
+%if $source.ElementID == $JobID%
+	%exit%
+%endif%
+%% ----------------------------------------------------------------------------
+
+
+%PI=""%
+%% ----------------------------------------------------------------------------
+%if $source.Type == "Synchronization"%
+	$Operator = " and "
+	%if $source.Stereotype != ""%
+		$Operator = %LOWER($source.Stereotype)%
+	%endif%
+[%list=$source.Connectors @template="AS_Job_Conditions" @parameters=$source.ElementID @separator=$Operator%]
+	%exit%
+%endif%
+%% ----------------------------------------------------------------------------
+%if $.Stereotype == "exitcode"%
+e[$source.Name]$.Name
+%else%
+s[$source.Name]
+%endif%

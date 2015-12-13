@@ -1,0 +1,17 @@
+%%
+%% Description: Template to get connector target
+%% Parameters:
+	$SourceElementID	= $1
+	$ConnectorStereotype	= $2
+%% 
+%% History
+%%
+%% Version Date    Developer           Description
+%% ------- ------- ------------------- ----------------------------------------
+%% ============================================================================
+
+%if $source.ElementID != $SourceElementID or $.Stereotype != $ConnectorStereotype%
+	%exit%
+%endif%
+%% ============================================================================
+$target.Name
