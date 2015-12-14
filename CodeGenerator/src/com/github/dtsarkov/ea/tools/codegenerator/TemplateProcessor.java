@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -220,7 +221,6 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 				this.element = EA_Model.GetPackageByGuid(((Element)element).GetElementGUID());
 			}
 		}
-		resetBranchFlags();
 		Parent 		= null;
 		hasParent 	= true;
 		Package 	= null;
@@ -304,14 +304,13 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	 **************************************************************************/
 	@Override
 	public void enterAssignment(AssignmentContext ctx) {
-		if ( !canExecute() ) return;
-		
-		textLevel = -1000;
+		if ( executionState.canProcessBranch() ) 
+			textLevel = -1000;
 	}
 	
 	@Override
 	public void exitAssignment(AssignmentContext ctx) {
-		if ( !canExecute() ) return;
+		if ( !executionState.canProcessBranch()) return;
 		
 		String variable = ctx.variable().getText();
 		Map<String,String> scope;
@@ -535,67 +534,39 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		return value;
 	}
 
+	private ExecutionState executionState = new ExecutionState();
+	private Stack<ExecutionState> executionStates = new Stack<ExecutionState>(); 
 	/*
 	 * IF section
 	 **************************************************************************/
-	private int 	branchLevel		  = 0;
-
-	private boolean processBranch 	  = true;
-	private boolean isBranchProcessed  = false;
-	//TODO: Replace by stack to implement nested ifs
 	@Override
 	public void exitIf_stmt(If_stmtContext ctx) {
-		branchLevel++;
-		isBranchProcessed  = false;
-		processBranch = evalCompareExpr(ctx.compare_expr());
-		debug("IF > branchLevel = %d, isBranchProcessed = %s, processBranch = %s"
-			,branchLevel
-			,isBranchProcessed
-			,processBranch
-		);
+		executionStates.push(executionState);
+		executionState = new ExecutionState();
+		
+		executionState.setProcessBranch(evalCompareExpr(ctx.compare_expr()));
+		debug("IF > %s", executionState.toString());
 	}
 
 	@Override
 	public void exitElseif_stmt(Elseif_stmtContext ctx) {
-		isBranchProcessed = processBranch;
-		if ( !processBranch ) {
-			processBranch = evalCompareExpr(ctx.compare_expr());
+		executionState.setBranchProcessed(executionState.canProcessBranch());
+		if ( executionState.canProcessBranch() ) {
+			executionState.setProcessBranch(evalCompareExpr(ctx.compare_expr()));
 		}
-		debug("ELSEIF > branchLevel = %d, isBranchProcessed = %s, processBranch = %s"
-				,branchLevel
-				,isBranchProcessed
-				,processBranch
-			);
+		debug("ELSEIF > %s", executionState.toString());
 	}
 
 	@Override
 	public void exitElse_stmt(Else_stmtContext ctx) {
-		isBranchProcessed = processBranch;
-		processBranch = !isBranchProcessed;
-		debug("ELSE > branchLevel = %d, isBranchProcessed = %s, processBranch = %s"
-				,branchLevel
-				,isBranchProcessed
-				,processBranch
-			);
+		executionState.setBranchProcessed(executionState.canProcessBranch());
+		debug("ELSE > %s", executionState.toString());
 	}
 
-	private void resetBranchFlags() {
-		processBranch 	  	= true;
-		isBranchProcessed 	= false;
-		branchLevel 		= 0;
-	}
 	@Override
 	public void exitEndif_stmt(Endif_stmtContext ctx) {
-		resetBranchFlags();
-		debug("ENDIF > branchLevel = %d, isBranchProcessed = %s, processBranch = %s"
-				,branchLevel
-				,isBranchProcessed
-				,processBranch
-			);
-	}
-	
-	private boolean canExecute() {
-		return (processBranch && !isBranchProcessed );
+		executionState = executionStates.pop();
+		debug("ELSE > %s", executionState.toString());
 	}
 	
 	private boolean evalCompareExpr( Compare_exprContext ctx ) {
@@ -625,7 +596,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	
 	@Override
 	public void exitEndtempalte_stmt(Endtempalte_stmtContext ctx) {
-		if (processBranch) {
+		if (executionState.canProcessBranch()) {
 			debug(">>Removing listener...");
 			flashOutput();
 			parser.removeParseListener(this);
@@ -653,14 +624,14 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	 **************************************************************************/
 	@Override
 	public void enterListMacro(ListMacroContext ctx) {
-		if ( !canExecute() ) return;
-		textLevel++;
+		if ( executionState.canProcessBranch() ) 
+			textLevel++;
 	}
 	
 	@Override
 	public void exitListMacro(ListMacroContext ctx) {
 		textLevel--;
-		if ( canExecute() && isTextMode() ) 
+		if ( executionState.canProcessBranch() && isTextMode() ) 
 			executeListMacro(ctx,writer);
 	}
 
@@ -737,17 +708,16 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	 **************************************************************************/
 	@Override
 	public void enterFunctions(FunctionsContext ctx) {
-		if ( !canExecute() ) return;
-		
-		textLevel++;
+		if ( executionState.canProcessBranch() ) 
+			textLevel++;
 	}
 	
 	@Override
 	public void exitFunctions(FunctionsContext ctx) {
-		if ( !canExecute() ) return;
-		
-		textLevel--;
-		if ( isTextMode() ) sendTextOut(calcFunction(ctx), ctx);
+		if ( executionState.canProcessBranch() ) {
+			textLevel--;
+			if ( isTextMode() ) sendTextOut(calcFunction(ctx), ctx);
+		}
 	}
 
 	/*
@@ -801,50 +771,50 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	
 	@Override
 	public void enterText(TextContext ctx) {
-		if ( !canExecute() ) return;
-		textLevel++;
+		if ( executionState.canProcessBranch() ) 
+			textLevel++;
 	}
 
 	@Override
 	public void exitVariable(VariableContext ctx) {
-		if ( !canExecute() || !isTextMode() ) return;
-		sendTextOut(getVariableValue(ctx.VAR().getText()),ctx);
+		if ( executionState.canProcessBranch() && isTextMode() ) 
+			sendTextOut(getVariableValue(ctx.VAR().getText()),ctx);
 	}
 
 	@Override
 	public void exitFreeText(FreeTextContext ctx) {
-		if ( !canExecute() || !isTextMode() ) return;
-		sendTextOut(ctx.FreeText().getText(),ctx);
+		if ( executionState.canProcessBranch() && isTextMode() ) 
+			sendTextOut(ctx.FreeText().getText(),ctx);
 	}
 
 	@Override
 	public void exitStringLiteral(StringLiteralContext ctx) {
-		if ( !canExecute() || !isTextMode() ) return;
-		sendTextOut(ctx.StringLiteral().getText(),ctx);
+		if ( executionState.canProcessBranch() && isTextMode() ) 
+			sendTextOut(ctx.StringLiteral().getText(),ctx);
 	}
 	
 	@Override
 	public void exitAttribute(AttributeContext ctx) {
-		if ( !canExecute() || !isTextMode() ) return;
-		if (isTextMode()) sendTextOut(getAttributeValue(ctx.getText()),ctx);
+		if ( executionState.canProcessBranch() && isTextMode() ) 
+			sendTextOut(getAttributeValue(ctx.getText()),ctx);
 	}
 
 	@Override
 	public void exitTag(TagContext ctx) {
-		if ( !canExecute() || !isTextMode() ) return;
-		if (isTextMode()) sendTextOut(getTagValue(ctx.getText()),ctx);
+		if ( executionState.canProcessBranch() && isTextMode() ) 
+			sendTextOut(getTagValue(ctx.getText()),ctx);
 	}
 	
 	@Override
 	public void exitParameter(ParameterContext ctx) {
-		if ( !canExecute() || !isTextMode() ) return;
-		sendTextOut(getParameter(ctx.getText()),ctx);
+		if ( executionState.canProcessBranch() && isTextMode() ) 
+			sendTextOut(getParameter(ctx.getText()),ctx);
 	}
 	
 	@Override
 	public void exitTextMacros(TextMacrosContext ctx) {
-		if ( !canExecute() || !isTextMode() ) return;
-		sendTextOut(TextMacros.get(ctx.getText()),ctx);
+		if ( executionState.canProcessBranch() && isTextMode() ) 
+			sendTextOut(TextMacros.get(ctx.getText()),ctx);
 	}
 
 	
@@ -870,7 +840,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	@Override
 	public void exitCallMacro(CallMacroContext ctx) {
 		textLevel--;
-		if ( canExecute() && isTextMode() ) 		
+		if ( executionState.canProcessBranch() && isTextMode() ) 
 			executeCallMacro(ctx,writer);
 	}
 	

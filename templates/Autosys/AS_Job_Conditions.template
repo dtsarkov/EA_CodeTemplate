@@ -18,22 +18,17 @@
 	%exit%
 %endif%
 
-$Operator = " and "
-%if $source.Stereotype != ""%
-	$Operator = " "+%LOWER($source.Stereotype)%+" "
-%endif%
-%% ----------------------------------------------------------------------------
-
-
-
 %PI=""%
 %% ----------------------------------------------------------------------------
 %if $source.Type == "Synchronization"%
+	$Operator = " and "
+	%if $source.Stereotype != ""%
+		$Operator = " "+%LOWER($source.Stereotype)%+" "
+	%endif%
 (%list=$source.Connectors @template="AS_Job_Conditions" @parameters=$source.ElementID @separator=$Operator%)
 	%exit%
 %endif%
 %% ----------------------------------------------------------------------------
-%%# $target.Type . $target.Name . $target.Stereotype ($target.ElementID) <- $source.Type . $source.Name . $source.Stereotype ($source.ElementID)
 %if $.Stereotype == "exitcode"%
 e($source.Name)$.Name
 %else%
