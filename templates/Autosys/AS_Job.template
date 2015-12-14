@@ -22,6 +22,7 @@ $JobType = "CMD"
 %endif%
 $JobName = $.Name + "_" + $JobType
 $Conditions = %list=$.Connectors @template="AS_Job_Conditions" @separator=" and " @parameters=$.ElementID%
+
 %% ============================================================================
 
 /* 
@@ -35,7 +36,7 @@ machine: au_cba_bidseng_91_buh
 permission: gx,ge,wx
 %if $Conditions != ""%
 condition: $Conditions
-%endif
+%endif%
 %%date_conditions: 1
 %%days_of_week: sa
 %%start_times: "20:00"

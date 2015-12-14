@@ -219,7 +219,8 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 				this.packageElement = this.element;
 				this.element = EA_Model.GetPackageByGuid(((Element)element).GetElementGUID());
 			}
-		} 
+		}
+		resetBranchFlags();
 		Parent 		= null;
 		hasParent 	= true;
 		Package 	= null;
@@ -389,11 +390,11 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		}
 		String firstParameter = calcExpression(ctx.parameters().expr(0)); 
 
-		if (function.equalsIgnoreCase("%LOWER") ) {
+		if (function.equalsIgnoreCase("%LOWER(") ) {
 			value = firstParameter.toLowerCase();
-		} else if (function.equalsIgnoreCase("%UPPER") ) {
+		} else if (function.equalsIgnoreCase("%UPPER(") ) {
 			value = firstParameter.toUpperCase();
-		} else if (function.equalsIgnoreCase("%REPLACE") ) {
+		} else if (function.equalsIgnoreCase("%REPLACE(") ) {
 			if (parmCount < 3 ) {
 				error("Incorrect function call %REPLACE( string, regexp, replacement )%\n");
 				return value;
@@ -547,6 +548,11 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		branchLevel++;
 		isBranchProcessed  = false;
 		processBranch = evalCompareExpr(ctx.compare_expr());
+		debug("IF > branchLevel = %d, isBranchProcessed = %s, processBranch = %s"
+			,branchLevel
+			,isBranchProcessed
+			,processBranch
+		);
 	}
 
 	@Override
@@ -555,19 +561,37 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		if ( !processBranch ) {
 			processBranch = evalCompareExpr(ctx.compare_expr());
 		}
+		debug("ELSEIF > branchLevel = %d, isBranchProcessed = %s, processBranch = %s"
+				,branchLevel
+				,isBranchProcessed
+				,processBranch
+			);
 	}
 
 	@Override
 	public void exitElse_stmt(Else_stmtContext ctx) {
 		isBranchProcessed = processBranch;
 		processBranch = !isBranchProcessed;
+		debug("ELSE > branchLevel = %d, isBranchProcessed = %s, processBranch = %s"
+				,branchLevel
+				,isBranchProcessed
+				,processBranch
+			);
 	}
 
+	private void resetBranchFlags() {
+		processBranch 	  	= true;
+		isBranchProcessed 	= false;
+		branchLevel 		= 0;
+	}
 	@Override
 	public void exitEndif_stmt(Endif_stmtContext ctx) {
-		processBranch 	  = true;
-		isBranchProcessed = false;
-		branchLevel--;
+		resetBranchFlags();
+		debug("ENDIF > branchLevel = %d, isBranchProcessed = %s, processBranch = %s"
+				,branchLevel
+				,isBranchProcessed
+				,processBranch
+			);
 	}
 	
 	private boolean canExecute() {
@@ -613,20 +637,15 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		String exp2 = calcExpression(ctx.expr(1));
 		String op   = ctx.test_op().getText();
 		
-		debug("Eval([%s] %s [%s]) is ",exp1,op,exp2);
-		
-		if ( exp1 == null || exp2 == null ) {
-			debug("\t\tfalse");
-			return false;
+		boolean equal = false;
+		if ( exp1 != null && exp2 != null ) {
+			equal = (exp1.compareTo(exp2) == 0);
+			
+			if ( op.compareTo("!=") == 0 ) {
+				equal = !equal;
+			}
 		}
-		
-		boolean equal = (exp1.compareTo(exp2) == 0);
-		
-		if ( op.compareTo("!=") == 0 ) {
-			equal = !equal;
-		}
-
-		debug("\t\t%s",equal);
+		debug("Eval([%s] %s [%s]) is %s",exp1,op,exp2,equal);
 		return equal;
 	}
 	/*
@@ -678,7 +697,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			List<ExprContext> parms = ctx.templateParameters(0).parameters().expr();
 			for ( int i = 0; i < parms.size(); i++ ) {
 				value = calcExpression(parms.get(i));
-				debug("\t\tset parameter $%d = [%s]",i,value);
+				debug("\t\tset parameter $%d = [%s]",i+1,value);
 				tp.addParameter(value);
 			}
 		}
@@ -690,7 +709,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		//Execute template for each element
 		StringWriter sw;
 		StringBuffer sb;
-		for ( short i = 0; i < ecCount; i++ ) {
+		for ( short i = 0, w = 0; i < ecCount; i++ ) {
 			obj = ec.GetAt(i);
 			sw = new StringWriter();
 			tp.setOutput(sw);
@@ -698,10 +717,10 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			tp.execute();
 			sb = sw.getBuffer();
 			try {
-				if ( sb.length() > 0 ) {
+				if ( sb.toString().trim().length() > 0 ) {
+					if ( w != 0 )	writer.write(separator);
 					writer.write(sb.toString());
-					if ( i < ecCount - 1 )
-						writer.write(separator);
+					w++;
 				}
 			} catch (IOException e ) {
 				error("Cannot write to output stream");

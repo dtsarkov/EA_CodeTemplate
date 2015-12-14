@@ -123,7 +123,7 @@ templateParameters	: Parameters parameters
 ;
 separator		: Separator expr
 ;
-functions		: Function '(' parameters ')%'
+functions		: Function parameters ')%'
 ;
 parameters		: expr (',' expr)*
 ;
@@ -137,7 +137,7 @@ piMacro			:  PI stringLiteral '%'
 List			: '%list=';
 Call			: '%call=';
 PI			: '%PI=';
-Function		: '%UPPER' | '%LOWER' | '%REPLACE';
+Function		: '%UPPER(' | '%LOWER(' | '%REPLACE(';
 
 TemplateName		: '@template=';
 Parameters		: '@parameters=';
@@ -147,7 +147,7 @@ Separator		: '@separator=';
 // ============================================================================
 freeText	: FreeText
 ;
-FreeText	: [a-zA-Z0-9_(){}\.+\-\*\:\/\[\]<>\~!?@#^&\|'`,]+
+FreeText	: [a-zA-Z0-9_(){}\.+\-\*\:\/\[\]<>\~!?@#^&\|'`,;]+
 ;
 
 //string 		: StringLiteral
