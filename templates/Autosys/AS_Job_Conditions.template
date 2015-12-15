@@ -32,7 +32,7 @@
 	%exit%
 %endif% 
 %% ----------------------------------------------------------------------------
-%call="test" @element=$source.%
+%call="test" @element=$target.%
 %if $.Stereotype == "exitcode"%
 e($source.Name)$.Name 
 %else%

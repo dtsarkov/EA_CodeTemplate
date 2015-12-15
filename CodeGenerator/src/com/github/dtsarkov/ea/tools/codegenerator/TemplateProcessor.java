@@ -31,6 +31,7 @@ import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.As
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.AttributeContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.CallMacroContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.Compare_exprContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.ElementInScopeContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.Else_stmtContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.Elseif_stmtContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.Endif_stmtContext;
@@ -866,8 +867,28 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		String name = translateStringLiteral(ctx.stringLiteral().getText());
 		
 		debug(">> Opening template [%s]...", name);
+		
 		TemplateProcessor tp = new TemplateProcessor(name);
 		tp.setOutput(writer);
+
+		Object element = this.element;
+		ElementInScopeContext ectx = ctx.elementInScope(0);
+		if ( ectx != null ) {
+			Object eo = null;
+			String en = "UNKNOWN";
+			if ( ectx.SRCE() != null ) {
+				eo = this.getSource();
+				en = "source";
+			} else if ( ectx.TRGT() != null ) {
+				eo = this.getTarget();
+				en = "target";
+			}
+			if ( eo != null ) {
+				element = eo;
+			} else {
+				error("Element has not got \"%s\" property!", en);
+			}
+		}
 		tp.setElement(element);
 
 		if ( ctx.templateParameters(0) != null ) {

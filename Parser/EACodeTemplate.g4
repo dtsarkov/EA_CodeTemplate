@@ -125,7 +125,7 @@ templateParameters	: Parameters parameters
 ;
 separator		: Separator expr
 ;
-elementInScope  : ElementInScope (SRCE | TRGT)
+elementInScope		: ElementInScope (SRCE | TRGT)
 ;
 functions		: Function parameters ')%'
 ;
