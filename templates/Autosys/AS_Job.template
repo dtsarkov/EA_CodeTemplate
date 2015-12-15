@@ -16,23 +16,36 @@
 %endif%
 
 $JobType = "CMD"
-
 %if $.Stereotype == "Box Job"%
 	$JobType = "BOX"
 %endif%
-$JobName = $.Name + "_" + $JobType
-$Conditions = %list=$.Connectors @template="AS_Job_Conditions" @separator=" and " @parameters=$.ElementID%
 
+$prefix = $package."AS::Prefix"
+%if $prefix != ""%
+	$prefix = $prefix+"_"
+%endif%
+
+$JobName = $prefix + $.Name + "_" + $JobType
+
+
+%if $parent.Stereotype == "Box Job"%
+	$BoxName = $prefix + %LOWER($parent.Name)% + "_box"
+%endif%
+
+$Conditions 	= %list=$.Connectors @template="AS_Job_Conditions" @separator=" and " @parameters=$.ElementID%
+$Description    = %REPLACE($.Notes,"","")%
 %% ============================================================================
 
 /* 
  * $.Stereotype - $.Name
  *****************************************************************************/
 insert_job:%LOWER($JobName)% job_type:%UPPER($JobType)%
-%%#box_name: N/A
+%if $BoxName != ""%
+box_name: $BoxName
+%endif%
 %%command: ${scriptdir}/TCF_Master_Schedule.sh -m RUN -s 406 -f 0 -j au_cba_rbsbus_p01_pssr_we1_406_05_prev_run_fin_cmd -v TCF_MSCHD_WKLY.sql
 machine: au_cba_bidseng_91_buh
-%%owner: rbsbusprod@au_cba_bidseng_91_buh
+owner: rbsbusprod@au_cba_bidseng_91_buh
 permission: gx,ge,wx
 %if $Conditions != ""%
 condition: $Conditions
@@ -40,11 +53,19 @@ condition: $Conditions
 %%date_conditions: 1
 %%days_of_week: sa
 %%start_times: "20:00"
-%%#success_codes: N/A
-%%#max_exit_success: N/A
-description: %qt%$.Notes%qt%
+%if $."AS::success_codes" != ""%
+success_codes:$."AS::success_codes"
+%endif%
+%if $."AS::max_exit_success" != ""%
+max_exit_success:$."AS::max_exit_success"
+%endif%
+description: %qt%$Description%qt%
 std_out_file: %dl%{log}/%dl%AUTO_JOB_NAME.log
 std_err_file: %dl%{log}/%dl%AUTO_JOB_NAME.err
 alarm_if_fail: 1
 %%profile:  /cba_app/RBSBUS/PROD/scripts/ds_profile
+
+%% ============================================================================
+%list=$.Elements @template="AS_Job"%
+
 

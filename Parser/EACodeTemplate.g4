@@ -117,31 +117,32 @@ listMacro		: List 	attribute templateName (
 				)* 
 			'%'
 ;
+callMacro		: Call stringLiteral (templateParameters | elementInScope)*  '%'
+;
 templateName 		: TemplateName stringLiteral
 ;
 templateParameters	: Parameters parameters
 ;
 separator		: Separator expr
 ;
+elementInScope  : ElementInScope (SRCE | TRGT)
+;
 functions		: Function parameters ')%'
 ;
 parameters		: expr (',' expr)*
 ;
-callMacro		: Call stringLiteral
-				templateParameters* 
-			'%'
-;
 piMacro			:  PI stringLiteral '%'
 ;
 
-List			: '%list=';
-Call			: '%call=';
-PI			: '%PI=';
-Function		: '%UPPER(' | '%LOWER(' | '%REPLACE(';
+List            : '%list=';
+Call            : '%call=';
+PI              : '%PI=';
+Function        : '%UPPER(' | '%LOWER(' | '%REPLACE(';
 
-TemplateName		: '@template=';
-Parameters		: '@parameters=';
-Separator		: '@separator=';
+TemplateName    : '@template=';
+Parameters      : '@parameters=';
+Separator       : '@separator=';
+ElementInScope  : '@element=';
 // ============================================================================
 // =
 // ============================================================================

@@ -30,22 +30,27 @@ public class Generator {
 			templateName = templateName.substring(0, idx);
 		}
 
-		Repository model = openModel(modelFile);
+        Repository  model       = null;
+        Element     element     = null;
+        if ( !modelFile.equalsIgnoreCase("not-required") ) {
+            model = openModel(modelFile);
 
-		Collection elements = model.GetElementsByQuery("Element Name", elementName);
-		if ( elements.GetCount() == 0 ) {
-			System.err.printf("Could not find any elments with name \"%s\"\n", elementName);
-			model.CloseFile();
-			return;
-		}
-		Element element = (Element)elements.GetAt((short)0);
-
+            Collection elements = model.GetElementsByQuery("Element Name", elementName);
+            if ( elements.GetCount() == 0 ) {
+                System.err.printf("Could not find any elments with name \"%s\"\n", elementName);
+                model.CloseFile();
+                return;
+            }
+            element = (Element)elements.GetAt((short)0);
+        }
+        
 		FileWriter fw = null; 
 		try { 
 			fw = new FileWriter(outputFileName);
 		} catch ( IOException e ) {
 			System.err.printf("Could not create output file \"%s\"\n", outputFileName);
-			model.CloseFile();
+			if ( model != null ) model.CloseFile();
+            return;
 		}
 		
 		TemplateProcessor.setTemplateFolder(templateFile.getParent());
@@ -69,35 +74,17 @@ public class Generator {
 
 		fw.flush();
 		fw.close();
-//		System.out.println("===============================================");
-//		System.out.println("Second Execution");
-//		System.out.println("===============================================");
-//		tp.execute();
 
-/*		
-		InputStream 			is 		= new FileInputStream(templateFileName);
-		
-		ANTLRInputStream  		input 	= new ANTLRInputStream(is);
-		EACodeTemplateLexer 	lexer 	= new EACodeTemplateLexer(input);
-		CommonTokenStream 		tokens	= new CommonTokenStream(lexer);
-		EACodeTemplateParser 	parser 	= new EACodeTemplateParser(tokens);
-
-		TemplateProcessor			listener = new TemplateProcessor(parser,element);
-		
-		parser.addParseListener(listener);
-		ParseTree				tree	= parser.file();	
-*/		
-		
-		//TODO: Figure out how to close EA application
-		System.out.printf("Closing model file \"%s\"...", modelFile);
-		element = null;
-		
-		model.CloseFile();
-		model = null;
-		System.out.println("done.");
-		
-		Runtime.getRuntime().runFinalization();
-		System.gc();
+        if ( model != null )  {
+            element = null;
+            System.out.printf("Closing model file \"%s\"...", modelFile);
+            model.CloseFile();
+            model = null;
+            System.out.println("done.");
+            
+            Runtime.getRuntime().runFinalization();
+            System.gc();
+        }
 		
 	}
 	

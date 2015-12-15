@@ -28,9 +28,13 @@
 (%list=$source.Connectors @template="AS_Job_Conditions" @parameters=$source.ElementID @separator=$Operator%)
 	%exit%
 %endif%
+%if $source.Type != "Activity"%
+	%exit%
+%endif% 
 %% ----------------------------------------------------------------------------
+%call="test" @element=$source.%
 %if $.Stereotype == "exitcode"%
-e($source.Name)$.Name
+e($source.Name)$.Name 
 %else%
 s($source.Name)
 %endif%

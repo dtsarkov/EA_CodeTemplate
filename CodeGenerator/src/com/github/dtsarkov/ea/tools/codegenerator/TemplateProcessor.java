@@ -203,8 +203,8 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			if ( !isOpen ) return;
 		}
 		message("%-30s|%-20s|%-30s"
-				,this.getAttribute("$.Name")
-				,this.getAttribute("$.Type")
+				,this.getAttribute("$.Name",false)
+				,this.getAttribute("$.Type",false)
 				,this.templateName
 		);
 		parser.addParseListener(this);
@@ -239,9 +239,13 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	private boolean	hasParent 	= true;
 	private Object getParent() {
 		if ( Parent == null && hasParent ) {
+            debug("Getting parent for elelment %s",element.getClass());
 			try {
 				Method m = element.getClass().getMethod("GetParentID", null);
-				Parent = EA_Model.GetElementByID(Integer.parseInt(m.invoke(element,null).toString()));
+                int parentID = Integer.parseInt(m.invoke(element,null).toString());
+                debug("\t\tParentID = %d",parentID);
+                if ( parentID != 0 )
+                    Parent = EA_Model.GetElementByID(parentID);
 			} catch (NoSuchMethodException e ) {
 				hasParent = false;
 			} catch (Exception e ) {
@@ -457,7 +461,11 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		return elements;
 	}
 	
-	private Object getAttribute(String attributeName) {
+    private Object getAttribute(String attributeName) {
+        return getAttribute(attributeName,true);
+    }
+    
+	private Object getAttribute(String attributeName, boolean raiseError) {
 		
 		String name[] = attributeName.split("\\.");
 		debug("getAttribute([%s] [%s]",name[0],name[1]);
@@ -476,12 +484,20 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 					Method pm = elements[1].getClass().getMethod(methodName);
 					attribute = pm.invoke(elements[1], null);
 				} catch (NoSuchMethodException pe) {
-					error("Could not find \"%s\" attribute",attributeName);
+                    if ( raiseError ) {
+                        error("Could not find \"%s\" attribute (2)",attributeName);
+                    } else {
+                        attribute = null;
+                    }
 				} catch (Exception pe ) {
 					pe.printStackTrace(System.err);;
 				}
 			} else {
-				error("Could not find \"%s\" attribute",attributeName);
+                if ( raiseError ) {
+                    error("Could not find \"%s\" attribute (1)",attributeName);
+                } else {
+                    attribute = null;
+                }
 			}
 		} catch (Exception e ) {
 			e.printStackTrace(System.err);;
@@ -519,7 +535,8 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 				if ( tag != null ) {
 					value = tag.GetValue();
 				} else {
-					error("Tag \"%s\" not found",tagName);
+                    if ( isTextMode() )
+                        error("Tag \"%s\" not found",tagName);
 				}
 				break;
 			} catch (NoSuchMethodException e) {
@@ -566,7 +583,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	@Override
 	public void exitEndif_stmt(Endif_stmtContext ctx) {
 		executionState = executionStates.pop();
-		debug("ELSE > %s", executionState.toString());
+		debug("ENDIF > %s", executionState.toString());
 	}
 	
 	private boolean evalCompareExpr( Compare_exprContext ctx ) {
