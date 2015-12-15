@@ -2,7 +2,7 @@
 %% Autosys job definition template
 %%  
 %%=============================================================================
-
+%call="test" @element=$source.%
 %if $.Type != "Activity"%
 	%exit%
 %endif%
