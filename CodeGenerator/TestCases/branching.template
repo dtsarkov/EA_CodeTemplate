@@ -1,0 +1,128 @@
+%if "a" == "a"%
+		Test 01 : PASS
+%else%
+		Test 01 : FAIL
+%endif%
+
+%if "a" != "a"%
+		Test 02 : FAIL
+%else%
+		Test 02 : PASS
+%endif%
+
+%if "a" == "b"%
+		Test 03 : FAIL
+%else%
+		Test 03 : PASS
+%endif%
+
+%if "a" == "a" and "b" == "b"%
+		Test 04 : PASS
+%else%
+		Test 04 : FAIL
+%endif%
+
+%if "a" != "a" and "b" == "b"%
+		Test 05 : FAIL
+%else%
+		Test 05 : PASS
+%endif%
+
+%if "a" != "a" and "b" != "b"%
+		Test 06 : FAIL
+%else%
+		Test 06 : PASS
+%endif%
+
+%if "a" == "a" or "b" == "b"%
+		Test 07 : PASS
+%else%
+		Test 07 : FAIL
+%endif%
+
+%if "a" != "a" or "b" == "b"%
+		Test 08 : PASS
+%else%
+		Test 08 : FAIL
+%endif%
+
+%if "a" == "a" or "b" != "b"%
+		Test 09 : PASS
+%endif%
+
+%DEBUG("=== Test #10 ========================")%
+%if "a" != "a" or "b" != "b"%
+		Test 10 : FAIL
+%else%
+		Test 10 : PASS
+%endif%
+
+%DEBUG("=== Test #11 ========================")%
+%if "b" == "b"% 
+		Test 11 : PASS
+%elseif "a" == "a"%
+		Test 11 : FAIL 1
+%else%
+		Test 11 : FAIL 2
+%endif%
+
+%DEBUG("=== Test #12 ========================")%
+%if "b" != "b"%
+		Test 12 : FAIL 1
+%elseif "a" == "a"%
+		Test 12 : PASS
+%else%
+		Test 12 : FAIL 2
+%endif%
+
+%DEBUG("=== Test #13 ========================")%
+%if "b" != "b"%
+		Test 13 : FAIL 1
+%elseif "a" != "a"%
+		Test 13 : FAIL 2
+%else%
+		Test 13 : PASS
+%endif%
+
+%DEBUG("=== Test #14 ========================")%
+%if "a" == "a"%
+%DEBUG("   = IF START =")%
+	%if "b" == "b"%
+		Test 14 : PASS
+	%elseif "a" == "a"%
+		Test 14 : FAIL 1
+	%else%
+		Test 14 : FAIL 2
+	%endif%
+%DEBUG("   = IF END =")%
+%else%
+%DEBUG("   = ELSE START =")%
+	%if "b" == "b"%
+		Test 14 : FAIL 3
+	%elseif "a" == "a"%
+		Test 14 : FAIL 4
+	%else%
+		Test 14 : FAIL 5
+	%endif%
+%DEBUG("   = ELSE END =")%
+%endif%
+
+%DEBUG("=== Test #15 ========================")%
+%if "a" != "a"%
+	%if "b" == "b"%
+		Test 15 : FAIL 1
+	%elseif "a" == "a"%
+		Test 15 : FAIL 2
+	%else%
+		Test 15 : FAIL 3
+	%endif%
+%else%
+	%if "b" == "b"%
+		Test 15 : PASS
+	%elseif "a" == "a"%
+		Test 15 : FAIL 4
+	%else%
+		Test 15 : FAIL 5
+	%endif%
+%endif%
+

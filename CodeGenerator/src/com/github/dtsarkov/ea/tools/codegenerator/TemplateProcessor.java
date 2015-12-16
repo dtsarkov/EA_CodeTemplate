@@ -383,7 +383,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	}
 	
 	private String calcFunction(FunctionsContext ctx ) {
-		String value = "";
+		String value = null;
 		String function = ctx.getChild(0).getText();
 		int parmCount = ctx.parameters().expr().size();
 		
@@ -407,6 +407,8 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 						calcExpression(ctx.parameters().expr(1))
 					   ,calcExpression(ctx.parameters().expr(2))
 					);
+		} else if (function.equalsIgnoreCase("%DEBUG(") ) {
+			debug(firstParameter);
 		} else {
 			error("Unknown function %s\n", function);
 		}
@@ -560,16 +562,20 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	@Override
 	public void exitIf_stmt(If_stmtContext ctx) {
 		executionStates.push(executionState);
-		executionState = new ExecutionState();
-		
-		executionState.setProcessBranch(evalCompareExpr(ctx.compare_expr()));
-		debug("IF > %s", executionState.toString());
+		executionState = new ExecutionState(executionState);
+		if ( executionState.canProcessBranch() ) {
+			executionState.setProcessBranch(evalCompareExpr(ctx.compare_expr()));
+			debug("IF > %s", executionState.toString());
+		} else {
+			executionState.setBranchProcessed();
+		}
 	}
 
 	@Override
 	public void exitElseif_stmt(Elseif_stmtContext ctx) {
-		executionState.setBranchProcessed(executionState.canProcessBranch());
 		if ( executionState.canProcessBranch() ) {
+			executionState.setBranchProcessed();
+		} else {
 			executionState.setProcessBranch(evalCompareExpr(ctx.compare_expr()));
 		}
 		debug("ELSEIF > %s", executionState.toString());
@@ -577,7 +583,11 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 
 	@Override
 	public void exitElse_stmt(Else_stmtContext ctx) {
-		executionState.setBranchProcessed(executionState.canProcessBranch());
+		if ( executionState.canProcessBranch() ) {
+			executionState.setBranchProcessed();
+		} else if (!executionState.isBranchProcessed()){
+			executionState.setProcessBranch(true);
+		}
 		debug("ELSE > %s", executionState.toString());
 	}
 
@@ -592,22 +602,24 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		boolean expressionValue = false;
 		List<PredicateContext> predicates = ctx.predicate();
 		
-		int o = -1;
-		for ( int p = 0; p < predicates.size(); p++ ) {
-			if ( o == -1 ) {
+        String dbg = "";
+		for ( int p = 0; p < predicates.size(); p++) {
+			if ( p == 0 ) {
 				expressionValue = evalPredicate(predicates.get(p));
+                dbg += expressionValue;
 			} else {
-				op = ctx.pred_op(o).getText().toLowerCase();
+				op = ctx.pred_op(p-1).getText().toLowerCase();
 				if ( op.compareTo("and") == 0 ) {
-					expressionValue &= evalPredicate(predicates.get(p));
+					expressionValue = (expressionValue && evalPredicate(predicates.get(p)));
 				} else if (op.compareTo("or") == 0 ) {
-					expressionValue |= evalPredicate(predicates.get(p));
+					expressionValue = (expressionValue || evalPredicate(predicates.get(p)));
 				} else {
 					error("Unsupported operator \"%s\"\n",op);
 				}
+                dbg += " ["+op+"] "+expressionValue;
 			}
 		}
-		debug("\tevalCompareExpr = "+expressionValue);
+		debug("\tevalCompareExpr (%s) = %s",dbg,expressionValue);
 		return expressionValue;
 	}
 
@@ -734,7 +746,12 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	public void exitFunctions(FunctionsContext ctx) {
 		if ( executionState.canProcessBranch() ) {
 			textLevel--;
-			if ( isTextMode() ) sendTextOut(calcFunction(ctx), ctx);
+			if ( isTextMode() ) {
+				String value = calcFunction(ctx);
+				if ( value != null ) {
+					sendTextOut(value, ctx);
+				}
+			}
 		}
 	}
 
@@ -862,6 +879,29 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			executeCallMacro(ctx,writer);
 	}
 	
+    private Object getElementInScope(ElementInScopeContext ctx) {
+        Object obj = null;
+		if ( ctx != null ) {
+			String en = "UNKNOWN";
+			if ( ctx.SRCE() != null ) {
+				obj = this.getSource();
+				en  = "source";
+			} else if ( ctx.TRGT() != null ) {
+				obj = this.getTarget();
+				en  = "target";
+			} else if ( ctx.PCKG() != null ) {
+				obj = this.getPackage();
+				en  = "package";
+			} else if ( ctx.PARN() != null ) {
+				obj = this.getParent();
+				en  = "parent";
+			}
+			if ( obj == null ) {
+				error("Element does not have the \"%s\" property!", en);
+			}
+		}
+        return obj;
+    }
 	private void executeCallMacro( CallMacroContext ctx, Writer writer ) {
 
 		String name = translateStringLiteral(ctx.stringLiteral().getText());
@@ -871,25 +911,10 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		TemplateProcessor tp = new TemplateProcessor(name);
 		tp.setOutput(writer);
 
-		Object element = this.element;
-		ElementInScopeContext ectx = ctx.elementInScope(0);
-		if ( ectx != null ) {
-			Object eo = null;
-			String en = "UNKNOWN";
-			if ( ectx.SRCE() != null ) {
-				eo = this.getSource();
-				en = "source";
-			} else if ( ectx.TRGT() != null ) {
-				eo = this.getTarget();
-				en = "target";
-			}
-			if ( eo != null ) {
-				element = eo;
-			} else {
-				error("Element has not got \"%s\" property!", en);
-			}
-		}
-		tp.setElement(element);
+		Object e = getElementInScope(ctx.elementInScope(0));
+        if ( e == null ) e = element;
+		
+		tp.setElement(e);
 
 		if ( ctx.templateParameters(0) != null ) {
 			String value = "";

@@ -114,6 +114,7 @@ textMacros 		: '%dl%' | '%pc%' | '%eq%' | '%qt%' | '%us%' //| '%sl%'
 listMacro		: List 	attribute templateName (
 					templateParameters
 				| 	separator
+                |   elementInScope
 				)* 
 			'%'
 ;
@@ -125,7 +126,7 @@ templateParameters	: Parameters parameters
 ;
 separator		: Separator expr
 ;
-elementInScope		: ElementInScope (SRCE | TRGT)
+elementInScope		: ElementInScope (SRCE | TRGT | PCKG | PARN)
 ;
 functions		: Function parameters ')%'
 ;
@@ -137,7 +138,7 @@ piMacro			:  PI stringLiteral '%'
 List            : '%list=';
 Call            : '%call=';
 PI              : '%PI=';
-Function        : '%UPPER(' | '%LOWER(' | '%REPLACE(';
+Function        : '%UPPER(' | '%LOWER(' | '%REPLACE(' | '%DEBUG(';
 
 TemplateName    : '@template=';
 Parameters      : '@parameters=';

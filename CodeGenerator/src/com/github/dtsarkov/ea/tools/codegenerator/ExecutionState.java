@@ -8,18 +8,26 @@ public class ExecutionState {
     public ExecutionState() {
         resetState();
     }
+    public ExecutionState(ExecutionState state) {
+    	isBranchProcessed 	= state.isBranchProcessed;
+    	processBranch		= state.processBranch; 
+    }
     
     public void setProcessBranch(boolean processBranch) {
             this.processBranch = processBranch;
     }
     
     public boolean canProcessBranch() {
-        return processBranch;
+        return processBranch && !isBranchProcessed;
     }
     
-    public void setBranchProcessed(boolean newState ) {
-        isBranchProcessed   = newState;
-        processBranch       = !newState;
+    public void setBranchProcessed() {
+        isBranchProcessed   = true;
+        processBranch       = false;
+    }
+    
+    public boolean isBranchProcessed() {
+    	return isBranchProcessed;
     }
     
     public void resetState() {
