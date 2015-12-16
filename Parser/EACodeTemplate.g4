@@ -85,10 +85,11 @@ predicate	: expr test_op expr
 //		| parameter
 //		| templateName  //TO-DO: Parser could not recognize templateName
 //;
-pred_op     	: 'and' | 'or'
-;
-test_op		: '=='	| '!='
-;
+pred_op     	: Pred_op;
+test_op		: Test_op;
+
+Pred_op 	: 'and' | 'or';
+Test_op		: '=='	| '!=';
 //
 // ============================================================================
 text		: ( 
