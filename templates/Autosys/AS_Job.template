@@ -11,7 +11,17 @@
 %endif%
 
 %if $.Stereotype == "StartStream"%
-	%%call="AS_StartStream"%
+	%call="AS_StartStream"%
+	%exit%
+%elseif $.Stereotype == "EndStream"%
+	%call="AS_EndStream"%
+	%exit%
+%elseif $.Stereotype == "TCF Job"%
+	%if $."TCF::RQM Type" == "RQM4"%
+		%call="AS_TCF_Job_RQM4"%
+	%else%
+		%call="AS_TCF_Job"%
+	%endif%
 	%exit%
 %endif%
 
@@ -32,8 +42,11 @@ $JobName = $prefix + $.Name + "_" + $JobType
 	$BoxName = $prefix + %LOWER($parent.Name)% + "_box"
 %endif%
 
+$command	= "!ERROR!"
+
 $Conditions 	= %list=$.Connectors @template="AS_Job_Conditions" @separator=" and " @parameters=$.ElementID%
 $Description    = %REPLACE($.Notes,"","")%
+
 %% ============================================================================
 
 /* 
@@ -43,16 +56,15 @@ insert_job:%LOWER($JobName)% job_type:%UPPER($JobType)%
 %if $BoxName != ""%
 box_name: $BoxName
 %endif%
-%%command: ${scriptdir}/TCF_Master_Schedule.sh -m RUN -s 406 -f 0 -j au_cba_rbsbus_p01_pssr_we1_406_05_prev_run_fin_cmd -v TCF_MSCHD_WKLY.sql
+%if $JobType != "BOX"%
+command: $command
+%endif%
 machine: au_cba_bidseng_91_buh
 owner: rbsbusprod@au_cba_bidseng_91_buh
 permission: gx,ge,wx
 %if $Conditions != ""%
 condition: $Conditions
 %endif%
-%%date_conditions: 1
-%%days_of_week: sa
-%%start_times: "20:00"
 %if $."AS::success_codes" != ""%
 success_codes:$."AS::success_codes"
 %endif%
@@ -63,7 +75,7 @@ description: %qt%$Description%qt%
 std_out_file: %dl%{log}/%dl%AUTO_JOB_NAME.log
 std_err_file: %dl%{log}/%dl%AUTO_JOB_NAME.err
 alarm_if_fail: 1
-%%profile:  /cba_app/RBSBUS/PROD/scripts/ds_profile
+profile: %call="AS_Job_Profile"%
 
 %% ============================================================================
 %list=$.Elements @template="AS_Job"%

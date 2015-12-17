@@ -11,7 +11,7 @@
 %endif%
 
 $StreamID  = $package."TCF::Stream ID"
-$Profile   = $package."AS::profile"
+$profile   = %call="AS_Job_Profile"%
 $JobPrefix = $package."AS::Prefix"
 $SQLScript = %list=$.Connectors @template="getConnectorTarget" @parameters=$.ElementID, "call"%
 

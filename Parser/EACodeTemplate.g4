@@ -108,24 +108,34 @@ macros		: textMacros
 		| listMacro
 		| functions
 		| callMacro
+		| splitMacro
 		| piMacro
 ;
-textMacros 		: '%dl%' | '%pc%' | '%eq%' | '%qt%' | '%us%' //| '%sl%' 
+textMacros 		: '%dl%' | '%pc%' | '%eq%' | '%qt%' | '%us%' | '%nl%' //| '%sl%' 
 ;
 listMacro		: List 	attribute templateName (
 					templateParameters
-				| 	separator
-                |   elementInScope
+				|	separator
+				|	elementInScope
 				)* 
 			'%'
 ;
 callMacro		: Call stringLiteral (templateParameters | elementInScope)*  '%'
 ;
+splitMacro		: Split expr templateName (
+					templateParameters 
+				| 	delimiter
+				|	separator
+				)*
+			'%'
+;				
 templateName 		: TemplateName stringLiteral
 ;
 templateParameters	: Parameters parameters
 ;
 separator		: Separator expr
+;
+delimiter		: Delimiter expr
 ;
 elementInScope		: ElementInScope (SRCE | TRGT | PCKG | PARN)
 ;
@@ -138,6 +148,7 @@ piMacro			:  PI stringLiteral '%'
 
 List            : '%list=';
 Call            : '%call=';
+Split           : '%split=';
 PI              : '%PI=';
 Function        : '%UPPER(' | '%LOWER(' | '%REPLACE(' | '%DEBUG(';
 
@@ -145,6 +156,7 @@ TemplateName    : '@template=';
 Parameters      : '@parameters=';
 Separator       : '@separator=';
 ElementInScope  : '@element=';
+Delimiter       : '@delimiter=';
 // ============================================================================
 // =
 // ============================================================================

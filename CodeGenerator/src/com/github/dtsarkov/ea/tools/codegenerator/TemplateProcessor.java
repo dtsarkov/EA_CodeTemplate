@@ -27,30 +27,7 @@ import org.sparx.TaggedValue;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateBaseListener;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateLexer;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser;
-import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.AssignmentContext;
-import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.AttributeContext;
-import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.CallMacroContext;
-import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.Compare_exprContext;
-import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.ElementInScopeContext;
-import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.Else_stmtContext;
-import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.Elseif_stmtContext;
-import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.Endif_stmtContext;
-import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.Endtempalte_stmtContext;
-import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.ExprContext;
-import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.FileContext;
-import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.FreeTextContext;
-import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.FunctionsContext;
-import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.If_stmtContext;
-import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.Line_textContext;
-import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.ListMacroContext;
-import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.ParameterContext;
-import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.PiMacroContext;
-import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.PredicateContext;
-import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.StringLiteralContext;
-import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.TagContext;
-import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.TextContext;
-import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.TextMacrosContext;
-import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.VariableContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.*;
 
 public class TemplateProcessor extends EACodeTemplateBaseListener {
 	/* Static section  
@@ -74,6 +51,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		TextMacros.put("%dl%", "$");
 		TextMacros.put("%qt%", "\"");
 		TextMacros.put("%us%", "_");
+		TextMacros.put("%nl%",System.lineSeparator());
 	}
 	
 	static public void setTemplateFolder( String path ) {
@@ -130,7 +108,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	private int						textLevel 	= 0;
 	private Writer 					writer;
 
-	private List<String>	   parameters	  = new ArrayList<String>(9);
+	private ArrayList<String>  parameters	  = new ArrayList<String>(9);
 	private Map<String,String> localVariables = new HashMap<String,String>();
 
 	public TemplateProcessor( String templateName ) {
@@ -142,6 +120,13 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	public void addParameter(String value) {
 		parameters.add(value);
 	}
+	
+	public void setParameter(int index, String value) {
+		if (index < parameters.size() ) 
+			parameters.remove(index);
+		parameters.add(index,value);
+	}
+	
 	public String getParameter(String parameter ) {
 		//Parameter is $[0-9]. $0 contains number of parameters passed to template.
 		int index = Integer.valueOf(parameter.substring(1));
@@ -307,6 +292,10 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	/*
 	 * 
 	 **************************************************************************/
+	 public void setVariable( String name, String value ) {
+		localVariables.put(name,value);
+	 }
+	 
 	@Override
 	public void enterAssignment(AssignmentContext ctx) {
 		if ( executionState.canProcessBranch() ) 
@@ -649,6 +638,82 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		debug("Eval([%s] %s [%s]) is %s",exp1,op,exp2,equal);
 		return equal;
 	}
+	/*
+	 * Split section
+	 **************************************************************************/
+	@Override
+	public void enterSplitMacro(SplitMacroContext ctx) {
+		if ( executionState.canProcessBranch() ) 
+			textLevel++;
+	}
+	
+	@Override
+	public void exitSplitMacro(SplitMacroContext ctx) {
+		textLevel--;
+		if ( executionState.canProcessBranch() && isTextMode() ) 
+			executeSplitMacro(ctx,writer);
+	}
+	 
+	private void executeSplitMacro(SplitMacroContext ctx, Writer writer ) {
+		String stringToSplit = calcExpression(ctx.expr());
+		String templateName  = translateStringLiteral(ctx.templateName().stringLiteral().getText());
+
+		String separator = getLineSeparator();
+		if (ctx.separator(0) != null ) {
+			separator = calcExpression(ctx.separator(0).expr());
+		}
+		
+		String delimiter     = ",";
+		if ( ctx.delimiter(0) != null ) {
+			delimiter = calcExpression(ctx.delimiter(0).expr());
+		}
+
+		String[] parts 	= stringToSplit.split(delimiter);
+		
+		debug("Split macro: string=[%s] @template=[%s] @delimiter=[%s] @separator=[%s]> count %d"
+			,stringToSplit
+			,templateName
+			,delimiter
+			,separator
+			,parts.length
+		);
+
+		TemplateProcessor tp 	= new TemplateProcessor(templateName);
+		tp.setElement(element);
+
+		//Set parameters
+		if ( ctx.templateParameters(0) != null ) {
+			String value = "";
+			List<ExprContext> parms = ctx.templateParameters(0).parameters().expr();
+			for ( int i = 0; i < parms.size(); i++ ) {
+				value = calcExpression(parms.get(i));
+				debug("\tset parameter $%d = [%s]",i+1,value);
+				tp.addParameter(value);
+			}
+		}
+		
+		//Execute template for each element
+		StringWriter sw;
+		StringBuffer sb;
+		for ( int i = 0, w = 0; i < parts.length; i++ ) {
+			sw = new StringWriter();
+			tp.setOutput(sw);
+			tp.setVariable("$PART",parts[i]);
+			tp.execute();
+			sb = sw.getBuffer();
+			try {
+				if ( sb.toString().trim().length() > 0 ) {
+					if ( w != 0 )	writer.write(separator);
+					writer.write(sb.toString());
+					w++;
+				}
+			} catch (IOException e ) {
+				error("Cannot write to output stream");
+				break;
+			}
+		}
+	}
+	 
 	/*
 	 * List section
 	 **************************************************************************/

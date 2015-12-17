@@ -1,0 +1,14 @@
+Current Object {
+	Type 		%eq% $.Type
+	Name 		%eq% $.Name
+	Subtype 	%eq% $.Subtype
+	Stereotype 	%eq% $.Stereotype
+	ObjectType 	%eq% $.ObjectType
+	modified   	%eq% $.Modified
+	GUID		%eq% $.ElementGUID
+}
+$$prefix=$."AS::Prefix"
+$$streamID=$."TCF::Stream ID"
+%list=$.Elements 	 @template="activity"%
+
+
