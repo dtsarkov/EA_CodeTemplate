@@ -1,11 +1,11 @@
 %DEBUG("=== Test #01 ========================")%
-%split="aaa,bbb,ccc" @template="split_merge"%
+%split="aaa,bbb,ccc" @template="split_x01"%
 
 %DEBUG("=== Test #02 ========================")%
-%split="aaa,bbb,ccc" @template="split_merge" @separator="="%
+%split="aaa,bbb,ccc" @template="split_x01" @separator="="%
 
 %DEBUG("=== Test #03 ========================")%
-%split="aaa:bbb:ccc" @template="split_merge" @delimiter=":"%
+%split="aaa:bbb:ccc" @template="split_x01" @delimiter=":"%
 
 %DEBUG("=== Test #04 ========================")%
-%split="aaa:bbb:ccc" @template="split_merge" @delimiter=":" @separator="="%
+%split="aaa:bbb:ccc" @template="split_x01" @delimiter=":" @separator="\t"%

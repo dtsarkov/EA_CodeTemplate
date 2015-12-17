@@ -10,6 +10,7 @@ import org.sparx.Repository;
 
 public class Generator {
 
+
 	public static void main(String[] args) throws Exception {
 		System.out.println("EACodeGenerator <EA Model File> <EA Element> <Template File> <Output File>");
 		if (args.length < 4 ) return;
