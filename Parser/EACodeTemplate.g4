@@ -67,9 +67,9 @@ if_stmt		: IF compare_expr '%'
 ;
 elseif_stmt	: ELSEIF compare_expr '%'
 ;
-else_stmt	: '%else%'
+else_stmt	: ELSE
 ;
-endif_stmt	: '%endif%'
+endif_stmt	: ENDIF
 ;
 endtempalte_stmt: '%exit%'
 ;
@@ -78,18 +78,13 @@ compare_expr	: predicate (pred_op predicate)*
 ;
 predicate	: expr test_op expr
 ;
-//test_expr	: stringLiteral 
-//		| variable 
-//		| attribute
-//		| tag
-//		| parameter
-//		| templateName  //TO-DO: Parser could not recognize templateName
-//;
 pred_op     	: Pred_op;
 test_op		: Test_op;
 
 Pred_op 	: 'and' | 'or';
 Test_op		: '=='	| '!=';
+
+
 //
 // ============================================================================
 text		: ( 
@@ -190,13 +185,13 @@ fragment EscapeSequence :
 // ============================================================================
 
 IF	: '%if'   	;
-//ELSE	: '%else%'      ;
+ELSE	: '%else%'      ;
 ELSEIF	: '%elseif'     ;
-//ENDIF	: '%endif%' 	;
-
+ENDIF	: '%endif%' 	;
 
 PC	: '%';
 EQ	: '=';
+EQQ	: '==';
 AEQ	: '+=';
 //ADD	: '+';
 

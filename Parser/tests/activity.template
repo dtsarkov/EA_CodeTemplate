@@ -2,6 +2,7 @@
 %% Autosys job definition template
 %%  
 %%=============================================================================
+Here I need to insert or and
 %call="test" @element=$source.%
 %if $.Type != "Activity"%
 	%exit%
