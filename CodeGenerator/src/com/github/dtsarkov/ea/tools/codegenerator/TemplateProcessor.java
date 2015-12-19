@@ -20,6 +20,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.sparx.Collection;
 import org.sparx.Element;
 import org.sparx.Repository;
@@ -28,7 +29,31 @@ import org.sparx.TaggedValue;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateBaseListener;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateLexer;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser;
-import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.*;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.AssignmentContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.AttributeContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.CallMacroContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.Compare_exprContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.ElementInScopeContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.Else_stmtContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.Elseif_stmtContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.Endif_stmtContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.Endtempalte_stmtContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.ExprContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.FileContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.FreeTextContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.FunctionsContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.If_stmtContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.Line_textContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.ListMacroContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.ParameterContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.PiMacroContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.PredicateContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.SplitMacroContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.StringLiteralContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.TagContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.TextContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.TextMacrosContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.VariableContext;
 
 public class TemplateProcessor extends EACodeTemplateBaseListener {
 	/* Static section  
@@ -886,8 +911,12 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 
 	@Override
 	public void exitFreeText(FreeTextContext ctx) {
-		if ( executionState.canProcessBranch() && isTextMode() ) 
-			sendTextOut(ctx.FreeText().getText(),ctx);
+		if ( executionState.canProcessBranch() && isTextMode() ) {
+			//V 0.21 
+			//replaced ctx.FreeText().getText() by ctx.getText() as grammar now 
+			//also includes Pred_op (and/or) in addition to FreeText
+			sendTextOut(ctx.getText(),ctx);
+		}
 	}
 
 	@Override

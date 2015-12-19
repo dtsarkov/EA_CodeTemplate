@@ -4,7 +4,7 @@
 %%=============================================================================
 Here I need to insert or and
 %call="test" @element=$source.%
-%if $.Type != "Activity"%
+%if $.Type != "Activity" and $.Type == "blah"%
 	%exit%
 %endif%
 

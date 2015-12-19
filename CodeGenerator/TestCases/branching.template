@@ -1,4 +1,4 @@
-Test branching macros, and/or conditons, nested ifs
+Test branching macros, ( and or ) conditons, nested ifs
 %if "a" == "a"%
 		Test 01 : PASS
 %else%

@@ -1,3 +1,10 @@
+//
+// History
+// Version	Description
+// ------------	---------------------------------------------------------------
+// 0.21		Added Pred_op to freeText rule to fix the bug when parser did not
+//		recognized and/or as a free text.
+// ----------------------------------------------------------------------------
 grammar EACodeTemplate;
 
 //file	: (line NL)* EOF
@@ -155,7 +162,7 @@ Delimiter       : '@delimiter=';
 // ============================================================================
 // =
 // ============================================================================
-freeText	: FreeText
+freeText	: FreeText | Pred_op
 ;
 FreeText	: [a-zA-Z0-9_(){}\.+\-\*\:\/\[\]<>\~!?@#^&\|'`,;]+
 ;
