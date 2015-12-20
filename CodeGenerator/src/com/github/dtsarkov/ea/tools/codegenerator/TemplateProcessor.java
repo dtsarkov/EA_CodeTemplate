@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,11 +19,8 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.TerminalNode;
 import org.sparx.Collection;
-import org.sparx.Element;
 import org.sparx.Repository;
-import org.sparx.TaggedValue;
 
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateBaseListener;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateLexer;
@@ -128,8 +124,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	private EACodeTemplateParser 	parser;
 	private CommonTokenStream 		tokens;
 	private EACodeTemplateLexer 	lexer;
-	private Object 			 		element;
-	private Object					packageElement;
+	private EAElement		 		element;
 	private String					lineSeparator = System.lineSeparator();
 	private int						textLevel 	= 0;
 	private Writer 					writer;
@@ -215,8 +210,8 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			if ( !isOpen ) return;
 		}
 		message("%-30s|%-20s|%-30s"
-				,this.getAttribute("$.Name",false)
-				,this.getAttribute("$.Type",false)
+				,element.getAttribute("$.Name",false)
+				,element.getAttribute("$.Type",false)
 				,this.templateName
 		);
 		parser.addParseListener(this);
@@ -226,95 +221,9 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	}
 	
 	public void setElement(Object element) {
-		this.element = element;
-		if ( element instanceof Element ) {
-			if ( ((Element)element).GetType().equalsIgnoreCase("Package") ) {
-				this.packageElement = this.element;
-				this.element = EA_Model.GetPackageByGuid(((Element)element).GetElementGUID());
-			}
-		}
-		Parent 		= null;
-		hasParent 	= true;
-		Package 	= null;
-		hasPackage	= true;
-		Source 		= null;
-		hasSource	= true;
-		Target 		= null;
-		hasTarget	= true;
+		this.element = new EAElement(element);
 	}
 	
-	public Object getElement() {
-		return element;
-	}
-	
-	private Object 	Parent 		= null;
-	private boolean	hasParent 	= true;
-	private Object getParent() {
-		if ( Parent == null && hasParent ) {
-            debug("Getting parent for elelment %s",element.getClass());
-			try {
-				Method m = element.getClass().getMethod("GetParentID", null);
-                int parentID = Integer.parseInt(m.invoke(element,null).toString());
-                debug("\t\tParentID = %d",parentID);
-                if ( parentID != 0 )
-                    Parent = EA_Model.GetElementByID(parentID);
-			} catch (NoSuchMethodException e ) {
-				hasParent = false;
-			} catch (Exception e ) {
-				e.printStackTrace(System.err);
-			}
-		}
-		
-		return Parent;
-	}
-
-	private Object 	Package 		= null;
-	private boolean	hasPackage 		= true;
-	private Object getPackage() {
-		if ( Package == null && hasPackage ) {
-			try {
-				Method m = element.getClass().getMethod("GetPackageID", null);
-				Package = EA_Model.GetPackageByID(Integer.parseInt(m.invoke(element,null).toString()));
-			} catch (NoSuchMethodException e ) {
-				hasPackage = false;
-			} catch (Exception e ) {
-				e.printStackTrace(System.err);
-			}
-		}
-		return Package;
-	}
-
-	private Object Source	  = null;
-	private boolean hasSource = true;
-	private Object getSource() {
-		if ( Source == null && hasSource ) {
-			try {
-				Method m = element.getClass().getMethod("GetClientID", null);
-				Source = EA_Model.GetElementByID(Integer.parseInt(m.invoke(element,null).toString()));
-			} catch (NoSuchMethodException e ) {
-				hasSource = false;
-			} catch (Exception e ) {
-				e.printStackTrace(System.err);
-			}
-		}
-		return Source;
-	}
-
-	private Object  Target	  = null;
-	private boolean hasTarget = true;
-	private Object getTarget() {
-		if ( Target == null && hasTarget ) {
-			try {
-				Method m = element.getClass().getMethod("GetSupplierID", null);
-				Target = EA_Model.GetElementByID(Integer.parseInt(m.invoke(element,null).toString()));
-			} catch (NoSuchMethodException e ) {
-				hasTarget = false;
-			} catch (Exception e ) {
-				e.printStackTrace(System.err);
-			}
-		}
-		return Target;
-	}
 	/*
 	 * 
 	 **************************************************************************/
@@ -372,7 +281,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			} else if ( c instanceof AttributeContext ) {
 				v = getAttributeValue(c.getText());
 			} else if ( c instanceof TagContext ) {
-				v = getTagValue(c.getText());
+				v = element.getTagValue(c.getText());
 			} else if ( c instanceof FunctionsContext ) {
 				v = calcFunction((FunctionsContext)c);
 			} else if ( c instanceof ParameterContext ) {
@@ -461,74 +370,9 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		return value;
 	}
 
-	private Object[] getElementSet(String scope) {
-		Object[] elements = new Object[2];
-		if ( scope.equalsIgnoreCase("$") || scope.equalsIgnoreCase("$this") ) {
-			elements[0]	= this.element;
-			elements[1]	= this.packageElement;
-		} else if ( scope.equalsIgnoreCase("$parent") ) {
-			elements[0] = getParent();
-		} else if ( scope.equalsIgnoreCase("$package") ) {
-			elements[0] 	= getPackage();
-			elements[1] = ((org.sparx.Package)elements[0]).GetElement();
-		} else if ( scope.equalsIgnoreCase("$source") ) {
-			elements[0] = getSource();
-		} else if ( scope.equalsIgnoreCase("$target") ) {
-			elements[0] = getTarget();
-		}
-		
-		
-		return elements;
-	}
-	
-    private Object getAttribute(String attributeName) {
-        return getAttribute(attributeName,true);
-    }
-    
-	private Object getAttribute(String attributeName, boolean raiseError) {
-		
-		String name[] = attributeName.split("\\.");
-		debug("getAttribute([%s] [%s]",name[0],name[1]);
-		
-		Object[] elements	= getElementSet(name[0]);
-		String methodName 	= "Get"+name[1];
-
-		Object attribute 		= null;
-		
-		if ( elements[0] != null ) try {
-			Method m = elements[0].getClass().getMethod(methodName);
-			attribute = m.invoke(elements[0], null);
-		} catch (NoSuchMethodException e) {
-			if ( elements[1] != null ) {
-				try {
-					Method pm = elements[1].getClass().getMethod(methodName);
-					attribute = pm.invoke(elements[1], null);
-				} catch (NoSuchMethodException pe) {
-                    if ( raiseError ) {
-                        error("Could not find \"%s\" attribute (2)",attributeName);
-                    } else {
-                        attribute = null;
-                    }
-				} catch (Exception pe ) {
-					pe.printStackTrace(System.err);;
-				}
-			} else {
-                if ( raiseError ) {
-                    error("Could not find \"%s\" attribute (1)",attributeName);
-                } else {
-                    attribute = null;
-                }
-			}
-		} catch (Exception e ) {
-			e.printStackTrace(System.err);;
-		}
-
-		return attribute;
-	}
-	
 	private String getAttributeValue(String attributeName) {
 		String value = null;
-		Object attribute = getAttribute(attributeName);
+		Object attribute = element.getAttribute(attributeName,true);
 		
 		if ( attribute != null )
 			value = attribute.toString();
@@ -536,46 +380,13 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		return value;
 	}
 	
-	private String getTagValue( String tagName ) {
-		String value 	= null;
-		debug("Processing tag value experession [%s]", tagName);
 
-		String name[] = tagName.split("\\.");
-		tagName = name[1].substring(1, name[1].length()-1);
-		Object[] elements = getElementSet(name[0]);
-		
-		Method m	= null;
-		Object tags = null;
-		for ( int i = 0; i < elements.length; i++ ) {
-			debug(">>\t class name = %s", elements[i].getClass().getName());
-			try {
-				m 		= elements[i].getClass().getMethod("GetTaggedValues");
-				tags 	= m.invoke(elements[i], null);
-				TaggedValue tag = (TaggedValue)(((Collection)tags).GetByName(tagName));
-				if ( tag != null ) {
-					value = tag.GetValue();
-				} else {
-                    if ( isTextMode() )
-                        error("Tag \"%s\" not found",tagName);
-				}
-				break;
-			} catch (NoSuchMethodException e) {
-				debug("\t\t No Such Method Exception");
-			} catch (Exception e ) {
-				e.printStackTrace(System.err);;
-			}
-		}
-		if ( m == null )
-			error("Element does not support tags.");
-		
-		return value;
-	}
-
-	private ExecutionState executionState = new ExecutionState();
-	private Stack<ExecutionState> executionStates = new Stack<ExecutionState>(); 
 	/*
 	 * IF section
 	 **************************************************************************/
+	private ExecutionState executionState = new ExecutionState();
+	private Stack<ExecutionState> executionStates = new Stack<ExecutionState>(); 
+
 	@Override
 	public void exitIf_stmt(If_stmtContext ctx) {
 		executionStates.push(executionState);
@@ -758,13 +569,14 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			executeListMacro(ctx,writer);
 	}
 
+	@SuppressWarnings("rawtypes")
 	private void executeListMacro(ListMacroContext ctx, Writer writer ) {
 		String attr = ctx.attribute().getText();
 		String name = translateStringLiteral(ctx.templateName().stringLiteral().getText());
 
 		debug("List macro: attribute=[%s] template=[%s]",attr,name);
 
-		Object attribute = getAttribute(attr);
+		Object attribute = element.getAttribute(attr,true);
 		if (attribute == null)  { 
 			return;
 		}
@@ -780,7 +592,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		
 		TemplateProcessor tp 	= new TemplateProcessor(name);
 
-		Collection	ec 			= (Collection)attribute;
+		Collection ec 	= (Collection)attribute;
 		short		ecCount	 	= ec.GetCount();
 		Object		obj			= null;
 		debug("\tCount = [%d]",ecCount);
@@ -854,8 +666,11 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	private boolean isTextMode() {
 		return (textLevel == 1 );
 	}
+	
+	private boolean newLineSent = false;
 	private void sendTextOut(String text, ParserRuleContext ctx) {
 			if (isTextMode() && text != null) {
+				newLineSent = (text.compareTo(System.lineSeparator()) == 0);
 				Token token = ctx.getStart();
 				int   idx  = token.getTokenIndex();
 				List<Token> channel = tokens.getHiddenTokensToLeft(idx, 1);
@@ -865,7 +680,6 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 						token = channel.get(i);
 						if ( token == null ) break;
 						ws += token.getText();
-						i++;
 					};
 					writeText(ws);
 				}
@@ -875,8 +689,9 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	
 	private void finishLine() {
 		if (isTextMode()) {
-			//debug("Finish line with [%s]", lineSeparator);
-			writeText(lineSeparator);
+			if ( !newLineSent)
+				writeText(lineSeparator);
+			newLineSent = false;
 		}
 	}
 
@@ -934,7 +749,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	@Override
 	public void exitTag(TagContext ctx) {
 		if ( executionState.canProcessBranch() && isTextMode() ) 
-			sendTextOut(getTagValue(ctx.getText()),ctx);
+			sendTextOut(element.getTagValue(ctx.getText()),ctx);
 	}
 	
 	@Override
@@ -976,21 +791,21 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			executeCallMacro(ctx,writer);
 	}
 	
-    private Object getElementInScope(ElementInScopeContext ctx) {
-        Object obj = null;
+    private EAElement getElementInScope(ElementInScopeContext ctx) {
+    	EAElement obj = null;
 		if ( ctx != null ) {
 			String en = "UNKNOWN";
 			if ( ctx.SRCE() != null ) {
-				obj = this.getSource();
+				obj = element.getSource();
 				en  = "source";
 			} else if ( ctx.TRGT() != null ) {
-				obj = this.getTarget();
+				obj = element.getTarget();
 				en  = "target";
 			} else if ( ctx.PCKG() != null ) {
-				obj = this.getPackage();
+				obj = element.getPackage();
 				en  = "package";
 			} else if ( ctx.PARN() != null ) {
-				obj = this.getParent();
+				obj = element.getParent();
 				en  = "parent";
 			}
 			if ( obj == null ) {

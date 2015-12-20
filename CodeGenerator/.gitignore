@@ -1,10 +1,9 @@
 /bin/
-*.temp*
+*.temp
+*.temp.*
 *.jar
 *.dll
 *.out
 *.dbg
 *.zip
 *.*bak*
-1
-

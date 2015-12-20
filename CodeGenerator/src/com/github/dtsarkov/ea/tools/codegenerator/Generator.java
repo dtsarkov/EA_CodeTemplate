@@ -36,7 +36,8 @@ public class Generator {
         if ( !modelFile.equalsIgnoreCase("not-required") ) {
             model = openModel(modelFile);
 
-            Collection elements = model.GetElementsByQuery("Element Name", elementName);
+            @SuppressWarnings("rawtypes")
+			Collection elements = model.GetElementsByQuery("Element Name", elementName);
             if ( elements.GetCount() == 0 ) {
                 System.err.printf("Could not find any elments with name \"%s\"\n", elementName);
                 model.CloseFile();
