@@ -1,0 +1,13 @@
+-- String functions start ----------
+%REPLACE("TX_125_34_R_CFIG_MAP_TM","^TX_[0-9]+_","")%
+-- String functions end ------------
+-- Output functions start ----------
+%MESSAGE("Simple message")%
+%WARNING("Warning message")%
+%ERROR("Error message")%
+-- Output functions end ------------
+
+-- Exist function start ------------
+%EXIST("functions")%
+%EXIST("BLA-BLA")%
+-- Exist function end --------------

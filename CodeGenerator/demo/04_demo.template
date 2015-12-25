@@ -1,0 +1,9 @@
+%%
+%% Description: Template to demonstrate template calls
+%% ============================================================================
+-- Stream Header called without parameters ------------------------------------
+%call="TCF_StreamHeader" @parameters="//"%
+
+-- Stream's jobs --------------------------------------------------------------
+%list=$.Elements @template="AS_Job"%
+%%list=$.Elements @template="AS_Job" @separator="###separator###\n"%

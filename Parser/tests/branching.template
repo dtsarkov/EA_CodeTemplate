@@ -1,8 +1,8 @@
-%if $aaa == "bbb" or $.Name == "My Object" %
+%if $aaa == "bbb" or $.Name ~= "My Object" %
 	text for 1st conidtion
-%elseif $xName == $var and $#str == "string" or "aaa" == "bbb"%
+%elseif $xName == $var and $str == "string" or "aaa" == "bbb"%
 	text for 2nd condition %dl%
 %else%
-	default text %AnotherTemplate%
+	default text
 	%exit%
 %endif%

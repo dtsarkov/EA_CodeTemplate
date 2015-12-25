@@ -1,3 +1,10 @@
+//
+// History
+// Version	Description
+// ------------	---------------------------------------------------------------
+// 0.21		Added Pred_op to freeText rule to fix the bug when parser did not
+//		recognized and/or as a free text.
+// ----------------------------------------------------------------------------
 grammar EACodeTemplate;
 
 //file	: (line NL)* EOF
@@ -13,10 +20,6 @@ line 		: assignment
 		| branching
 		| text 
 ;
-
-//
-// ============================================================================
-//comment		: '$COMMENT' EQ StringLiteral
 
 //
 // ============================================================================
@@ -77,14 +80,14 @@ endtempalte_stmt: '%exit%'
 compare_expr	: predicate (pred_op predicate)*
 ;
 predicate	: expr test_op expr
+		| expr RegEx_op stringLiteral
 ;
 pred_op     	: Pred_op;
 test_op		: Test_op;
 
 Pred_op 	: 'and' | 'or';
 Test_op		: '=='	| '!=';
-
-
+RegEx_op	: '~=';
 //
 // ============================================================================
 text		: ( 
@@ -115,16 +118,17 @@ listMacro		: List 	attribute templateName (
 				)* 
 			'%'
 ;
-callMacro		: Call stringLiteral (templateParameters | elementInScope)*  '%'
+callMacro		: Call expr (templateParameters | elementInScope)*  '%'
 ;
 splitMacro		: Split expr templateName (
 					templateParameters 
 				| 	delimiter
 				|	separator
+				|	elementInScope
 				)*
 			'%'
 ;				
-templateName 		: TemplateName stringLiteral
+templateName 		: TemplateName expr //stringLiteral
 ;
 templateParameters	: Parameters parameters
 ;
@@ -136,7 +140,7 @@ elementInScope		: ElementInScope (SRCE | TRGT | PCKG | PARN)
 ;
 functions		: Function parameters ')%'
 ;
-parameters		: expr (',' expr)*
+parameters		: expression (COMA expression)*
 ;
 piMacro			:  PI stringLiteral '%'
 ;
@@ -145,7 +149,10 @@ List            : '%list=';
 Call            : '%call=';
 Split           : '%split=';
 PI              : '%PI=';
-Function        : '%UPPER(' | '%LOWER(' | '%REPLACE(' | '%DEBUG(';
+Function        : '%UPPER(' | '%LOWER(' | '%REPLACE(' | '%TRIM('  
+		| '%MESSAGE(' | '%WARNING(' | '%ERROR(' | '%DEBUG('
+		| '%EXIST('
+;
 
 TemplateName    : '@template=';
 Parameters      : '@parameters=';
@@ -155,9 +162,9 @@ Delimiter       : '@delimiter=';
 // ============================================================================
 // =
 // ============================================================================
-freeText	: FreeText
+freeText	: FreeText | Pred_op | COMA
 ;
-FreeText	: [a-zA-Z0-9_(){}\.+\-\*\:\/\[\]<>\~!?@#^&\|'`,;]+
+FreeText	: [a-zA-Z0-9_(){}\.+\-\*\:\/\[\]<>\~!?@#^&\|'`;]+
 ;
 
 //string 		: StringLiteral
@@ -194,6 +201,7 @@ EQ	: '=';
 EQQ	: '==';
 AEQ	: '+=';
 //ADD	: '+';
+COMA	: ',';
 
 fragment DIGIT : [0-9];
 NUMBER  : DIGIT+;

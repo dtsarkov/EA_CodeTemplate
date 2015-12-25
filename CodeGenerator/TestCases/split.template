@@ -1,11 +1,16 @@
-%DEBUG("=== Test #01 ========================")%
+$templateName = "split_x01"
+%%DEBUG("=== Test #01 ========================")%
+-- Test #01 ------------------------------------------------
 %split="aaa,bbb,ccc" @template="split_x01"%
 
-%DEBUG("=== Test #02 ========================")%
+%%DEBUG("=== Test #02 ========================")%
+-- Test #02 ------------------------------------------------
 %split="aaa,bbb,ccc" @template="split_x01" @separator="="%
 
-%DEBUG("=== Test #03 ========================")%
+%%DEBUG("=== Test #03 ========================")%
+-- Test #03 ------------------------------------------------
 %split="aaa:bbb:ccc" @template="split_x01" @delimiter=":"%
 
-%DEBUG("=== Test #04 ========================")%
-%split="aaa:bbb:ccc" @template="split_x01" @delimiter=":" @separator="\t"%
+%%DEBUG("=== Test #04 ========================")%
+-- Test #04 ------------------------------------------------
+%split="aaa:bbb:ccc" @template=$templateName @delimiter=":" @separator="\t"%

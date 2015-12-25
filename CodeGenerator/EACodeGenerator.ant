@@ -15,9 +15,9 @@
                 <attribute name="Rsrc-Class-Path" value="./ antlr-4.5.1-complete.jar eaapi.jar"/>
             </manifest>
             <zipfileset src="jar-in-jar-loader.zip"/>
-            <fileset dir="//VMWARE-HOST/Shared Folders/Work/EA/Add-in/EA_CodeTemplate/CodeGenerator/bin"/>
-            <zipfileset dir="//vmware-host/Shared Folders/Utils" includes="antlr-4.5.1-complete.jar"/>
-            <zipfileset dir="//VMWARE-HOST/Shared Folders/Work/EA/Add-in/EA_CodeTemplate/CodeGenerator" includes="eaapi.jar"/>
+            <fileset dir="bin"/>
+            <zipfileset dir="." includes="antlr-4.5.1-complete.jar"/>
+            <zipfileset dir="." includes="eaapi.jar"/>
         </jar>
     </target>
 </project>

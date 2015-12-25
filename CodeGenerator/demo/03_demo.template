@@ -1,0 +1,8 @@
+%%
+%% Description: Template to demonstrate template call
+%% ============================================================================
+-- Stream Header called without parameters -----------
+%call="TCF_StreamHeader"%
+
+-- Stream Header called with parameters -----------
+%call="TCF_StreamHeader" @parameters="//"%

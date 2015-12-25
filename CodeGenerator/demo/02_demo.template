@@ -1,0 +1,10 @@
+%%
+%% Description: Template to demonstrate usage of element's attributes and tags
+%% ============================================================================
+// TCF Stream
+// Name		: $.Name
+// Stream ID	: $."TCF::Stream ID"
+// Executes	: $."AS::days_of_week" @ $."AS::start_time"
+// Description	: $.Notes
+
+

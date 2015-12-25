@@ -36,7 +36,8 @@ public class Generator {
         if ( !modelFile.equalsIgnoreCase("not-required") ) {
             model = openModel(modelFile);
 
-            Collection elements = model.GetElementsByQuery("Element Name", elementName);
+            @SuppressWarnings("rawtypes")
+			Collection elements = model.GetElementsByQuery("Element Name", elementName);
             if ( elements.GetCount() == 0 ) {
                 System.err.printf("Could not find any elments with name \"%s\"\n", elementName);
                 model.CloseFile();
@@ -54,7 +55,6 @@ public class Generator {
             return;
 		}
 		
-		TemplateProcessor.setTemplateFolder(templateFile.getParent());
 		TemplateProcessor.setTemplateExtention(templateExt);
 		TemplateProcessor.setEAModel(model);
 		if (args.length == 5 && args[4].equalsIgnoreCase("debug")) {
@@ -69,6 +69,7 @@ public class Generator {
 				,"------------------------------"
 		);
 		TemplateProcessor tp = new TemplateProcessor(templateName);
+		tp.setTemplateFolder(templateFile.getParent());
 		tp.setOutput(fw);
 		tp.setElement(element);
 		tp.execute();
@@ -76,10 +77,15 @@ public class Generator {
 		fw.flush();
 		fw.close();
 
+		TemplateProcessor.message("-------------------------------------------------------------------------------");
+		TemplateProcessor.message("Warnings\t: %d",TemplateProcessor.getWarningCounter());
+		TemplateProcessor.message("Errors  \t: %d",TemplateProcessor.getErrorCounter());
+		
         if ( model != null )  {
             element = null;
             System.out.printf("Closing model file \"%s\"...", modelFile);
             model.CloseFile();
+            model.Exit();
             model = null;
             System.out.println("done.");
             

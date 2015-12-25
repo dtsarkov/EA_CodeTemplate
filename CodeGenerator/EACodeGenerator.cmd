@@ -4,7 +4,7 @@
 TASKLIST /FI "IMAGENAME eq EA.exe" /FO CSV /NH > ea1.temp
  
 ::Execute EACodeGenerator
-"C:\Program Files (x86)\Java\jdk1.7.0_79\bin\java.exe" -d32 -jar EACodeGenerator.jar %*
+"C:\Utils\Java\jdk1.7.0_79\bin\java.exe" -d32 -jar EACodeGenerator.jar %*
 ::;eaapi.jar;antlr-4.5.1-complete.jar;" com.github.dtsarkov.ea.tools.codegenerator.Generator 
  
 ::Get 2nd list of EA instances

@@ -1,5 +1,0 @@
-$profile = $package."AS::profile"
-%if $profile == ""%
-	$profile = "/cba_app/RBSBUS/PROD/scripts/ds_profile"
-%endif%
-$profile

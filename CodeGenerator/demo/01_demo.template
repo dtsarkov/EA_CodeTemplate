@@ -1,0 +1,17 @@
+%%
+%% Description: Template to demonstrate basic features
+%% ============================================================================
+
+This text will be inserted into output file without any transformation
+including system characters %dl% %pc% %eq% %qt% %us%
+-- and 
+$var1 = "b"
+$var2 = "c"
+$var3 = "b"
+%if $var1 == $var2 or $var1 == $var3%
+	True Condition
+%else%
+	False Condition
+%endif%	
+//
+
