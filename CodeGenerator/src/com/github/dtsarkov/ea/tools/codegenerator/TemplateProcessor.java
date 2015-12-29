@@ -65,6 +65,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	
 	private	static int			errorCounter 	= 0;
 	private static int			warningCounter 	= 0;
+	private static boolean		verbose			= false;
 	
 	static {
 		templateExtention = ".template";
@@ -94,6 +95,13 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		return EA_Model;
 	}
 	
+	static public void setVerbose(boolean mode) {
+		verbose = mode;
+	}
+	static public boolean getVerbose() {
+		return verbose;
+	}
+
 	static public void message(String s) {
 		System.out.println(s);
 	}
@@ -253,11 +261,13 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			isOpen = openTemplateFile();
 			if ( !isOpen ) return;
 		}
-		message("%-30s|%-20s|%-30s"
-				,element.getAttribute("$.Name",false)
-				,element.getAttribute("$.Type",false)
-				,this.templateName
-		);
+		if ( verbose ) {
+			message("%-30s|%-20s|%-30s"
+					,element.getAttribute("$.Name",false)
+					,element.getAttribute("$.Type",false)
+					,this.templateName
+			);
+		}
 		parser.addParseListener(this);
 		parser.file();
 		parser.removeParseListeners();
