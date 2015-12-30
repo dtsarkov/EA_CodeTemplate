@@ -127,3 +127,22 @@ Test branching macros, ( and or ) conditons, nested ifs
 	%endif%
 %endif%
 
+%if "Regexpression123" ~= ".*expression[0-9]+"%
+		Test 16 : PASS
+%else%
+		Test 16 : FAIL
+%endif%				
+
+$expression = ".*expression[0-9]+"
+
+%if "Regexpression123" ~= $expression%
+		Test 17 : PASS
+%else%
+		Test 17 : FAIL
+%endif%				
+
+%if "RegexpressionABC" ~= $expression%
+		Test 18	 : FAIL
+%else%
+		Test 18 : PASS
+%endif%				

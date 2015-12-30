@@ -80,14 +80,14 @@ endtempalte_stmt: '%exit%'
 compare_expr	: predicate (pred_op predicate)*
 ;
 predicate	: expr test_op expr
-		| expr RegEx_op stringLiteral
+		//| expr RegEx_op stringLiteral
 ;
 pred_op     	: Pred_op;
 test_op		: Test_op;
 
 Pred_op 	: 'and' | 'or';
-Test_op		: '=='	| '!=';
-RegEx_op	: '~=';
+Test_op		: '=='	| '!=' | '~=';
+//RegEx_op	: '~=';
 //
 // ============================================================================
 text		: ( 

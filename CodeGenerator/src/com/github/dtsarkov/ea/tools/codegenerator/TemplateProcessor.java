@@ -557,10 +557,13 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		
 		boolean equal = false;
 		if ( exp1 != null && exp2 != null ) {
-			equal = (exp1.compareTo(exp2) == 0);
-			
-			if ( op.compareTo("!=") == 0 ) {
-				equal = !equal;
+			if ( op.compareTo("~=") == 0 ) {
+				equal = exp1.matches(exp2);
+			} else {
+				equal = (exp1.compareTo(exp2) == 0);
+				if ( op.compareTo("!=") == 0 ) {
+					equal = !equal;
+				}
 			}
 		}
 		debug("Eval([%s] %s [%s]) is %s",exp1,op,exp2,equal);
