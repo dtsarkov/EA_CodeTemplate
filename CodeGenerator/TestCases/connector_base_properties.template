@@ -1,0 +1,7 @@
+Name		:$.Name	
+ConnectorID	:$.ConnectorID 
+Type		:$.Type	
+Subtype		:$.Subtype
+Stereotype	:$.Stereotype
+ConnectorGUID	:$.ConnectorGUID 
+--------------------------------------------------------------------------------

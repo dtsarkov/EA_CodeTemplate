@@ -1,0 +1,21 @@
+################################################################################
+Case#1: List all elements from %qt%$package.Name%qt% package
+################################################################################
+%list=$package.Elements @template="element_base_properties"%
+%nl%
+################################################################################
+Case#2: List all packages from %qt%$package.Name%qt% package
+################################################################################
+%list=$package.Packages @template="element_base_properties"%
+%nl%
+################################################################################
+Case#3: List all connectors attached to element %qt%$.Name%qt%  
+################################################################################
+%list=$.Connectors @template="list_x01" @parameters="connector_base_properties"%
+%nl%
+################################################################################
+$connectorType="Dependency"
+Case#4: List all %qt%$connectorType%qt% connectors attached to element %qt%$.Name%qt% 
+################################################################################
+%list=$.Connectors @template="list_x01" @parameters="connector_base_properties" ($.Type == $connectorType)%
+%nl%

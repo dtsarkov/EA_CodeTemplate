@@ -1,0 +1,133 @@
+################################################################################
+Case#1: List all elements from "List Demo" package
+################################################################################
+Name		:Activity1
+ElementID	:22
+Type		:Activity
+Subtype		:0
+Stereotype	:
+ElementGUID	:{A2F9593A-7787-4442-8EBD-76B83BD74828}
+--------------------------------------------------------------------------------
+Name		:Activity2
+ElementID	:23
+Type		:Activity
+Subtype		:0
+Stereotype	:
+ElementGUID	:{269B71BA-E656-4d60-AC64-5943EEA635E1}
+--------------------------------------------------------------------------------
+Name		:Activity3
+ElementID	:24
+Type		:Activity
+Subtype		:0
+Stereotype	:
+ElementGUID	:{9A86145D-1478-4cbf-B67E-EC54C029B665}
+--------------------------------------------------------------------------------
+Name		:
+ElementID	:30
+Type		:Text
+Subtype		:76
+Stereotype	:
+ElementGUID	:{A02C4A24-8906-4d94-A5E7-8EAE6B61EAED}
+--------------------------------------------------------------------------------
+Name		:
+ElementID	:25
+Type		:Text
+Subtype		:76
+Stereotype	:
+ElementGUID	:{D4256345-C948-4b26-BE04-5F0AC79DE1FB}
+--------------------------------------------------------------------------------
+
+################################################################################
+Case#2: List all packages from "List Demo" package
+################################################################################
+Name		:Database1
+ElementID	:26
+Type		:Package
+Subtype		:0
+Stereotype	:
+ElementGUID	:{32567EDC-4C2A-404f-8402-4F963B7A2E30}
+--------------------------------------------------------------------------------
+Name		:Database2
+ElementID	:27
+Type		:Package
+Subtype		:0
+Stereotype	:
+ElementGUID	:{6A08487F-07EF-4222-B292-ED748348EB2A}
+--------------------------------------------------------------------------------
+Name		:Database3
+ElementID	:28
+Type		:Package
+Subtype		:0
+Stereotype	:
+ElementGUID	:{874EB917-1AA2-42d4-BBB0-0F8DA33D500E}
+--------------------------------------------------------------------------------
+Name		:Database4
+ElementID	:29
+Type		:Package
+Subtype		:0
+Stereotype	:
+ElementGUID	:{620076DF-A5ED-41ff-8D06-CBB8C18373B7}
+--------------------------------------------------------------------------------
+
+################################################################################
+Case#3: List all connectors attached to element "Activity2"
+################################################################################
+> Processing element# 1 out of 4
+Name		:
+ConnectorID	:10
+Type		:Dependency
+Subtype		:
+Stereotype	:
+ConnectorGUID	:{5A152596-F65E-487c-B01B-F316943BDA6E}
+--------------------------------------------------------------------------------
+
+> Processing element# 2 out of 4
+Name		:
+ConnectorID	:11
+Type		:Dependency
+Subtype		:
+Stereotype	:
+ConnectorGUID	:{058560F9-0A04-4b7f-BFF8-8EB987238326}
+--------------------------------------------------------------------------------
+
+> Processing element# 3 out of 4
+Name		:
+ConnectorID	:18
+Type		:ControlFlow
+Subtype		:
+Stereotype	:
+ConnectorGUID	:{F56AF750-1A59-49fa-A7A8-6FAD027BBAEE}
+--------------------------------------------------------------------------------
+
+> Processing element# 4 out of 4
+Name		:
+ConnectorID	:19
+Type		:ControlFlow
+Subtype		:
+Stereotype	:
+ConnectorGUID	:{72918668-E59C-4c00-98C7-0A8C58BDA391}
+--------------------------------------------------------------------------------
+
+
+################################################################################
+Case#4: List all "Dependency" connectors attached to element "Activity2"
+################################################################################
+> Processing element# 1 out of 2
+Name		:
+ConnectorID	:10
+Type		:Dependency
+Subtype		:
+Stereotype	:
+ConnectorGUID	:{5A152596-F65E-487c-B01B-F316943BDA6E}
+--------------------------------------------------------------------------------
+
+> Processing element# 2 out of 2
+Name		:
+ConnectorID	:11
+Type		:Dependency
+Subtype		:
+Stereotype	:
+ConnectorGUID	:{058560F9-0A04-4b7f-BFF8-8EB987238326}
+--------------------------------------------------------------------------------
+
+

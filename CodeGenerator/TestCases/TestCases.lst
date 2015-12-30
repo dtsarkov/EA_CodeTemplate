@@ -4,3 +4,5 @@ Component 1.1.2.1,escapeCodes,escapeCodes.out
 Component 1.1.2.1,functions,functions.out
 Component 1.1.2.1,split,split.out
 Component 1.1.2.1,textMacros,textMacros.out
+Activity2,list,list.out
+Activity2,call,call.out

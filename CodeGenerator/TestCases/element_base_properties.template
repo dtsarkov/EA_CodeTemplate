@@ -1,0 +1,7 @@
+Name		:$.Name	
+ElementID	:$.ElementID 
+Type		:$.Type	
+Subtype		:$.Subtype
+Stereotype	:$.Stereotype
+ElementGUID	:$.ElementGUID 
+--------------------------------------------------------------------------------

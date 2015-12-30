@@ -694,18 +694,40 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		Collection ec 	= (Collection)attribute;
 		short		ecCount	 	= ec.GetCount();
 		Object		obj			= null;
-		debug("\tCount = [%d]",ecCount);
 
+		
+		Compare_exprContext conditions = null;
+		if (ctx.conditions(0) != null ) {
+			conditions = ctx.conditions(0).compare_expr();
+			debug("\tConditions=[%s]",conditions.getText());
+		}
+		
+		//Prepare list of elements
+		ArrayList<Object> elements = new ArrayList(ecCount);
+		EAElement currentElement = this.element;
+		for ( short i = 0; i < ecCount; i++ ) {
+			obj = ec.GetAt(i);
+			this.setElement(obj);
+			if ( conditions == null || evalCompareExpr(conditions) ) {
+				elements.add(obj);
+			}
+		}
+		this.setElement(currentElement);
+		int elementsCount = elements.size();
+		debug("\tElements: total count=[%d] for processing=[%d]",ecCount, elementsCount);
+			
 		//Set parameters
 		if ( ctx.templateParameters(0) != null ) {
 			String value = "";
 			List<ExpressionContext> parms = ctx.templateParameters(0).parameters().expression();
 			for ( int i = 0; i < parms.size(); i++ ) {
 				value = calcExpression(parms.get(i));
-				debug("\t\tset parameter $%d = [%s]",i+1,value);
+				debug("\tset parameter $%d = [%s]",i+1,value);
 				tp.addParameter(value);
 			}
 		}
+		
+		//Set separator
 		String separator = getLineSeparator();
 		if (ctx.separator(0) != null ) {
 			separator = calcExpression(ctx.separator(0).expr());
@@ -714,12 +736,12 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		//Execute template for each element
 		StringWriter sw;
 		StringBuffer sb;
-		for ( short i = 0, w = 0; i < ecCount; i++ ) {
-			obj = ec.GetAt(i);
+		for ( int i = 0, w = 0; i < elementsCount; i++ ) {
+			obj = elements.get(i);
 			sw = new StringWriter();
 			tp.setOutput(sw);
 			tp.setElement(obj);
-			tp.setVariable("$COUNT", Integer.toString(ecCount));
+			tp.setVariable("$COUNT", Integer.toString(elementsCount));
 			tp.setVariable("$CURRENT", Integer.toString(i+1));
 			tp.execute();
 			sb = sw.getBuffer();

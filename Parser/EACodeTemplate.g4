@@ -114,7 +114,7 @@ textMacros 		: '%dl%' | '%pc%' | '%eq%' | '%qt%' | '%us%' | '%nl%' //| '%sl%'
 listMacro		: List 	attribute templateName (
 					templateParameters
 				|	separator
-				|	elementInScope
+				|	conditions
 				)* 
 			'%'
 ;
@@ -134,11 +134,13 @@ templateParameters	: Parameters parameters
 ;
 separator		: Separator expr
 ;
+conditions		: OBR compare_expr CBR
+;
 delimiter		: Delimiter expr
 ;
 elementInScope		: ElementInScope (SRCE | TRGT | PCKG | PARN)
 ;
-functions		: Function parameters ')%'
+functions		: Function parameters CBR '%'
 ;
 parameters		: expression (COMA expression)*
 ;
@@ -162,9 +164,9 @@ Delimiter       : '@delimiter=';
 // ============================================================================
 // =
 // ============================================================================
-freeText	: FreeText | Pred_op | COMA
+freeText	: FreeText | Pred_op | COMA | OBR | CBR | DOT
 ;
-FreeText	: [a-zA-Z0-9_(){}\.+\-\*\:\/\[\]<>\~!?@#^&\|'`;]+
+FreeText	: [a-zA-Z0-9_{}\.+\-\*\:\/\[\]<>\~!?@#^&\|'`;]+
 ;
 
 //string 		: StringLiteral
@@ -202,6 +204,9 @@ EQQ	: '==';
 AEQ	: '+=';
 //ADD	: '+';
 COMA	: ',';
+OBR	: '(';
+CBR	: ')';
+DOT	: '.';
 
 fragment DIGIT : [0-9];
 NUMBER  : DIGIT+;

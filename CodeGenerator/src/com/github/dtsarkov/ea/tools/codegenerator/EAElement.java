@@ -147,9 +147,11 @@ public class EAElement {
 		if ( element != null ) {
 			if ( element.package_element != null ) {
 				//Try to get attribute from package element
+				TemplateProcessor.debug("\tfrom package_element");
 				attribute = executeGetMethod(element.package_element,attributeName);
 			}
 			if ( attribute == null ) {
+				TemplateProcessor.debug("\tfrom element");
 				attribute = executeGetMethod(element.element,attributeName);
 			}
 		}
