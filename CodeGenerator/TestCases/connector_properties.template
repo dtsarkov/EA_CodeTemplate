@@ -1,0 +1,17 @@
+################################################################################
+Name			:$.Name	
+ConnectorID		:$.ConnectorID 
+Type			:$.Type	
+Subtype			:$.Subtype
+Stereotype		:$.Stereotype
+ConnectorGUID		:$.ConnectorGUID
+
+--------------------------------------------------------------------------------
+Source Role properties
+--------------------------------------------------------------------------------
+%call="connectorRole_properties" @element=$sourceRole.%
+
+--------------------------------------------------------------------------------
+Target Role properties
+--------------------------------------------------------------------------------
+%call="connectorRole_properties" @element=$targetRole.%
