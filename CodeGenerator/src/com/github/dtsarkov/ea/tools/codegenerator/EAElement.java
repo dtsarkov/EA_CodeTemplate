@@ -16,8 +16,10 @@ public class EAElement {
 	private EAElement	elementPackage		= null;
 	private boolean 	elementHasSource	= true;
 	private EAElement	elementSource		= null;
+	private EAElement	sourceRole			= null;
 	private boolean 	elementHasTarget	= true;
 	private EAElement	elementTarget		= null;
+	private EAElement	targetRole			= null;
 	
 	public EAElement(Object element) {
 		this.element 		= element;
@@ -119,6 +121,16 @@ public class EAElement {
 		return elementSource;
 	}
 
+	public EAElement getSourceRole() {
+		if ( sourceRole == null && elementHasSource ) {
+			Object t = executeGetMethod(element, "ClientEnd");
+			elementHasSource = (t != null);
+			if ( elementHasSource )
+				sourceRole = new EAElement(t);
+		}
+		return sourceRole;
+	}
+	
 	public EAElement getTarget() {
 		if ( elementTarget == null && elementHasTarget ) {
 			//try to get element's target
@@ -140,6 +152,16 @@ public class EAElement {
 			}
 		}
 		return elementTarget;
+	}
+	
+	public EAElement getTargetRole() {
+		if ( targetRole == null && elementHasTarget ) {
+			Object t = executeGetMethod(element, "SupplierEnd");
+			elementHasTarget = (t != null);
+			if ( elementHasTarget )
+				targetRole = new EAElement(t);
+		}
+		return targetRole;
 	}
 
 	private Object getAttribute(EAElement element, String attributeName) {
@@ -176,8 +198,12 @@ public class EAElement {
 			attribute = getAttribute(getPackage(),name[1]);
 		} else if ( name[0].equalsIgnoreCase("$source") ) {
 			attribute = getAttribute(getSource(),name[1]);
+		} else if ( name[0].equalsIgnoreCase("$sourceRole") ) {
+			attribute = getAttribute(getSourceRole(),name[1]);
 		} else if ( name[0].equalsIgnoreCase("$target") ) {
 			attribute = getAttribute(getTarget(),name[1]);
+		} else if ( name[0].equalsIgnoreCase("$targetRole") ) {
+			attribute = getAttribute(getTargetRole(),name[1]);
 		} else {
 			TemplateProcessor.error("Invalid scope modifier \"%s\"!", name[1]);
 		}
@@ -208,8 +234,12 @@ public class EAElement {
 			tag = getTag(getPackage(),name[1]);
 		} else if ( name[0].equalsIgnoreCase("$source") ) {
 			tag = getTag(getSource(),name[1]);
+		} else if ( name[0].equalsIgnoreCase("$sourceRole") ) {
+			tag = getTag(getSourceRole(),name[1]);
 		} else if ( name[0].equalsIgnoreCase("$target") ) {
 			tag = getTag(getTarget(),name[1]);
+		} else if ( name[0].equalsIgnoreCase("$targetRole") ) {
+			tag = getTag(getTargetRole(),name[1]);
 		} else {
 			TemplateProcessor.error("Invalid scope modifier \"%s\"!", name[1]);
 		}

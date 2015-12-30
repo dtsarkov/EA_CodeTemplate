@@ -46,15 +46,22 @@ tag		: TAG
 parameter	: PARM
 ;
 PARM		: '$' DIGIT	;
-ATTR		: (THIS | PARN | PCKG | SRCE | TRGT ) ID;
-TAG		: (THIS | PARN | PCKG | SRCE | TRGT ) StringLiteral;
+ATTR		: (
+			THIS | PARN | PCKG | SRCE | TRGT | SROL | TROL 
+		  ) ID;
+TAG		: (
+			THIS | PARN | PCKG | SRCE | TRGT | SROL | TROL 
+		  ) StringLiteral;
 VAR		: '$''$'?  ID	;
 
-THIS		: '$.' | '$this.';
-PARN		: '$parent.'	;
-PCKG		: '$package.'	;
-SRCE		: '$source.'	;
-TRGT		: '$target.'	; 
+THIS		: '$.' | '$this.'	;
+PARN		: '$parent.'		;
+PCKG		: '$package.'		;
+SRCE		: '$source.'		;
+TRGT		: '$target.'		;
+SROL		: '$sourceRole.'	;
+TROL		: '$targetRole.'	;
+ 
 
 // Branching
 // ============================================================================
@@ -138,7 +145,9 @@ conditions		: OBR compare_expr CBR
 ;
 delimiter		: Delimiter expr
 ;
-elementInScope		: ElementInScope (SRCE | TRGT | PCKG | PARN)
+elementInScope		: ElementInScope (
+				THIS | PARN | PCKG | SRCE | TRGT | SROL | TROL 
+			)
 ;
 functions		: Function parameters CBR '%'
 ;

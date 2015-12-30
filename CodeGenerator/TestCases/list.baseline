@@ -82,7 +82,7 @@ ConnectorGUID	:{5A152596-F65E-487c-B01B-F316943BDA6E}
 --------------------------------------------------------------------------------
 
 > Processing element# 2 out of 4
-Name		:
+Name		:A2 -> V5
 ConnectorID	:11
 Type		:Dependency
 Subtype		:
@@ -91,11 +91,11 @@ ConnectorGUID	:{058560F9-0A04-4b7f-BFF8-8EB987238326}
 --------------------------------------------------------------------------------
 
 > Processing element# 3 out of 4
-Name		:
+Name		:A1 -> A2
 ConnectorID	:18
 Type		:ControlFlow
 Subtype		:
-Stereotype	:
+Stereotype	:JobDependency
 ConnectorGUID	:{F56AF750-1A59-49fa-A7A8-6FAD027BBAEE}
 --------------------------------------------------------------------------------
 
@@ -122,12 +122,248 @@ ConnectorGUID	:{5A152596-F65E-487c-B01B-F316943BDA6E}
 --------------------------------------------------------------------------------
 
 > Processing element# 2 out of 2
-Name		:
+Name		:A2 -> V5
 ConnectorID	:11
 Type		:Dependency
 Subtype		:
 Stereotype	:
 ConnectorGUID	:{058560F9-0A04-4b7f-BFF8-8EB987238326}
 --------------------------------------------------------------------------------
+
+
+################################################################################
+Case#5: List all connectors attached to element "Activity2"
+################################################################################
+################################################################################
+Name			:
+ConnectorID		:10
+Type			:Dependency
+Subtype			:
+Stereotype		:
+ConnectorGUID		:{5A152596-F65E-487c-B01B-F316943BDA6E}
+--------------------------------------------------------------------------------
+Source Role properties
+--------------------------------------------------------------------------------
+Aggregation		:0
+Alias			:
+AllowDuplicates		:false
+Cardinality		:
+Constraint		:
+Containment		:Unspecified
+Derived			:false
+DerivedUnion		:false
+End			:Client
+IsChangeable		:none
+IsNavigable		:false
+Navigable		:Non-Navigable
+ObjectType		:otConnectorEnd
+Ordering		:0
+OwnedByClassifier	:false
+Qualifier		:
+Role			:
+RoleNote		:
+RoleType		:
+Stereotype		:
+StereotypeEx		:
+Visibility		:Public
+--------------------------------------------------------------------------------
+Target Role properties
+--------------------------------------------------------------------------------
+Aggregation		:0
+Alias			:
+AllowDuplicates		:false
+Cardinality		:
+Constraint		:
+Containment		:Unspecified
+Derived			:false
+DerivedUnion		:false
+End			:Supplier
+IsChangeable		:none
+IsNavigable		:true
+Navigable		:Navigable
+ObjectType		:otConnectorEnd
+Ordering		:0
+OwnedByClassifier	:false
+Qualifier		:
+Role			:
+RoleNote		:
+RoleType		:
+Stereotype		:
+StereotypeEx		:
+Visibility		:Public
+
+################################################################################
+Name			:A2 -> V5
+ConnectorID		:11
+Type			:Dependency
+Subtype			:
+Stereotype		:
+ConnectorGUID		:{058560F9-0A04-4b7f-BFF8-8EB987238326}
+--------------------------------------------------------------------------------
+Source Role properties
+--------------------------------------------------------------------------------
+Aggregation		:0
+Alias			:A2R
+AllowDuplicates		:false
+Cardinality		:1
+Constraint		:
+Containment		:Unspecified
+Derived			:false
+DerivedUnion		:false
+End			:Client
+IsChangeable		:none
+IsNavigable		:false
+Navigable		:Non-Navigable
+ObjectType		:otConnectorEnd
+Ordering		:0
+OwnedByClassifier	:false
+Qualifier		:
+Role			:Activity2 Role
+RoleNote		:
+RoleType		:
+Stereotype		:Updates
+StereotypeEx		:
+Visibility		:Public
+--------------------------------------------------------------------------------
+Target Role properties
+--------------------------------------------------------------------------------
+Aggregation		:2
+Alias			:V5R
+AllowDuplicates		:false
+Cardinality		:
+Constraint		:
+Containment		:Unspecified
+Derived			:false
+DerivedUnion		:false
+End			:Supplier
+IsChangeable		:none
+IsNavigable		:false
+Navigable		:Unspecified
+ObjectType		:otConnectorEnd
+Ordering		:0
+OwnedByClassifier	:false
+Qualifier		:
+Role			:View5 Role
+RoleNote		:
+RoleType		:
+Stereotype		:Updated
+StereotypeEx		:
+Visibility		:
+
+################################################################################
+Name			:A1 -> A2
+ConnectorID		:18
+Type			:ControlFlow
+Subtype			:
+Stereotype		:JobDependency
+ConnectorGUID		:{F56AF750-1A59-49fa-A7A8-6FAD027BBAEE}
+--------------------------------------------------------------------------------
+Source Role properties
+--------------------------------------------------------------------------------
+Aggregation		:0
+Alias			:
+AllowDuplicates		:false
+Cardinality		:
+Constraint		:
+Containment		:Unspecified
+Derived			:false
+DerivedUnion		:false
+End			:Client
+IsChangeable		:none
+IsNavigable		:false
+Navigable		:
+ObjectType		:otConnectorEnd
+Ordering		:0
+OwnedByClassifier	:false
+Qualifier		:
+Role			:
+RoleNote		:
+RoleType		:
+Stereotype		:
+StereotypeEx		:
+Visibility		:Public
+--------------------------------------------------------------------------------
+Target Role properties
+--------------------------------------------------------------------------------
+Aggregation		:0
+Alias			:
+AllowDuplicates		:false
+Cardinality		:
+Constraint		:
+Containment		:Unspecified
+Derived			:false
+DerivedUnion		:false
+End			:Supplier
+IsChangeable		:none
+IsNavigable		:false
+Navigable		:
+ObjectType		:otConnectorEnd
+Ordering		:0
+OwnedByClassifier	:false
+Qualifier		:
+Role			:
+RoleNote		:
+RoleType		:
+Stereotype		:
+StereotypeEx		:
+Visibility		:
+
+################################################################################
+Name			:
+ConnectorID		:19
+Type			:ControlFlow
+Subtype			:
+Stereotype		:
+ConnectorGUID		:{72918668-E59C-4c00-98C7-0A8C58BDA391}
+--------------------------------------------------------------------------------
+Source Role properties
+--------------------------------------------------------------------------------
+Aggregation		:0
+Alias			:
+AllowDuplicates		:false
+Cardinality		:
+Constraint		:
+Containment		:Unspecified
+Derived			:false
+DerivedUnion		:false
+End			:Client
+IsChangeable		:none
+IsNavigable		:false
+Navigable		:
+ObjectType		:otConnectorEnd
+Ordering		:0
+OwnedByClassifier	:false
+Qualifier		:
+Role			:
+RoleNote		:
+RoleType		:
+Stereotype		:
+StereotypeEx		:
+Visibility		:Public
+--------------------------------------------------------------------------------
+Target Role properties
+--------------------------------------------------------------------------------
+Aggregation		:0
+Alias			:
+AllowDuplicates		:false
+Cardinality		:
+Constraint		:
+Containment		:Unspecified
+Derived			:false
+DerivedUnion		:false
+End			:Supplier
+IsChangeable		:none
+IsNavigable		:false
+Navigable		:
+ObjectType		:otConnectorEnd
+Ordering		:0
+OwnedByClassifier	:false
+Qualifier		:
+Role			:
+RoleNote		:
+RoleType		:
+Stereotype		:
+StereotypeEx		:
+Visibility		:Public
 
 

@@ -980,25 +980,31 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	
     private EAElement getElementInScope(ElementInScopeContext ctx) {
     	EAElement obj = null;
-	if ( ctx != null ) {
-		String en = "UNKNOWN";
-		if ( ctx.SRCE() != null ) {
-			obj = element.getSource();
-			en  = "source";
-		} else if ( ctx.TRGT() != null ) {
-			obj = element.getTarget();
-			en  = "target";
-		} else if ( ctx.PCKG() != null ) {
-			obj = element.getPackage();
-			en  = "package";
-		} else if ( ctx.PARN() != null ) {
-			obj = element.getParent();
-			en  = "parent";
+		if ( ctx != null ) {
+			String en = ctx.getText();
+			if ( ctx.SRCE() != null ) {
+				obj = element.getSource();
+				en  = "source";
+			} else if ( ctx.SROL() != null ) {
+				obj = element.getSourceRole();
+				en  = "sourceRole";
+			} else if ( ctx.TRGT() != null ) {
+				obj = element.getTarget();
+				en  = "target";
+			} else if ( ctx.TROL() != null ) {
+				obj = element.getTargetRole();
+				en  = "targetRole";
+			} else if ( ctx.PCKG() != null ) {
+				obj = element.getPackage();
+				en  = "package";
+			} else if ( ctx.PARN() != null ) {
+				obj = element.getParent();
+				en  = "parent";
+			}
+			if ( obj == null ) {
+				error("Element does not have the \"%s\" property!", en);
+			}
 		}
-		if ( obj == null ) {
-			error("Element does not have the \"%s\" property!", en);
-		}
-	}
         return obj;
     }
 	private void executeCallMacro( CallMacroContext ctx, Writer writer ) {

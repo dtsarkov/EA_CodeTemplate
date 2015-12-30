@@ -19,3 +19,8 @@ Case#4: List all %qt%$connectorType%qt% connectors attached to element %qt%$.Nam
 ################################################################################
 %list=$.Connectors @template="list_x01" @parameters="connector_base_properties" ($.Type == $connectorType)%
 %nl%
+################################################################################
+Case#5: List all connectors attached to element %qt%$.Name%qt% 
+################################################################################
+%list=$.Connectors @template="connector_properties"%
+%nl%
