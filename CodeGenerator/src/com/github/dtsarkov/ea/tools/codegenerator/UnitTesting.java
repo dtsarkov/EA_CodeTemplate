@@ -13,7 +13,7 @@ public class UnitTesting {
 		String[] testArgs = new String[] {
 				 "--model", "C:\\Work\\EA\\Add-in\\EA_CodeTemplate\\CodeGeneratorDemo.EAP"
 				,"-b", "TestCases\\TestCases.lst", "-f", "TestCases", "-x", "template"
-				//,"-t", "TestCases\\list.template"	,"-e", "Activity2" ,"-o", "test.out" //, "-d"
+				//,"-t", "TestCases\\attributes.template"	,"-e", "Activity2" ,"-o", "test.out" //, "-d"
 				//,"-v"
 				//,"-d"
 			};

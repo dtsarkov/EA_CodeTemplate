@@ -2,7 +2,6 @@
 %% 
 %% Execution: CodeGeneratorDemo.eap "Component 1.1.1.1" attributes.template
 %%
-
 ###: -- Tast case #1 -- Element's attributes
 #01: Name	: $.Name	%eq% $this.Name
 #02: Alias	: $.Alias	%eq% $this.Alias

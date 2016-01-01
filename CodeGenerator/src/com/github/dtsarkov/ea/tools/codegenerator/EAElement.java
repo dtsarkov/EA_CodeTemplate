@@ -2,6 +2,7 @@ package com.github.dtsarkov.ea.tools.codegenerator;
 
 import java.lang.reflect.Method;
 
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.sparx.Collection;
 import org.sparx.Element;
 import org.sparx.TaggedValue;
@@ -180,7 +181,16 @@ public class EAElement {
 		return attribute;
 	}
 	
-	public Object getAttribute(String attributeFullName, boolean raiseError) {
+	public String getAttributeValue(ParserRuleContext ctx) {
+		Object attribute = getAttribute(ctx.getText(),ctx);
+		
+		if ( attribute == null )
+			return null;
+		else 
+			return attribute.toString();
+	}
+	
+	public Object getAttribute(String attributeFullName, ParserRuleContext ctx) {
 		if ( this.element == null ) return null;
 
 		Object attribute 	= null;
@@ -205,9 +215,12 @@ public class EAElement {
 		} else if ( name[0].equalsIgnoreCase("$targetRole") ) {
 			attribute = getAttribute(getTargetRole(),name[1]);
 		} else {
-			TemplateProcessor.error("Invalid scope modifier \"%s\"!", name[1]);
+			TemplateProcessor.error(ctx, "Invalid scope modifier \""+name[0]+"\"!");
 		}
 		
+		if ( attribute == null ) {
+			TemplateProcessor.error(ctx, "Attribute \""+name[1]+"\" does not exist!");
+		}
 		return attribute;
 	}
 

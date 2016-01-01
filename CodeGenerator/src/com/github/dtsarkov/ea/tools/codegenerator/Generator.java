@@ -120,6 +120,7 @@ public class Generator {
 	    		);
     		}
     		tp = new TemplateProcessor(pe.template);
+    		
     		tp.setTemplateFolder(templateFolder);
     		tp.setOutput(fw);
     		tp.setElement(element);
@@ -271,6 +272,7 @@ public class Generator {
 				line 		= lr.readLine();
 			}
 			loaded = ( line == null );
+			lr.close();
 		} catch (FileNotFoundException e) {
 			System.out.printf("File %s not found\n", fileName);
 		} catch (IOException e) {
