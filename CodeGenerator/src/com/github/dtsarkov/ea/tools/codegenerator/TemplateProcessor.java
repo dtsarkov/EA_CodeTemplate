@@ -8,12 +8,18 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.regex.Matcher;
+
+import javax.swing.text.html.parser.DTD;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -70,6 +76,10 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	static {
 		templateExtention = ".template";
 		
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat dt = new SimpleDateFormat("hh:mm:ss");
+		Date date 			= Calendar.getInstance().getTime();
+		
 		globalVariables = new HashMap<String,String>();
 		
 		TextMacros = new HashMap<String,String>();
@@ -79,6 +89,9 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		TextMacros.put("%qt%", "\"");
 		TextMacros.put("%us%", "_");
 		TextMacros.put("%nl%",System.lineSeparator());
+		TextMacros.put("%DATE%", df.format(date));
+		TextMacros.put("%TIME%", dt.format(date));
+		TextMacros.put("%USER%", "");
 	}
 	
 	static public void setTemplateExtention( String extention ) {
@@ -408,15 +421,66 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			value = firstParameter.toUpperCase();
 		} else if (function.equalsIgnoreCase("%TRIM(") ) {
 			value = firstParameter.trim();
+		} else if (function.equalsIgnoreCase("%LENGTH(") ) {
+			value = String.valueOf(firstParameter.length());
 		} else if (function.equalsIgnoreCase("%REPLACE(") ) {
 			if (parmCount < 3 ) {
-				error(ctx,"Incorrect function call %REPLACE( string, regexp, replacement )%");
+				error(ctx,"Incorrect function call %REPLACE(string, regexp, replacement )%");
 				return value;
 			}
 			value = firstParameter.replaceAll(
 						calcExpression(ctx.parameters().expression(1))
 					   ,calcExpression(ctx.parameters().expression(2))
 					);
+		} else if (function.equalsIgnoreCase("%MID(") ) {
+			if (parmCount < 2) {
+				error(ctx,"Incorrect function call %MID(string, start [,count])%");
+				return value;
+			} 
+			int start	= Integer.valueOf(calcExpression(ctx.parameters().expression(1)))-1;
+			int	end 	= start; 
+			if (parmCount >  2 ) {
+				end	  = start+Integer.valueOf(calcExpression(ctx.parameters().expression(2)));
+				if ( end > firstParameter.length() )
+					end = firstParameter.length();
+			} else {
+				end = firstParameter.length();
+			}
+			value = firstParameter.substring(start, end);
+			
+		} else if (function.equalsIgnoreCase("%PLAIN_TEXT(") ) {
+			value = EA_Model.GetFormatFromField("TXT", firstParameter);
+			
+		} else if (function.equalsIgnoreCase("%WRAP_TEXT(") ) {
+			if (parmCount < 2) {
+				error(ctx,"Incorrect function call %WRAP_TEXT(string, length [,prefix [,sufix]])%");
+				return value;
+			}
+			
+			firstParameter= firstParameter.replace("\n", " ").replace("\r", "");
+			int len0  	  = firstParameter.length();
+			int len1 	  = Integer.valueOf(calcExpression(ctx.parameters().expression(1)));
+			String prefix = (parmCount > 2) ? calcExpression(ctx.parameters().expression(2)) : "";
+			String suffix = (parmCount > 3) ? calcExpression(ctx.parameters().expression(3)) : "";
+			value 		  = "";
+			for ( int s = 0, e = 0; s < len0; s+=len1 ) {
+				e += len1;
+				if ( e > len0 ) {
+					if ( !suffix.isEmpty() ) {
+						//Left pad suffix with spaces.
+						char p[] = new char[e-len0];
+						Arrays.fill(p, ' ');
+						suffix = new String(p) + suffix;
+					}
+					e = len0;
+				}
+				value += (
+						prefix 
+					+ 	firstParameter.substring(s,e) 
+					+ 	suffix 
+					+ 	((e != len0) ? System.lineSeparator() : "")
+				);
+			}
 		} else if (function.equalsIgnoreCase("%DEBUG(") ) {
 			debug(firstParameter);
 		} else if (function.equalsIgnoreCase("%ERROR(") ) {
@@ -428,7 +492,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		} else if (function.equalsIgnoreCase("%EXIST(") ) {
 			value = Boolean.toString(existTemplate(firstParameter));
 		} else {
-			error(ctx, "Unknown function "+function+")");
+			error(ctx, "Unknown function "+function+")%");
 		}
 		debug("\t\t value = %s", value);
 		return value;

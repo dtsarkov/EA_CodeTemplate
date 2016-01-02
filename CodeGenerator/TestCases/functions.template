@@ -1,13 +1,33 @@
--- String functions start ----------
+$txt="This a very long and very stupid line used to test WRAP_TEXT and LENGTH functions. It repeats 3 times. "
+$txt+=$txt
+$txt+=$txt
+
+$str="123456789@123456789~123456789#123456789^"
+-- String functions start ------------------------------------------------------
 %REPLACE("TX_125_34_R_CFIG_MAP_TM","^TX_[0-9]+_","")%
--- String functions end ------------
--- Output functions start ----------
+%LENGTH($txt)%
+%MID($str,"20")%
+%MID($str,"29","10")%
+-- String functions end --------------------------------------------------------
+
+-- Wrap Text function start ----------------------------------------------------
+%WRAP_TEXT($txt,"80")%
+//
+%WRAP_TEXT($txt,"80","// ")%
+
+/*******************************************************************************
+%WRAP_TEXT($txt,"75"," * ", " *")%
+ *******************************************************************************/
+-- Wrap Text function end ------------------------------------------------------
+
+-- Output functions start ------------------------------------------------------
 %MESSAGE("Simple message")%
 %WARNING("Warning message")%
 %ERROR("Error message")%
--- Output functions end ------------
+-- Output functions end --------------------------------------------------------
 
--- Exist function start ------------
+-- Exist function start --------------------------------------------------------
 %EXIST("functions")%
 %EXIST("BLA-BLA")%
--- Exist function end --------------
+-- Exist function end ----------------------------------------------------------
+

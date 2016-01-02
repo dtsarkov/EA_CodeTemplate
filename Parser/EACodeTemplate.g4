@@ -116,7 +116,8 @@ macros		: textMacros
 		| splitMacro
 		| piMacro
 ;
-textMacros 		: '%dl%' | '%pc%' | '%eq%' | '%qt%' | '%us%' | '%nl%' //| '%sl%' 
+textMacros 		: '%dl%' | '%pc%' | '%eq%' | '%qt%' | '%us%' | '%nl%' //| '%sl%'
+			| '%DATE%' | '%TIME%' //| '%USER%' 
 ;
 listMacro		: List 	attribute templateName (
 					templateParameters
@@ -160,7 +161,9 @@ List            : '%list=';
 Call            : '%call=';
 Split           : '%split=';
 PI              : '%PI=';
-Function        : '%UPPER(' | '%LOWER(' | '%REPLACE(' | '%TRIM('  
+Function        : '%UPPER(' | '%LOWER(' | '%REPLACE(' | '%TRIM('  | '%MID('
+		| '%LENGTH(' //| 'FIND('
+		| '%WRAP_TEXT(' | '%PLAIN_TEXT('
 		| '%MESSAGE(' | '%WARNING(' | '%ERROR(' | '%DEBUG('
 		| '%EXIST('
 ;
