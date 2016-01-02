@@ -61,11 +61,17 @@ public class Generator {
 				pe.template = pe.template.substring(0, idx);
 			}
 		}
+		
+		String queryName = "Element Name";
+		if ( cmd.hasOption('q') ) {
+			queryName = cmd.getOptionValue('q');
+		}
 
-		System.out.printf("Model: %s\nTemplate Folder: %s\nTemplate Extentions: %s\n"
+		System.out.printf("Model: %s\nTemplate Folder: %s\nTemplate Extentions: %s\nQuery Name: %s\n"
 				,modelFile
 				,templateFolder
 				,templateExt
+				,queryName
 		);
 		
 
@@ -95,9 +101,9 @@ public class Generator {
 
 			if ( model != null ) {
 	            @SuppressWarnings("rawtypes")
-				Collection elements = model.GetElementsByQuery("Element Name", pe.element);
+				Collection elements = model.GetElementsByQuery(queryName, pe.element);
 	            if ( elements.GetCount() == 0 ) {
-	            	TemplateProcessor.error("Could not find any elments with name \"%s\"", pe.element);
+	            	TemplateProcessor.error("Could not find any elments using query \"%s\" and search term \"%s\"", queryName, pe.element);
 	                break;
 	            }
 	            element = (Element)elements.GetAt((short)0);
@@ -206,6 +212,13 @@ public class Generator {
 				.desc("use specified file to save generated code")
 				.required(false)
 				.hasArg(true).argName("file name")
+				.build()
+		);
+		options.addOption(Option
+				.builder("q").longOpt("query")
+				.desc("select element using specified query name.\n Default: Simple")
+				.required(false)
+				.hasArg(true).argName("query name")
 				.build()
 		);
 		options.addOption("d", "debug", false, "print debug information");

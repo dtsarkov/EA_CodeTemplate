@@ -12,8 +12,8 @@ public class UnitTesting {
 	public static void main(String[] args) throws Exception {
 		String[] testArgs = new String[] {
 				 "--model", "C:\\Work\\EA\\Add-in\\EA_CodeTemplate\\CodeGeneratorDemo.EAP"
-				,"-b", "TestCases\\TestCases.lst", "-f", "TestCases", "-x", "template"
-				//,"-t", "TestCases\\attributes.template"	,"-e", "Activity2" ,"-o", "test.out" //, "-d"
+				//,"-b", "TestCases\\TestCases.lst", "-f", "TestCases", "-x", "template"
+				,"-t", "TestCases\\attributes.template"	,"-e", "List Demo:Activity2" ,"-o", "test.out", "-q", "Package:Element" //, "-d"
 				//,"-v"
 				//,"-d"
 			};
