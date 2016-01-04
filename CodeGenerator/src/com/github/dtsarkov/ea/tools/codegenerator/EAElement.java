@@ -193,33 +193,37 @@ public class EAElement {
 	public Object getAttribute(String attributeFullName, ParserRuleContext ctx) {
 		if ( this.element == null ) return null;
 
-		Object attribute 	= null;
-		String name[] 		= attributeFullName.split("\\.");
+		EAElement elementInScope= null;
+		Object attribute 		= null;
+		String name[] 			= attributeFullName.split("\\.");
 		
 		TemplateProcessor.debug("getAttribute(%s) => [%s] [%s]"
 				,attributeFullName, name[0],name[1]
 		);
 
 		if ( name[0].equalsIgnoreCase("$") || name[0].equalsIgnoreCase("$this") ) {
-			attribute = getAttribute(this,name[1]);
+			elementInScope = this;
 		} else if ( name[0].equalsIgnoreCase("$parent") ) {
-			attribute = getAttribute(getParent(),name[1]);
+			elementInScope = getParent();
 		} else if ( name[0].equalsIgnoreCase("$package") ) {
-			attribute = getAttribute(getPackage(),name[1]);
+			elementInScope = getPackage();
 		} else if ( name[0].equalsIgnoreCase("$source") ) {
-			attribute = getAttribute(getSource(),name[1]);
+			elementInScope = getSource();
 		} else if ( name[0].equalsIgnoreCase("$sourceRole") ) {
-			attribute = getAttribute(getSourceRole(),name[1]);
+			elementInScope = getSourceRole();
 		} else if ( name[0].equalsIgnoreCase("$target") ) {
-			attribute = getAttribute(getTarget(),name[1]);
+			elementInScope = getTarget();
 		} else if ( name[0].equalsIgnoreCase("$targetRole") ) {
-			attribute = getAttribute(getTargetRole(),name[1]);
+			elementInScope = getTargetRole();
 		} else {
 			TemplateProcessor.error(ctx, "Invalid scope modifier \""+name[0]+"\"!");
 		}
-		
-		if ( attribute == null ) {
-			TemplateProcessor.error(ctx, "Attribute \""+name[1]+"\" does not exist!");
+
+		if (elementInScope != null ) {
+			attribute = getAttribute(elementInScope,name[1]);
+			if ( attribute == null ) {
+				TemplateProcessor.error(ctx, "Attribute \""+name[1]+"\" does not exist!");
+			}
 		}
 		return attribute;
 	}

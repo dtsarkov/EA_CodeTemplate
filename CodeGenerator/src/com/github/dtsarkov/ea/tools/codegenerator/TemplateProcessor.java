@@ -19,8 +19,6 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.regex.Matcher;
 
-import javax.swing.text.html.parser.DTD;
-
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -77,7 +75,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		templateExtention = ".template";
 		
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-		SimpleDateFormat dt = new SimpleDateFormat("hh:mm:ss");
+		SimpleDateFormat dt = new SimpleDateFormat("HH:mm:ss");
 		Date date 			= Calendar.getInstance().getTime();
 		
 		globalVariables = new HashMap<String,String>();
@@ -122,17 +120,18 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		message(String.format(format, args));
 	}
 
+
 	static public void error(ParserRuleContext ctx, String message) {
-		if ( ctx == null ) {
-			error("%s",message);
-		} else {
-			error("Line (%d:%d) - %s"
+		error("%s",message);
+		if ( ctx != null ) {
+			System.err.printf("   %3d,%-3d: %s\n"
 				 ,ctx.getStart().getLine()
 				 ,ctx.getStart().getCharPositionInLine()
-				 ,message
+				 ,ctx.getText()
 			);
 		}
 	}
+	
 	static public void error(String format, Object...args) {
 		errorCounter++;
 		System.err.println("ERROR: "+String.format(format, args));
@@ -456,31 +455,11 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 				error(ctx,"Incorrect function call %WRAP_TEXT(string, length [,prefix [,sufix]])%");
 				return value;
 			}
-			
-			firstParameter= firstParameter.replace("\n", " ").replace("\r", "");
-			int len0  	  = firstParameter.length();
-			int len1 	  = Integer.valueOf(calcExpression(ctx.parameters().expression(1)));
-			String prefix = (parmCount > 2) ? calcExpression(ctx.parameters().expression(2)) : "";
-			String suffix = (parmCount > 3) ? calcExpression(ctx.parameters().expression(3)) : "";
-			value 		  = "";
-			for ( int s = 0, e = 0; s < len0; s+=len1 ) {
-				e += len1;
-				if ( e > len0 ) {
-					if ( !suffix.isEmpty() ) {
-						//Left pad suffix with spaces.
-						char p[] = new char[e-len0];
-						Arrays.fill(p, ' ');
-						suffix = new String(p) + suffix;
-					}
-					e = len0;
-				}
-				value += (
-						prefix 
-					+ 	firstParameter.substring(s,e) 
-					+ 	suffix 
-					+ 	((e != len0) ? System.lineSeparator() : "")
-				);
-			}
+			value = wrapText(firstParameter
+					,Integer.valueOf(calcExpression(ctx.parameters().expression(1)))
+					,(parmCount > 2) ? calcExpression(ctx.parameters().expression(2)) : ""
+					,(parmCount > 3) ? calcExpression(ctx.parameters().expression(3)) : ""
+			);
 		} else if (function.equalsIgnoreCase("%DEBUG(") ) {
 			debug(firstParameter);
 		} else if (function.equalsIgnoreCase("%ERROR(") ) {
@@ -496,6 +475,37 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		}
 		debug("\t\t value = %s", value);
 		return value;
+	}
+	
+	
+	private String wrapText(String text, int width, String prefix, String suffix) {
+		String[] lines = text.replace("\r", "").split("\n");
+
+		text = "";
+		
+		int len0;  	  
+		for ( int i = 0; i < lines.length; i ++) {
+			len0 = lines[i].length();
+			for ( int s = 0, e = 0; s < len0; s+=width ) {
+				e += width;
+				if ( e > len0 ) {
+					if ( !suffix.isEmpty() ) {
+						//Left pad suffix with spaces.
+						char p[] = new char[e-len0];
+						Arrays.fill(p, ' ');
+						suffix = new String(p) + suffix;
+					}
+					e = len0;
+				}
+				text += (
+						prefix 
+					+ 	lines[i].substring(s,e) 
+					+ 	suffix 
+					+ 	((e != len0 || i < lines.length-1) ? System.lineSeparator() : "")
+				);
+			}
+		}
+		return text;
 	}
 	
 	static private String escapes[][] = {
