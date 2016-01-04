@@ -295,6 +295,17 @@ public class Generator {
 	}
 	
 	private static Repository openModel( String fileName ) {
+		File file = new File(fileName);
+		if ( !file.exists() ) {
+			TemplateProcessor.error("Could not find model file \"%s\"",fileName);
+			return null;
+		}
+		try {
+			fileName = file.getCanonicalPath();
+		} catch (IOException e) {
+			TemplateProcessor.error("Incorret path\"%s\"",fileName);
+			return null;
+		}
 		TemplateProcessor.message("Opening model file \"%s\"...", fileName);
 		Repository r = new Repository();
 		if ( !r.OpenFile(fileName) ) {
