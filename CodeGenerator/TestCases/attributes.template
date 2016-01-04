@@ -12,7 +12,7 @@ $Var = $."Component::Tag1"
 #05: Var-Tag	: $Var
 #06: Notes	: $.Notes
 %%#07: 
-%WRAP_TEXT(%PLAIN_TEXT($.Notes)%, "20", "#07: ")%
+%WRAP_TEXT(%PLAIN_TEXT($.Notes)%, "40", "#07: ")%
 
 %nl%
 ###: -- Tast case #2 -- Parent's attributes

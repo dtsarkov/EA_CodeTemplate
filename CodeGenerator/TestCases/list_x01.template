@@ -1,2 +1,2 @@
 > Processing element# $CURRENT out of $COUNT
-%call=$1%
+%call @template=$1%

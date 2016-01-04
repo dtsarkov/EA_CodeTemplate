@@ -1,20 +1,20 @@
 ################################################################################
 Case#1: List current element base properties
 ################################################################################
-%call="element_base_properties"%
+%call @template="element_base_properties"%
 %nl%
 ################################################################################
 Case#2: List current element's package base properties
 ################################################################################
-%call="element_base_properties" @element=$package.%
+%call @template="element_base_properties" @element=$package.%
 %nl%
 ################################################################################
 Case#3: Pass parameters
 ################################################################################
-%call="parameters" @parameters="A","B","C","D","E","F","H","G","J"%
+%call @template="parameters" @parameters="A","B","C","D","E","F","H","G","J"%
 %nl%
 ################################################################################
 Case#4: Pass parameters and element
 ################################################################################
-%call="parameters" @element=$package. @parameters="A","B","C","D","E"%
+%call @template="parameters" @element=$package. @parameters="A","B","C","D","E"%
 %nl%

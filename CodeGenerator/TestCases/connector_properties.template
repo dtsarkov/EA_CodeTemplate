@@ -9,9 +9,9 @@ ConnectorGUID		:$.ConnectorGUID
 --------------------------------------------------------------------------------
 Source Role properties
 --------------------------------------------------------------------------------
-%call="connectorRole_properties" @element=$sourceRole.%
+%call @template="connectorRole_properties" @element=$sourceRole.%
 
 --------------------------------------------------------------------------------
 Target Role properties
 --------------------------------------------------------------------------------
-%call="connectorRole_properties" @element=$targetRole.%
+%call @template="connectorRole_properties" @element=$targetRole.%

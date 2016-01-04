@@ -126,7 +126,7 @@ listMacro		: List 	attribute templateName (
 				)* 
 			'%'
 ;
-callMacro		: Call expr (templateParameters | elementInScope)*  '%'
+callMacro		: Call templateName (templateParameters | elementInScope)*  '%'
 ;
 splitMacro		: Split expr templateName (
 					templateParameters 
@@ -157,8 +157,8 @@ parameters		: expression (COMA expression)*
 piMacro			:  PI stringLiteral '%'
 ;
 
+Call            : '%call';
 List            : '%list=';
-Call            : '%call=';
 Split           : '%split=';
 PI              : '%PI=';
 Function        : '%UPPER(' | '%LOWER(' | '%REPLACE(' | '%TRIM('  | '%MID('
