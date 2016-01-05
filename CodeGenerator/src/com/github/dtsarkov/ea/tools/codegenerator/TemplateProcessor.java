@@ -519,7 +519,8 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			len0 = lines[i].length();
 			chars = lines[i].toCharArray();
 			int sp = -1, nsp = -1;
-			for ( int c = 0, s = 0, e = 0, nl = 1; c < len0; c++, nl++ ) {
+			int s = 0, e = 0;
+			for ( int c = 0,  nl = 1; c < len0; c++, nl++ ) {
 				if ( chars[c] != ' ' ) { 
 					nsp = c;
 				} else {
@@ -538,6 +539,8 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 					nl = 1;
 				}
 			}
+			
+			/*
 			for ( int s = 0, e = 0; s < len0; s+=width ) {
 				e += width;
 				if ( e > len0 ) {
@@ -553,6 +556,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 				buffer.append(lines[i].substring(s,e));
 				buffer.append(suffix);
 			}
+			*/
 		}
 		return buffer.toString();
 	}
