@@ -17,7 +17,7 @@ public class Utils {
 		System.out.println("--- Wrap text start ---");
 		System.out.println(">         1         2         3         4         5         6         7         8         9        10");
 		System.out.println(">123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|");
-		System.out.println(wrapText(s,40,">","<<<"));
+		System.out.println(wrapText(s,80,">  |","|"));
 		System.out.println("--- Wrap text end   ---");
 	}
 
@@ -46,12 +46,14 @@ public class Utils {
 					sp = c;
 				}
 				if ( nl == width ) {
-					if ( sp > nsp || ( c < len0 && chars[c+1] != ' ' ) ) {
+					if ( sp > nsp || (c < len0-1 && chars[c+1] != ' ' ) ) {
 						e = sp;
 					} else {
-						e = nsp;
+						e = nsp+((c == len0-1) ? 0:1);
 					}
-					System.out.printf("%d, %d, %d, %d\n",width,s,e,e-s);
+					if ( e == -1 ) e = s+width-1;
+					
+					//System.out.printf("w=%d, s=%d, e=%d, e-s=%d, [sp=%d, nsp=%d] [c=%d,nl=%d]\n",width,s,e,e-s,sp,nsp,c,nl);
 					buffer.append(chars, s, e-s);
 					if (e != len0 || i < lines.length-1) {
 						//buffer.append('|');
@@ -60,19 +62,16 @@ public class Utils {
 							buffer.append(fill, 0, sp_len);
 						}
 						buffer.append(suffix);
-//						buffer.append(
-//								String.format("  %4d, %4d, %4d - %4d, %4d, %4d, [%c]"
-//										, width, e, sp_len 
-//										,sp, nsp, c, chars[c]
-//								)
-//						);
 						buffer.append(System.lineSeparator());
 						buffer.append(prefix);
 					}
-					s  = e+1;
+					c  = e; 
+					s  = e+((e != len0-1) ? 1 : 0);
 					nl = 1;
+					sp=-1; nsp=-1;
 				}
 			}
+			//System.out.printf("%d, %d, %d, %d <\n",width,s,e,e-s);
 			if ( s < len0 ) {
 				buffer.append(chars, s, len0-s);
 				buffer.append(fill, 0, width-(len0-s)+1);
@@ -82,7 +81,6 @@ public class Utils {
 					//buffer.append(prefix);
 				}
 			}
-			//System.out.printf("(%d,%d - %d)\n",s,e,len0);
 		}
 		return buffer.toString();
 	}

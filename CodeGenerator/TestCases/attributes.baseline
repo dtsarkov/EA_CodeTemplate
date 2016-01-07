@@ -9,12 +9,10 @@
 	<li><i>Text formatting</i></li>
 	<li><font color="#ff0000">Different paragraph types </font></li>
 </ol>
-#07: Some notes about Com
-#07: ponent 1.1.2.2 compo
-#07: nent to highlight:  
-#07: 	1. Text formatting 
-#07: 	2. Different paragr
-#07: aph types 
+#07: Some notes about Component 1.1.2.2  
+#07: component to highlight:             
+#07: #07: 	1. Text formatting                 
+#07: 	2. Different paragraph types       
 
 ###: -- Tast case #2 -- Parent's attributes
 #11: Name	: Component 1.1.2.1

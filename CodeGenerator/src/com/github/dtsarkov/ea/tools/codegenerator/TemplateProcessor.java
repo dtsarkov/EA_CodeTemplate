@@ -455,7 +455,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 				error(ctx,"Incorrect function call %WRAP_TEXT(string, length [,prefix [,sufix]])%");
 				return value;
 			}
-			value = wrapText(firstParameter
+			value = Utils.wrapText(firstParameter
 					,Integer.valueOf(calcExpression(ctx.parameters().expression(1)))
 					,(parmCount > 2) ? calcExpression(ctx.parameters().expression(2)) : ""
 					,(parmCount > 3) ? calcExpression(ctx.parameters().expression(3)) : ""
@@ -477,89 +477,6 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		return value;
 	}
 	
-/*
-  	private String wrapText(String text, int width, String prefix, String suffix) {
-		String[] lines = text.replace("\r", "").split("\n");
-
-		text = "";
-		
-		int len0;
-		for ( int i = 0; i < lines.length; i ++) {
-			len0 = lines[i].length();
-			for ( int s = 0, e = 0; s < len0; s+=width ) {
-				e += width;
-				if ( e > len0 ) {
-					if ( !suffix.isEmpty() ) {
-						//Left pad suffix with spaces.
-						char p[] = new char[e-len0];
-						Arrays.fill(p, ' ');
-						suffix = new String(p) + suffix;
-					}
-					e = len0;
-				}
-				text += (
-						prefix 
-					+ 	lines[i].substring(s,e) 
-					+ 	suffix 
-					+ 	((e != len0 || i < lines.length-1) ? System.lineSeparator() : "")
-				);
-			}
-		}
-		return text;
-	
- */
-	private String wrapText(String text, int width, String prefix, String suffix) {
-		String[] lines = text.replace("\r", "").split("\n");
-
-		StringBuilder buffer = new StringBuilder(text.length());
-		
-		int len0;
-		char[] chars;
-		for ( int i = 0; i < lines.length; i ++) {
-			len0 = lines[i].length();
-			chars = lines[i].toCharArray();
-			int sp = -1, nsp = -1;
-			int s = 0, e = 0;
-			for ( int c = 0,  nl = 1; c < len0; c++, nl++ ) {
-				if ( chars[c] != ' ' ) { 
-					nsp = c;
-				} else {
-					sp = c;
-				}
-				if ( nl == width ) {
-					if ( sp > nsp || ( c < len0-1 && chars[c+1] != ' ' ) ) {
-						e = sp;
-					} else {
-						e = nsp;
-					}
-					buffer.append(chars, s, e-s);
-					if (e != len0 || i < lines.length-1) 
-						buffer.append(System.lineSeparator());
-					s  = e+1;
-					nl = 1;
-				}
-			}
-			
-			/*
-			for ( int s = 0, e = 0; s < len0; s+=width ) {
-				e += width;
-				if ( e > len0 ) {
-					if ( !suffix.isEmpty() ) {
-						//Left pad suffix with spaces.
-						char p[] = new char[e-len0];
-						Arrays.fill(p, ' ');
-						suffix = new String(p) + suffix;
-					}
-					e = len0;
-				}
-				buffer.append(prefix);
-				buffer.append(lines[i].substring(s,e));
-				buffer.append(suffix);
-			}
-			*/
-		}
-		return buffer.toString();
-	}
 	
 	static private String escapes[][] = {
 			 {Matcher.quoteReplacement("\\t"), 	"\t"}

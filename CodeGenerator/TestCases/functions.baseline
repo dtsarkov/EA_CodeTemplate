@@ -5,26 +5,26 @@
 9#12345678
 -- String functions end --------------------------------------------------------
 -- Wrap Text function start ----------------------------------------------------
-This a very long and very stupid line used to test WRAP_TEXT and LENGTH function
-s. It repeats 3 times. This a very long and very stupid line used to test WRAP_T
-EXT and LENGTH functions. It repeats 3 times. This a very long and very stupid l
-ine used to test WRAP_TEXT and LENGTH functions. It repeats 3 times. This a very
- long and very stupid line used to test WRAP_TEXT and LENGTH functions. It repea
-ts 3 times. 
+This a very long and very stupid line used to test WRAP_TEXT and LENGTH          
+functions. It repeats 3 times. This a very long and very stupid line used to     
+test WRAP_TEXT and LENGTH functions. It repeats 3 times. This a very long and    
+very stupid line used to test WRAP_TEXT and LENGTH functions. It repeats 3       
+times. This a very long and very stupid line used to test WRAP_TEXT and LENGTH   
+functions. It repeats 3 times.                                                   
 //
-// This a very long and very stupid line used to test WRAP_TEXT and LENGTH function
-// s. It repeats 3 times. This a very long and very stupid line used to test WRAP_T
-// EXT and LENGTH functions. It repeats 3 times. This a very long and very stupid l
-// ine used to test WRAP_TEXT and LENGTH functions. It repeats 3 times. This a very
-//  long and very stupid line used to test WRAP_TEXT and LENGTH functions. It repea
-// ts 3 times. 
+// This a very long and very stupid line used to test WRAP_TEXT and LENGTH       
+// functions. It repeats 3 times. This a very long and very stupid line used to  
+// test WRAP_TEXT and LENGTH functions. It repeats 3 times. This a very long     
+// and very stupid line used to test WRAP_TEXT and LENGTH functions. It repeats  
+// 3 times. This a very long and very stupid line used to test WRAP_TEXT and     
+// LENGTH functions. It repeats 3 times.                                         
 /*******************************************************************************
- * This a very long and very stupid line used to test WRAP_TEXT and LENGTH fun *
- * ctions. It repeats 3 times. This a very long and very stupid line used to t *
- * est WRAP_TEXT and LENGTH functions. It repeats 3 times. This a very long an *
- * d very stupid line used to test WRAP_TEXT and LENGTH functions. It repeats  *
- * 3 times. This a very long and very stupid line used to test WRAP_TEXT and L *
- * ENGTH functions. It repeats 3 times.                                        *
+ * This a very long and very stupid line used to test WRAP_TEXT and LENGTH      *
+ * functions. It repeats 3 times. This a very long and very stupid line used    *
+ * to test WRAP_TEXT and LENGTH functions. It repeats 3 times. This a very      *
+ * long and very stupid line used to test WRAP_TEXT and LENGTH functions. It    *
+ * repeats 3 times. This a very long and very stupid line used to test          *
+ * WRAP_TEXT and LENGTH functions. It repeats 3 times.                          *
  *******************************************************************************/
 -- Wrap Text function end ------------------------------------------------------
 -- Output functions start ------------------------------------------------------
