@@ -5,11 +5,11 @@ import java.util.Arrays;
 public class Utils {
 
 	public static void main(String[] args) {
-		String s = "[A mutable sequence of characters.]\n"
-				
+		String s = "[A mutable sequence of characters.]"
+				 + System.lineSeparator()
 				 + "[This class provides an API compatible with StringBuffer, "
-				 + "but with no guarantee of synchronization.]\n"
-				 
+				 + "but with no guarantee of synchronization.]"
+				 +""+System.lineSeparator()
 				 + "[This class is designed for use as a drop-in replacement for "
 				 + "StringBuffer in places where the string buffer was being used "
 				 + "by a single thread (as is generally the case).]"
@@ -19,6 +19,7 @@ public class Utils {
 		System.out.println(">123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|");
 		System.out.println(wrapText(s,80,">  |","|"));
 		System.out.println("--- Wrap text end   ---");
+		System.out.println(s.replace("\n", "").replace("\r", ""));
 	}
 
 	public static String wrapText(String text, int width, String prefix, String suffix) {
@@ -28,7 +29,7 @@ public class Utils {
 		
 		int len0;
 		width -= ( prefix.length() + suffix.length());
-		char fill[] = new char[width];
+		char fill[] = new char[width+5];
 		Arrays.fill(fill, ' ');
 		
 		char[] chars;
@@ -71,8 +72,8 @@ public class Utils {
 					sp=-1; nsp=-1;
 				}
 			}
-			//System.out.printf("%d, %d, %d, %d <\n",width,s,e,e-s);
-			if ( s < len0 ) {
+			System.out.printf("%d, %d, %d, %d, %d <\n",width,len0,s,e,e-s);
+			if ( s <= len0 ) {
 				buffer.append(chars, s, len0-s);
 				buffer.append(fill, 0, width-(len0-s)+1);
 				buffer.append(suffix);

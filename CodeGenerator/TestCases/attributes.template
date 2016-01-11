@@ -13,6 +13,9 @@ $Var = $."Component::Tag1"
 #06: Notes	: $.Notes
 %%#07: 
 %WRAP_TEXT(%PLAIN_TEXT($.Notes)%, "40", "#07: ")%
+%nl%
+#08: %REPLACE(%REPLACE(%PLAIN_TEXT($.Notes)%,"\n","")%,"\r","")%
+
 
 %nl%
 ###: -- Tast case #2 -- Parent's attributes
