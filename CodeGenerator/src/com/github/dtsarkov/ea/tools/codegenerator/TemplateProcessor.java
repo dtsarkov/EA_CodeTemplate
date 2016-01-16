@@ -135,13 +135,20 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 
 
 	static public void error(ParserRuleContext ctx, String message) {
-		error("%s",message);
+		error(ctx,message,true);
+	}
+	static public void error(ParserRuleContext ctx, String message,boolean printLine) {
 		if ( ctx != null ) {
-			System.err.printf("   %3d,%-3d: %s\n"
+			error("Line (%d:%d) - %s"
 				 ,ctx.getStart().getLine()
 				 ,ctx.getStart().getCharPositionInLine()
-				 ,ctx.getText()
+				 ,message
 			);
+			if ( printLine ) {
+				System.err.printf("   >%s\n",ctx.getText());
+			}
+		} else {
+			error("%s",message);
 		}
 	}
 	
@@ -476,7 +483,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		} else if (function.equalsIgnoreCase("%DEBUG(") ) {
 			debug(firstParameter);
 		} else if (function.equalsIgnoreCase("%ERROR(") ) {
-			error(ctx,firstParameter);
+			error(ctx,firstParameter,false);
 		} else if (function.equalsIgnoreCase("%WARNING(") ) {
 			warning(ctx,firstParameter);
 		} else if (function.equalsIgnoreCase("%MESSAGE(") ) {
@@ -886,7 +893,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			this.setOutput(fw);
 			fileCounter++;
 		} catch (IOException e) {
-			error("Cannot open file ["+fileName+"]",ctx);
+			error(ctx,"Cannot open file ["+fileName+"]");
 		}
 	}
 	
