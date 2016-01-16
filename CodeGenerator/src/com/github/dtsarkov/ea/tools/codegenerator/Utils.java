@@ -72,7 +72,7 @@ public class Utils {
 					sp=-1; nsp=-1;
 				}
 			}
-			System.out.printf("%d, %d, %d, %d, %d <\n",width,len0,s,e,e-s);
+			//System.out.printf("%d, %d, %d, %d, %d <\n",width,len0,s,e,e-s);
 			if ( s <= len0 ) {
 				buffer.append(chars, s, len0-s);
 				buffer.append(fill, 0, width-(len0-s)+1);

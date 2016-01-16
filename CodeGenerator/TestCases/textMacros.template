@@ -1,5 +1,4 @@
 '%dl%'|'%pc%'|'%eq%'|'%qt%'|'%us%'
 %nl%
 '%dl%'|'%pc%'|'%eq%'|'%qt%'|'%us%'
-DATE: %DATE%
-TIME: %TIME%
+DATE: %DATE% TIME: %TIME%

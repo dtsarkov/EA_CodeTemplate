@@ -16,12 +16,18 @@ line_text: line NL
 ;	
 emptyLine	: NL
 ;
-line 		: assignment 
+line 		: fileMacro
+		| assignment 
 		| branching
 		| text 
 ;
 
 //
+// ============================================================================
+fileMacro	: FileMacro expr '%'
+;
+FileMacro	: '%file='
+;
 // ============================================================================
 assignment	: variable (op=EQ|op=AEQ) expression
 ;

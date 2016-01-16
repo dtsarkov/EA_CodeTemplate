@@ -1,4 +1,4 @@
-###: -- Tast case #1 -- Element's attributes
+###: -- Test case #1 -- Element's attributes
 #01: Name	: Component 1.1.2.2	= Component 1.1.2.2
 #02: Alias	: CMP2	= CMP2
 #03: Tag	: Tag value for Component 1.1.2.2 = Tag value for Component 1.1.2.2
@@ -17,14 +17,14 @@
 
 #08: Some notes about Component 1.1.2.2 component to highlight:	1. Text formatting	2. Different paragraph types 
 
-###: -- Tast case #2 -- Parent's attributes
+###: -- Test case #2 -- Parent's attributes
 #11: Name	: Component 1.1.2.1
 #12: Alias	: CMP1
 #13: Tag  	: Tag value for Component 1.1.2.1
 #14: Var-Name	: Component 1.1.2.1
 #15: Var-Tag	: Tag value for Component 1.1.2.1
 
-###: -- Tast case #3 -- Package's attributes
+###: -- Test case #3 -- Package's attributes
 #21: Name	: Component 1.1.2
 #22: Alias	: PCKG2
 #23: Tag	: Tag Value for Component 1.1.2

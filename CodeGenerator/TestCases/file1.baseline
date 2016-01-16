@@ -1,0 +1,29 @@
+################################################################################
+This text will go to file1
+--------------------------------------------------------------------------------
+###: -- Test case #1 -- Element's attributes
+#01: Name	: Activity2	= Activity2
+#02: Alias	: 	= 
+#03: Tag	: =
+#04: Var-Name	: Activity2
+#05: Var-Tag	: null
+#06: Notes	: 
+#07:                                     
+
+#08:
+
+###: -- Test case #2 -- Parent's attributes
+#11: Name	:
+#12: Alias	:
+#13: Tag  	:
+#14: Var-Name	: null
+#15: Var-Tag	: null
+
+###: -- Test case #3 -- Package's attributes
+#21: Name	: List Demo
+#22: Alias	: 
+#23: Tag	:
+#14: Var-Name	: List Demo
+#15: Var-Tag	: null
+
+################################################################################

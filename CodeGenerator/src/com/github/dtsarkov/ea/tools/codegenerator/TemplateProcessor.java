@@ -3,6 +3,7 @@ package com.github.dtsarkov.ea.tools.codegenerator;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -42,6 +43,7 @@ import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.En
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.ExprContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.ExpressionContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.FileContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.FileMacroContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.FreeTextContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.FunctionsContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.If_stmtContext;
@@ -62,6 +64,8 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	/* Static section  
 	 **************************************************************************/
 	private static String 		templateExtention;
+	private static String		outputFolder;
+
 	private static Repository 	EA_Model;
 	
 	private static Map<String,String> TextMacros;
@@ -72,7 +76,8 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	private static boolean		verbose			= false;
 	
 	static {
-		templateExtention = ".template";
+		templateExtention 	= ".template";
+		outputFolder		= ".";
 		
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat dt = new SimpleDateFormat("HH:mm:ss");
@@ -99,6 +104,14 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		return templateExtention;
 	}
 	
+
+	public static String getOutputFolder() {
+		return outputFolder;
+	}
+	public static void setOutputFolder(String outputFolder) {
+		TemplateProcessor.outputFolder = outputFolder;
+	}
+
 	static public void setEAModel( Repository model ) {
 		EA_Model = model;
 	}
@@ -847,10 +860,36 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	public void exitPiMacro(PiMacroContext ctx) {
 		if ( executionState.canProcessBranch() ) {
 			setLineSeparator(translateStringLiteral(ctx.stringLiteral().getText()));
-//			textLevel--;
 		}
 	}
 
+	
+	private int fileCounter = 0;
+	@Override
+	public void exitFileMacro(FileMacroContext ctx) {
+		if ( this.writer instanceof StringWriter)
+			return;
+		
+		String fileName = calcExpression(ctx.expr());
+		File file = new File(fileName);
+		if ( !file.isAbsolute() ) {
+			file = new File(TemplateProcessor.getOutputFolder()+"/"+fileName);
+		}
+		debug("New output file = [%s]\n",file.getAbsolutePath());
+		try {
+			FileWriter fw = new FileWriter(file);
+			this.flashOutput();
+			if ( fileCounter > 0 ) {
+				//Close output file if it was open in this template
+				this.writer.close();
+			}
+			this.setOutput(fw);
+			fileCounter++;
+		} catch (IOException e) {
+			error("Cannot open file ["+fileName+"]",ctx);
+		}
+	}
+	
 	
 	@Override
 	public void enterText(TextContext ctx) {

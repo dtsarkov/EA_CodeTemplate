@@ -1,3 +1,6 @@
+################################################################################
+This text will go to file2
+--------------------------------------------------------------------------------
 Test branching macros, ( and or ) conditions, nested ifs
 		Test 01 : PASS
 		Test 02 : PASS
@@ -17,3 +20,5 @@ Test branching macros, ( and or ) conditions, nested ifs
 		Test 16 : PASS
 		Test 17 : PASS
 		Test 18 : PASS
+
+################################################################################

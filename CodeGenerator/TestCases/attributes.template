@@ -2,7 +2,7 @@
 %% 
 %% Execution: CodeGeneratorDemo.eap "Component 1.1.1.1" attributes.template
 %%
-###: -- Tast case #1 -- Element's attributes
+###: -- Test case #1 -- Element's attributes
 #01: Name	: $.Name	%eq% $this.Name
 #02: Alias	: $.Alias	%eq% $this.Alias
 #03: Tag	: $."Component::Tag1" %eq% $this."Component::Tag1"
@@ -18,7 +18,7 @@ $Var = $."Component::Tag1"
 
 
 %nl%
-###: -- Tast case #2 -- Parent's attributes
+###: -- Test case #2 -- Parent's attributes
 #11: Name	: $parent.Name
 #12: Alias	: $parent.Alias
 #13: Tag  	: $parent."Component::Tag1"
@@ -28,7 +28,7 @@ $Var = $parent."Component::Tag1"
 #15: Var-Tag	: $Var
 
 %nl%
-###: -- Tast case #3 -- Package's attributes
+###: -- Test case #3 -- Package's attributes
 #21: Name	: $package.Name
 #22: Alias	: $package.Alias
 #23: Tag	: $package."Package::Tag1"

@@ -111,11 +111,12 @@ public class Generator {
 
     		try { 
     			fw = new FileWriter(pe.outputFile);
+    			TemplateProcessor.setOutputFolder(pe.outputFile.getAbsoluteFile().getParent());
     		} catch ( IOException e ) {
     			TemplateProcessor.error("Could not create output file \"%s\"", pe.outputFile);
                 break;
     		}
-
+    		//System.out.printf("Output folder: [%s]\n",TemplateProcessor.getOutputFolder());
     		if ( verbose ) {		
 	    		TemplateProcessor.message("Processing Elements...");
 	    		TemplateProcessor.message("%-30s|%-20s|%-30s","Name","Type","Template");
@@ -319,12 +320,12 @@ public class Generator {
 	private static class ProcessingEntry {
 		public String template;
 		public String element;
-		public String outputFile;
+		public File outputFile;
 		
 		ProcessingEntry(String element, String template, String outputFile) {
 			this.element 	= element.trim();
 			this.template 	= template.trim();
-			this.outputFile	= outputFile.trim();
+			this.outputFile	= new File(outputFile.trim());
 		}
 	}
 
