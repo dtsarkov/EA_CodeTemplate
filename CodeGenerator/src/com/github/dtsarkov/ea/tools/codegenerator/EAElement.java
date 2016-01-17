@@ -221,7 +221,7 @@ public class EAElement {
 
 		if (elementInScope != null ) {
 			attribute = getAttribute(elementInScope,name[1]);
-			if ( attribute == null ) {
+			if ( attribute == null && ctx != null ) {
 				TemplateProcessor.error(ctx, "Attribute \""+name[1]+"\" does not exist!");
 			}
 		}
