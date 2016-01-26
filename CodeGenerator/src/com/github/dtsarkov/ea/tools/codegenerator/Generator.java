@@ -170,7 +170,7 @@ public class Generator {
 		
 		options.addOption(Option
 				.builder("b").longOpt("batch")
-				.desc("executes the CodeGeneratory in the batch mode.\n"
+				.desc("executes the CodeGenerator in the batch mode.\n"
 					 +"Batch file is a CSV file containing <element name>,<template name>, <output file name>.")
 				.hasArg(true).argName("file name")
 				.build()
@@ -187,8 +187,8 @@ public class Generator {
 		
 		options.addOption(Option
 				.builder("x").longOpt("extension")
-				.desc("template file extension."
-					 //+"\nDefault: extention of the template file specified in option -t"
+				.desc("template file extension"
+					 //+"\nDefault: extension of the template file specified in option -t"
 				 )
 				.hasArg(true).argName("extention")
 				.build()
@@ -215,6 +215,7 @@ public class Generator {
 				.hasArg(true).argName("file name")
 				.build()
 		);
+		
 		options.addOption(Option
 				.builder("q").longOpt("query")
 				.desc("select element using specified query name.\n Default: Simple")
