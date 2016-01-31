@@ -872,6 +872,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 
 	
 	private int fileCounter = 0;
+	private static final String MODES="override;append;new";
 	@Override
 	public void exitFileMacro(FileMacroContext ctx) {
 		if ( this.writer instanceof StringWriter)
@@ -888,6 +889,10 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		OverrideContext octx = ctx.override();
 		if (octx != null ) {
 			mode = calcExpression(octx.expr()).toLowerCase().trim();
+			if ( !MODES.contains(mode)) {
+				error(ctx,"Invalid file mode \""+mode+"\"");
+				return;
+			}
 		}
 		debug("File mode = %s", mode);
 		
@@ -899,7 +904,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			error(ctx,"Cannot close output file!");
 		}
 		
-		if ( !(mode.equalsIgnoreCase("skip") && file.exists()) ) {
+		if ( !(mode.equalsIgnoreCase("new") && file.exists()) ) {
 			try {
 				FileWriter fw = new FileWriter(file, mode.equalsIgnoreCase("append"));
 				
