@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.util.ArrayList;
+import java.util.Properties;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -23,7 +24,7 @@ public class Generator {
 
 	
 	public static void main(String[] args) throws Exception {
-		System.out.println("EACodeGenerator v 0.30");
+		System.out.println("EACodeGenerator v 0.35");
 
 		CommandLine cmd = parseCommandLine(args);
 		if ( cmd == null ) return;
@@ -66,15 +67,16 @@ public class Generator {
 		if ( cmd.hasOption('q') ) {
 			queryName = cmd.getOptionValue('q');
 		}
-
-		System.out.printf("Model: %s\nTemplate Folder: %s\nTemplate Extentions: %s\nQuery Name: %s\n"
-				,modelFile
-				,templateFolder
-				,templateExt
-				,queryName
-		);
 		
-
+		if ( verbose ) {
+			System.out.printf("Model: %s\nTemplate Folder: %s\nTemplate Extentions: %s\nQuery Name: %s\n"
+					,modelFile
+					,templateFolder
+					,templateExt
+					,queryName
+			);
+		}
+		
         Repository  		model   = null;
         Element     		element = null;
 		FileWriter 			fw 		= null;
@@ -86,8 +88,20 @@ public class Generator {
             	return;
         }
 
+		if (cmd.hasOption("variable") ) {
+			if ( verbose ) 
+				System.out.println("Global Variables:");
+			Properties vars = cmd.getOptionProperties("variable");
+			for( Object key : vars.keySet() ) {
+				//TemplateProcessor.
+				if ( verbose ) 
+					System.out.printf("\t%-30s\t= %s\n", key, vars.get(key));
+				
+			}
+		}
+		
 		TemplateProcessor.setDebug(cmd.hasOption('d'));
-		TemplateProcessor.setVerbose(cmd.hasOption('v'));
+		TemplateProcessor.setVerbose(verbose);
 
 		TemplateProcessor.setTemplateExtention(templateExt);
 		TemplateProcessor.setEAModel(model);
@@ -223,6 +237,15 @@ public class Generator {
 				.hasArg(true).argName("query name")
 				.build()
 		);
+		
+		/*
+		options.addOption(Option.builder("D")
+				.longOpt("variable")
+				.desc("assign <value> to a global variable <name> ")
+				.hasArgs().valueSeparator('=').argName("name=value")
+				.build()
+		);
+		*/
 		options.addOption("d", "debug", false, "print debug information");
 		options.addOption("v", "verbose", false, "set verbose mode");
 		options.addOption("h", "help", false, "print this message");

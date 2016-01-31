@@ -884,13 +884,12 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		}
 		debug("New output file = [%s], Exist = %s",file.getAbsolutePath(), file.exists());
 		
-		boolean override = true;
+		String mode = "override";
 		OverrideContext octx = ctx.override();
 		if (octx != null ) {
-			String ovrd = calcExpression(octx.expr());
-			override = (ovrd.trim().equalsIgnoreCase("true"));
+			mode = calcExpression(octx.expr()).toLowerCase().trim();
 		}
-		debug("Override mode = %s", override);
+		debug("File mode = %s", mode);
 		
 		flashOutput();
 		if ( fileCounter > 0 && writer != null ) try {
@@ -900,9 +899,10 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			error(ctx,"Cannot close output file!");
 		}
 		
-		if ( override || !file.exists() ) {
+		if ( !(mode.equalsIgnoreCase("skip") && file.exists()) ) {
 			try {
-				FileWriter fw = new FileWriter(file);
+				FileWriter fw = new FileWriter(file, mode.equalsIgnoreCase("append"));
+				
 				setOutput(fw);
 				fileCounter++;
 			} catch (IOException e) {

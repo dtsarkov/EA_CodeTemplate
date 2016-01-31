@@ -12,7 +12,9 @@ public class UnitTesting {
 	public static void main(String[] args) throws Exception {
 		String[] testArgs = new String[] {
 				 "--model", "..\\CodeGeneratorDemo.EAP"
-				,"-b", "TestCases\\TestCases.lst", "-f", "TestCases", "-x", "template"
+				,"-b", "TestCases\\TestCases.lst", "-f", "TestCases", "-x", "template", "-v"
+				//, "--variable", "OVERRIDE=all" 
+				//, "-D", "USE_FILE_NAMES=YES"
 				//,"-t", "TestCases\\listConnectors.template"	,"-e", "Activity2" ,"-o", "test.out", "-v", //"-q", "Package:Element" //, "-d"
 				//,"-v"
 				//,"-d"
