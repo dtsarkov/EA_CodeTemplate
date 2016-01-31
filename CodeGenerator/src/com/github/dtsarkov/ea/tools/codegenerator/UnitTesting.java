@@ -12,8 +12,8 @@ public class UnitTesting {
 	public static void main(String[] args) throws Exception {
 		String[] testArgs = new String[] {
 				 "--model", "..\\CodeGeneratorDemo.EAP"
-				//,"-b", "TestCases\\TestCases.lst", "-f", "TestCases", "-x", "template"
-				,"-t", "TestCases\\listConnectors.template"	,"-e", "List Demo:Activity2" ,"-o", "test.out", "-q", "Package:Element", "-v" //, "-d"
+				,"-b", "TestCases\\TestCases.lst", "-f", "TestCases", "-x", "template"
+				//,"-t", "TestCases\\listConnectors.template"	,"-e", "Activity2" ,"-o", "test.out", "-v", //"-q", "Package:Element" //, "-d"
 				//,"-v"
 				//,"-d"
 			};

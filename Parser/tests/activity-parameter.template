@@ -3,18 +3,6 @@ Type		: $.Type
 Stereotype	: $.Stereotype
 ElementID	: $.ElementID 
 ObjectType	: $.ObjectType
-Value		: $.Value
-1 --------------------------------------------------------
-%list=$.EmbeddedElements @template="activity-parameter"%
-2 --------------------------------------------------------
-%list=$.Elements @template="activity-parameter"%
-3 --------------------------------------------------------
-%list=$.TemplateParameters @template="activity-parameter"%
-4 --------------------------------------------------------
-%list=$.Properties @template="activity-parameter"%
-5 --------------------------------------------------------
-%list=$.CustomProperties @template="activity-parameter"%
-6 --------------------------------------------------------
-%list=$.Attributes @template="activity-parameter"%
-< --------------------------------------------------------
+****************************************************************
+$.Name %eq% %list=$.CustomProperties @template="parameter-properties" ($.Name == "default")%
 

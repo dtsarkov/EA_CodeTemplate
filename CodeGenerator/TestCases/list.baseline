@@ -73,7 +73,7 @@ ElementGUID	:{620076DF-A5ED-41ff-8D06-CBB8C18373B7}
 Case#3: List all connectors attached to element "Activity2"
 ################################################################################
 > Processing element# 1 out of 4
-Name		:
+Name		:V4->A2
 ConnectorID	:10
 Type		:Dependency
 Subtype		:
@@ -100,7 +100,7 @@ ConnectorGUID	:{F56AF750-1A59-49fa-A7A8-6FAD027BBAEE}
 --------------------------------------------------------------------------------
 
 > Processing element# 4 out of 4
-Name		:
+Name		:A2->A3
 ConnectorID	:19
 Type		:ControlFlow
 Subtype		:
@@ -113,7 +113,7 @@ ConnectorGUID	:{72918668-E59C-4c00-98C7-0A8C58BDA391}
 Case#4: List all "Dependency" connectors attached to element "Activity2"
 ################################################################################
 > Processing element# 1 out of 2
-Name		:
+Name		:V4->A2
 ConnectorID	:10
 Type		:Dependency
 Subtype		:
@@ -135,7 +135,7 @@ ConnectorGUID	:{058560F9-0A04-4b7f-BFF8-8EB987238326}
 Case#5: List all connectors attached to element "Activity2"
 ################################################################################
 ################################################################################
-Name			:
+Name			:V4->A2
 ConnectorID		:10
 Type			:Dependency
 Subtype			:
@@ -190,7 +190,7 @@ RoleNote		:
 RoleType		:
 Stereotype		:
 StereotypeEx		:
-Visibility		:Public
+Visibility		:
 
 ################################################################################
 Name			:A2 -> V5
@@ -309,7 +309,7 @@ StereotypeEx		:
 Visibility		:
 
 ################################################################################
-Name			:
+Name			:A2->A3
 ConnectorID		:19
 Type			:ControlFlow
 Subtype			:
@@ -364,6 +364,6 @@ RoleNote		:
 RoleType		:
 Stereotype		:
 StereotypeEx		:
-Visibility		:Public
+Visibility		:
 
 

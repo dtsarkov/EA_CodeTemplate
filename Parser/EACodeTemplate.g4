@@ -24,9 +24,13 @@ line 		: fileMacro
 
 //
 // ============================================================================
-fileMacro	: FileMacro expr '%'
+fileMacro	: FileMacro expr (override)?'%'
 ;
+override	: Override expr // expr should return "true" or "false"
+; 		
 FileMacro	: '%file='
+;
+Override	: '@override='
 ;
 // ============================================================================
 assignment	: variable (op=EQ|op=AEQ) expression

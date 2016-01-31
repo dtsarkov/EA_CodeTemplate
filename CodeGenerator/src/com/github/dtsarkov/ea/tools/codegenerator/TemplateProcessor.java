@@ -11,7 +11,6 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -50,6 +49,7 @@ import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.If
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.Line_textContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.ListMacroContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.MacrosContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.OverrideContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.ParameterContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.PiMacroContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.PredicateContext;
@@ -700,7 +700,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 				w++;
 			}
 		}
-		try {
+		if (writer != null ) try {
 			writer.write(txt);
 		} catch(IOException e){
 			error(ctx,"Split Macro: Cannot write to output stream!");
@@ -786,7 +786,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			tp.setVariable("$CURRENT", Integer.toString(i+1));
 			tp.execute();
 			sb = sw.getBuffer();
-			try {
+			if ( writer != null ) try {
 				if ( sb.toString().trim().length() > 0 ) {
 					if ( w != 0 )	writer.write(separator);
 					writer.write(sb.toString());
@@ -847,7 +847,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	}
 
 	private void writeText(String text) {
-		try {
+		if ( writer != null ) try {
 			writer.write(text);
 		} catch(IOException e) {
 			error("Cannot write to output stream!");
@@ -856,7 +856,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	}
 	
 	private void flashOutput() {
-		try {
+		if (writer != null ) try {
 			writer.flush();
 		} catch(IOException e) {
 			
@@ -882,18 +882,34 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		if ( !file.isAbsolute() ) {
 			file = new File(TemplateProcessor.getOutputFolder()+"/"+fileName);
 		}
-		debug("New output file = [%s]\n",file.getAbsolutePath());
-		try {
-			FileWriter fw = new FileWriter(file);
-			this.flashOutput();
-			if ( fileCounter > 0 ) {
-				//Close output file if it was open in this template
-				this.writer.close();
+		debug("New output file = [%s], Exist = %s",file.getAbsolutePath(), file.exists());
+		
+		boolean override = true;
+		OverrideContext octx = ctx.override();
+		if (octx != null ) {
+			String ovrd = calcExpression(octx.expr());
+			override = (ovrd.trim().equalsIgnoreCase("true"));
+		}
+		debug("Override mode = %s", override);
+		
+		flashOutput();
+		if ( fileCounter > 0 && writer != null ) try {
+			//Close output file if it was open in this template
+			writer.close();
+		} catch ( IOException e ) {
+			error(ctx,"Cannot close output file!");
+		}
+		
+		if ( override || !file.exists() ) {
+			try {
+				FileWriter fw = new FileWriter(file);
+				setOutput(fw);
+				fileCounter++;
+			} catch (IOException e) {
+				error(ctx,"Cannot open file ["+fileName+"]");
 			}
-			this.setOutput(fw);
-			fileCounter++;
-		} catch (IOException e) {
-			error(ctx,"Cannot open file ["+fileName+"]");
+		} else {
+			setOutput(null);
 		}
 	}
 	

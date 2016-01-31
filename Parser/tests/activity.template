@@ -1,31 +1,10 @@
-%%=============================================================================
-%% Autosys job definition template
-%%  
-%%=============================================================================
-Here I need to insert or and
-%call="test" @element=$source.%
-%if $.Type != "Activity"%
-	%exit%
-%endif%
-
-$type="cmd"
-$suffix="_c"
-%if $.Stereotype == "Box Job"%
-	$type="box"
-	$suffix="_b"
-%endif%
-$JobName = $this.Name + $suffix
-%if $$prefix != ""%
-	$JobName = $$prefix + "_" +$JobName
-%endif%
-%%=============================================================================
-
-/* $.Stereotype: $JobName  
- * Description: $.Notes
- *****************************************************************************/ 
-insert_job: %REPLACE(%LOWER($JobName)%," ","_")% type:$type
-%list=$.Connectors @template="jobConnector" @parameters=$.ElementID @separator=" and "%
-/*****************************************************************************/ 
-
-%%=============================================================================
-%%list=$.Elements @template="activity"%
+Name		: $.Name
+Type		: $.Type
+Stereotype	: $.Stereotype
+ElementID	: $.ElementID 
+ObjectType	: $.ObjectType
+$N1 = %REPLACE($.Name,"TX_","")%
+$N2 = %REPLACE($N1,"_[0-9]+_.+$","")%
+Control_ID	: $N2
+####################################################################
+%list=$.EmbeddedElements @template="activity-parameter"%
