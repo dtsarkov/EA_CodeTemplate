@@ -91,7 +91,7 @@ else_stmt	: ELSE
 ;
 endif_stmt	: ENDIF
 ;
-endtempalte_stmt: '%exit%'
+endtempalte_stmt: EXIT | BREAK
 ;
 // ----------------------------------------------------------------------------
 compare_expr	: predicate (pred_op predicate)*
@@ -219,6 +219,8 @@ IF	: '%if'   	;
 ELSE	: '%else%'      ;
 ELSEIF	: '%elseif'     ;
 ENDIF	: '%endif%' 	;
+EXIT	: '%exit%' 	;
+BREAK	: '%exit loop%' ;
 
 PC	: '%';
 EQ	: '=';

@@ -63,6 +63,8 @@ import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.Va
 public class TemplateProcessor extends EACodeTemplateBaseListener {
 	/* Static section  
 	 **************************************************************************/
+	private static final String BREAK = "___BREAK___";
+	
 	private static String 		templateExtention;
 	private static String		outputFolder;
 
@@ -610,6 +612,9 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			debug(">>Removing listener...");
 			flashOutput();
 			parser.removeParseListener(this);
+			if ( ctx.BREAK() != null ) {
+				this.setVariable(BREAK, "true");
+			}
 		}
 	}
 
@@ -683,6 +688,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		StringWriter sw;
 		StringBuffer sb;
 		String txt	 = "";
+		String breakLoop;
 		int w = 0;
 		for ( int i = 0; i < parts.length; i++ ) {
 			sw = new StringWriter();
@@ -698,6 +704,10 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 				if ( w != 0 )	txt += separator;
 				txt += sb.toString();
 				w++;
+			}
+			breakLoop = tp.getVariableValue(BREAK);
+			if (breakLoop != null && breakLoop.equalsIgnoreCase("true")) {
+				break;
 			}
 		}
 		if (writer != null ) try {
@@ -777,6 +787,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		//Execute template for each element
 		StringWriter sw;
 		StringBuffer sb;
+		String		 breakLoop;
 		for ( int i = 0, w = 0; i < elementsCount; i++ ) {
 			obj = elements.get(i);
 			sw = new StringWriter();
@@ -797,6 +808,10 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 				break;
 			}
 			obj = null;
+			breakLoop = tp.getVariableValue(BREAK);
+			if (breakLoop != null && breakLoop.equalsIgnoreCase("true")) {
+				break;
+			}
 		}
 		obj = null;
 		ec 	= null;

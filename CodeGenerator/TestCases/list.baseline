@@ -367,3 +367,59 @@ StereotypeEx		:
 Visibility		:
 
 
+################################################################################
+Case#6: List all connectors attached to element "Activity2"
+        Exit after the first element
+################################################################################
+> Processing element# 1 out of 4
+Name		:V4->A2
+ConnectorID	:10
+Type		:Dependency
+Subtype		:
+Stereotype	:
+ConnectorGUID	:{5A152596-F65E-487c-B01B-F316943BDA6E}
+--------------------------------------------------------------------------------
+> Stop processing on element# 1
+
+> Processing element# 2 out of 4
+Name		:A2 -> V5
+ConnectorID	:11
+Type		:Dependency
+Subtype		:
+Stereotype	:
+ConnectorGUID	:{058560F9-0A04-4b7f-BFF8-8EB987238326}
+--------------------------------------------------------------------------------
+
+> Processing element# 3 out of 4
+Name		:A1 -> A2
+ConnectorID	:18
+Type		:ControlFlow
+Subtype		:
+Stereotype	:JobDependency
+ConnectorGUID	:{F56AF750-1A59-49fa-A7A8-6FAD027BBAEE}
+--------------------------------------------------------------------------------
+
+> Processing element# 4 out of 4
+Name		:A2->A3
+ConnectorID	:19
+Type		:ControlFlow
+Subtype		:
+Stereotype	:
+ConnectorGUID	:{72918668-E59C-4c00-98C7-0A8C58BDA391}
+--------------------------------------------------------------------------------
+
+
+################################################################################
+Case#7: List all connectors attached to element "Activity2"
+        Exit loop after the first element
+################################################################################
+> Processing element# 1 out of 4
+Name		:V4->A2
+ConnectorID	:10
+Type		:Dependency
+Subtype		:
+Stereotype	:
+ConnectorGUID	:{5A152596-F65E-487c-B01B-F316943BDA6E}
+--------------------------------------------------------------------------------
+> Stop processing on element# 1
+

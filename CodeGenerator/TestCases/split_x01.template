@@ -1,1 +1,9 @@
-($CURRENT-$COUNT)[$PART]
+%PI=""%
+> ($CURRENT-$COUNT)[$PART]
+%if $1 == $CURRENT%
+	%if $2 == "loop"%
+		%exit loop%
+	%else% 
+		%exit%
+	%endif%
+%endif%	

@@ -1,2 +1,10 @@
 > Processing element# $CURRENT out of $COUNT
 %call @template=$1%
+%if $2 == $CURRENT%
+> Stop processing on element# $CURRENT
+	%if $3 == "loop"%
+		%exit loop%
+	%else% 
+		%exit%
+	%endif%
+%endif%	

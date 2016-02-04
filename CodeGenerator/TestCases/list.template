@@ -24,3 +24,14 @@ Case#5: List all connectors attached to element %qt%$.Name%qt%
 ################################################################################
 %list=$.Connectors @template="connector_properties"%
 %nl%
+################################################################################
+Case#6: List all connectors attached to element %qt%$.Name%qt%  
+        Exit after the first element  
+################################################################################
+%list=$.Connectors @template="list_x01" @parameters="connector_base_properties","1"%
+%nl%
+################################################################################
+Case#7: List all connectors attached to element %qt%$.Name%qt%
+        Exit loop after the first element  
+################################################################################
+%list=$.Connectors @template="list_x01" @parameters="connector_base_properties","1","loop"%
