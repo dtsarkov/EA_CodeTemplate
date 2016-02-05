@@ -6,4 +6,4 @@ Component 1.1.2.1,split,split.out
 Component 1.1.2.1,textMacros,textMacros.out
 Activity2,list,list.out
 Activity2,call,call.out
-Activity2,multipleOutputFiles,file0.out
+Activity2,multipleOutputFiles,file00.out

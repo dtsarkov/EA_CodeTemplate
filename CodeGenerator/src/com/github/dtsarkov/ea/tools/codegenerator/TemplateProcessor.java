@@ -201,6 +201,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	private String					lineSeparator = System.lineSeparator();
 	private int						textLevel 	= 0;
 	private Writer 					writer;
+	private boolean					canRedirectOutput = true;
 
 	private ArrayList<String>  parameters	  = new ArrayList<String>(9);
 	private Map<String,String> localVariables = new HashMap<String,String>();
@@ -278,6 +279,13 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		return writer;
 	}
 
+	public boolean isRedirectOutputEnabled() {
+		return canRedirectOutput;
+	}
+	public void enableRedirectOutput(boolean enableRedirectOutput) {
+		this.canRedirectOutput = enableRedirectOutput;
+	}
+
 	public String getLineSeparator() {
 		return lineSeparator;
 	}
@@ -345,34 +353,36 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	 public void setVariable( String name, String value ) {
 		localVariables.put(name,value);
 	 }
-	 
-//	@Override
-//	public void enterAssignment(AssignmentContext ctx) {
-//		if ( executionState.canProcessBranch() ) 
-//			textLevel = -1000;
-//	}
+
+	private boolean inAssignmentMode = false; 
+	@Override
+	public void enterAssignment(AssignmentContext ctx) {
+		inAssignmentMode = true;
+	}
 	
 	@Override
 	public void exitAssignment(AssignmentContext ctx) {
-		if ( !executionState.canProcessBranch()) return;
 		
-		String variable = ctx.variable().getText();
-		Map<String,String> scope;
-		
-		if (variable.startsWith("$$")) {
-			scope = globalVariables;
-		} else {
-			scope = localVariables;
-		}
-		
-		
-		String value = "";
-		if ( ctx.op.getType() == EACodeTemplateParser.AEQ ) {
-			value = scope.get(variable);
-		}
-		value += calcExpression(ctx.expression());
-		debug("Assignment (%d): %s=%s",textLevel, variable,value);
+		if ( executionState.canProcessBranch()) {
+			String variable = ctx.variable().getText();
+			Map<String,String> scope;
+			
+			if (variable.startsWith("$$")) {
+				scope = globalVariables;
+			} else {
+				scope = localVariables;
+			}
+			
+			
+			String value = "";
+			if ( ctx.op.getType() == EACodeTemplateParser.AEQ ) {
+				value = scope.get(variable);
+			}
+			value += calcExpression(ctx.expression());
+			debug("Assignment (%d): %s=%s",textLevel, variable,value);
 		scope.put(variable, value);
+		}
+		inAssignmentMode = false;
 	}
 
 	private String calcExpression(ExpressionContext ctx ) {
@@ -890,15 +900,22 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	private static final String MODES="override;append;new";
 	@Override
 	public void exitFileMacro(FileMacroContext ctx) {
-		if ( this.writer instanceof StringWriter)
+
+		debug("Executing exitFileMacro : canRedirectOutput = [%s], Context = [%s]"
+				,isRedirectOutputEnabled() 
+				,ctx.toString()
+		);
+		
+		if ( !isRedirectOutputEnabled()) {
 			return;
+		} 
 		
 		String fileName = calcExpression(ctx.expr());
 		File file = new File(fileName);
 		if ( !file.isAbsolute() ) {
 			file = new File(TemplateProcessor.getOutputFolder()+"/"+fileName);
 		}
-		debug("New output file = [%s], Exist = %s",file.getAbsolutePath(), file.exists());
+		debug("\tNew output file = [%s], Exist = %s",file.getAbsolutePath(), file.exists());
 		
 		String mode = "override";
 		OverrideContext octx = ctx.override();
@@ -909,7 +926,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 				return;
 			}
 		}
-		debug("File mode = %s", mode);
+		debug("\tFile mode = %s", mode);
 		
 		flashOutput();
 		if ( fileCounter > 0 && writer != null ) try {
@@ -1036,6 +1053,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		
 		TemplateProcessor tp = new TemplateProcessor(templateName, getTemplateFolder());
 		tp.setOutput(writer);
+		tp.enableRedirectOutput(!this.inAssignmentMode && this.isRedirectOutputEnabled());
 
 		EAElement e = getElementInScope(ctx.elementInScope(0));
 		if ( e == null ) e = element;
