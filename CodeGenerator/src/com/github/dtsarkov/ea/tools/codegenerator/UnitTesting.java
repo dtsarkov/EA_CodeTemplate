@@ -13,8 +13,8 @@ public class UnitTesting {
 		String[] testArgs = new String[] {
 				 "--model", "..\\CodeGeneratorDemo.EAP"
 				,"-b", "TestCases\\TestCases.lst", "-f", "TestCases", "-x", "template", "-v" //,"-d"
-				//, "--variable", "OVERRIDE=all" 
-				//, "-D", "USE_FILE_NAMES=YES"
+				, "--variable", "CMD_VAR_1=Global variable CMD_VAR_1 value" 
+				, "-D", "CMD_VAR_2=Global variable CMD_VAR_2 value" 
 				//,"-t", "TestCases\\listConnectors.template"	,"-e", "Activity2" ,"-o", "test.out", "-v", //"-q", "Package:Element" //, "-d"
 				//,"-v"
 				//,"-d"

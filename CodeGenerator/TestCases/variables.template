@@ -1,0 +1,19 @@
+$localVariable   ="Local Variable Value"
+$$globalVariable ="Global Variable Value"
+################################################################################
+Template variables
+--------------------------------------------------------------------------------
+Local  variable %eq% [$localVariable]
+Global variable %eq% [$$globalVariable]
+CMD_VAR_1	%eq% [$$CMD_VAR_1]
+CMD_VAR_2	%eq% [$$CMD_VAR_2]
+$$CMD_VAR_2 = "New Value"
+--------------------------------------------------------------------------------
+%call @template="variables_1"%
+--------------------------------------------------------------------------------
+Local  variable %eq% [$localVariable]
+Global variable %eq% [$$globalVariable]
+CMD_VAR_1	%eq% [$$CMD_VAR_1]
+CMD_VAR_2	%eq% [$$CMD_VAR_2]
+################################################################################
+ 

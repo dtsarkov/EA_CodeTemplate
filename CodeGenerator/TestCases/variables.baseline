@@ -1,0 +1,24 @@
+################################################################################
+Template variables
+--------------------------------------------------------------------------------
+Local  variable = [Local Variable Value]
+Global variable = [Global Variable Value]
+CMD_VAR_1	= [Global variable CMD_VAR_1 value]
+CMD_VAR_2	= [Global variable CMD_VAR_2 value]
+--------------------------------------------------------------------------------
+################################################################################
+Template variables_1
+--------------------------------------------------------------------------------
+Local  variable = []
+Global variable = [Global Variable Value]
+CMD_VAR_1	= [Global variable CMD_VAR_1 value]
+CMD_VAR_2	= [New Value]
+Local  variable = [value 10]
+################################################################################
+
+--------------------------------------------------------------------------------
+Local  variable = [Local Variable Value]
+Global variable = [Global Variable Value]
+CMD_VAR_1	= [new value set in template "variables_1"]
+CMD_VAR_2	= [New Value]
+################################################################################

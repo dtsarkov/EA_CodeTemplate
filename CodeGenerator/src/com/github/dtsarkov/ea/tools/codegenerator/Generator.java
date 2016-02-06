@@ -24,7 +24,7 @@ public class Generator {
 
 	
 	public static void main(String[] args) throws Exception {
-		System.out.println("EACodeGenerator v 0.36");
+		System.out.println("EACodeGenerator v 0.37");
 
 		CommandLine cmd = parseCommandLine(args);
 		if ( cmd == null ) return;
@@ -93,10 +93,10 @@ public class Generator {
 				System.out.println("Global Variables:");
 			Properties vars = cmd.getOptionProperties("variable");
 			for( Object key : vars.keySet() ) {
-				//TemplateProcessor.
-				if ( verbose ) 
+				if ( verbose ) {
 					System.out.printf("\t%-30s\t= %s\n", key, vars.get(key));
-				
+				}
+				TemplateProcessor.addVariable("$$"+key.toString(), vars.get(key).toString());
 			}
 		}
 		
@@ -238,14 +238,14 @@ public class Generator {
 				.build()
 		);
 		
-		/*
+		
 		options.addOption(Option.builder("D")
 				.longOpt("variable")
 				.desc("assign <value> to a global variable <name> ")
 				.hasArgs().valueSeparator('=').argName("name=value")
 				.build()
 		);
-		*/
+		
 		options.addOption("d", "debug", false, "print debug information");
 		options.addOption("v", "verbose", false, "set verbose mode");
 		options.addOption("h", "help", false, "print this message");

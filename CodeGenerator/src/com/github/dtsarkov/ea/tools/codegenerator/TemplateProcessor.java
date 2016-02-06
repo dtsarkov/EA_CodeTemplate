@@ -188,6 +188,9 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		return warningCounter;
 	}
 
+	public static void addVariable(String variable, String value) {
+		globalVariables.put(variable, value);
+	}
 	/*
 	 * 
 	 **************************************************************************/
