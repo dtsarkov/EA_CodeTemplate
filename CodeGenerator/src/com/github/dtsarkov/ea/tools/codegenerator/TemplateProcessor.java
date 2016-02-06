@@ -903,6 +903,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	private static final String MODES="override;append;new";
 	@Override
 	public void exitFileMacro(FileMacroContext ctx) {
+		if ( !executionState.canProcessBranch()) return;
 
 		debug("Executing exitFileMacro : canRedirectOutput = [%s], Context = [%s]"
 				,isRedirectOutputEnabled() 
@@ -969,7 +970,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		ParseTree c;
 		for ( int i = 0; i < childCount; i++ ) {
 			c = ctx.getChild(i);
-			debug("\t(%d) %s => [%s])",i,c.getClass().getName(),c.getText());
+			//debug("\t(%d) %s => [%s])",i,c.getClass().getName(),c.getText());
 			if ( c instanceof FreeTextContext ) {
 				sendTextOut(c.getText(), (FreeTextContext)c);
 			} else if ( c instanceof VariableContext ) {

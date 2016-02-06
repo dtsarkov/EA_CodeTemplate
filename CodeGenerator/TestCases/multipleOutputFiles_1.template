@@ -1,7 +1,12 @@
-%if $1 == "null" or $1 == "assignment"%
+%if $1 == "assignment"%
 	$mode = "override"
 %else%
 	$mode = $1
 %endif%		
-%file="file11.out" @mode=$mode%
-This text will go to file11	mode %eq% [$1]
+%if $1 == ""%
+	%file="file11-default.out"%
+This text will go to file11-default. Mode %eq% [$1]
+%else%	
+	%file="file11.out" @mode=$mode%
+This text will go to file11. Mode %eq% [$1]
+%endif%	

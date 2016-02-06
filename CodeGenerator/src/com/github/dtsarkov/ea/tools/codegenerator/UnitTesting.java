@@ -20,6 +20,20 @@ public class UnitTesting {
 				//,"-d"
 			};
 		System.out.println(
+				"*** Delete .out files ********************************************************************"
+		);
+		File outFolder = new File(".");
+		File[] outFiles = outFolder.listFiles(new FileFilter() {
+			@Override
+			public boolean accept(File pathname) {
+				return pathname.getName().endsWith(".out");
+			}
+		});
+		for( File f : outFiles ) {
+			f.delete();
+		}
+
+		System.out.println(
 				"*** Unit Testing Start ******************************************************************"
 		);
 		Generator.main(testArgs);

@@ -6,6 +6,7 @@
 $txt = %call @template="multipleOutputFiles_1" @parameters="assignment"%
 3. This is the output from multipleOutputFile_1 template
 	$txt
+%call @template="multipleOutputFiles_1" @parameters="override"%
 ################################################################################
 $mode="override"
 
