@@ -18,19 +18,21 @@ What's new
 -   Fixed **%file%** macro bug when macro does not create new output file when
     called from a template which called from another template.
 
--   Added a new command line parameter **-D --variable**. The parameter allows
-    define global variables (**$$**) from command line.  
-    E.g. the below command line defines two global variables **$$Variable1**
-    and **$$Variable2**
+-   Added the second parameter "*remove new lines*" to **PLAIN_TEXT** function.
+    Syntax:
+    ~~~~
+    %PLAIN_TEXT(<notes> [,<remove new lines>])%
+    ~~~~
+    Where:
+	* <notes> - element notes
+	* <remove new lines>  - expression returning "true" or "false"
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-EACodeGenerator.cmd -m model.eap -e "Element name" 
-	... 
-	-D Variable1="Variable1 Value" 
-	--variable Variable2="Varable2 Value" 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
- 
+-   Added a new command line parameter **-D** | **--variable**. The parameter allows
+    define global variables (**$$**) from command line.   E.g. the below command
+    line defines two global variables **$$Variable1** and **$$Variable2**
+    ~~~~ 
+    EACodeGenerator.cmd -m model.eap -t template_name ... -D Variable1=Value1" --variable Variable2=Value2 
+    ~~~~
 
 ### Version 0.36
 

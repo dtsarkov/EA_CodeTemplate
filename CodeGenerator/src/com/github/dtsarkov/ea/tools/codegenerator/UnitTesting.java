@@ -12,10 +12,11 @@ public class UnitTesting {
 	public static void main(String[] args) throws Exception {
 		String[] testArgs = new String[] {
 				 "--model", "..\\CodeGeneratorDemo.EAP"
-				,"-b", "TestCases\\TestCases.lst", "-f", "TestCases", "-x", "template", "-v" //,"-d"
+				,"-v" 
 				, "--variable", "CMD_VAR_1=Global variable CMD_VAR_1 value" 
 				, "-D", "CMD_VAR_2=Global variable CMD_VAR_2 value" 
-				//,"-t", "TestCases\\listConnectors.template"	,"-e", "Activity2" ,"-o", "test.out", "-v", //"-q", "Package:Element" //, "-d"
+				,"-b", "TestCases\\TestCases.lst", "-f", "TestCases", "-x", "template"
+				//,"-t", "TestCases\\functions.template"	,"-e", "Component 1.1.2.1" ,"-o", "functions.out", "-v", //"-q", "Package:Element" //, "-d"
 				//,"-v"
 				//,"-d"
 			};

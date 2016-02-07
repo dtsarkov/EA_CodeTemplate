@@ -33,3 +33,23 @@ functions. It repeats 3 times.
 true
 false
 -- Exist function end ----------------------------------------------------------
+-- PLAIN_TEXT start ------------------------------------------------------------
+> Notes with formating
+> --------------------------------------
+<b><u>Description:</u></b>
+This is a dummy component create for:
+<ol>
+	<li>Demonstration purpose</li>
+	<li>And nothing else</li>
+</ol>
+> Notes without formating
+> --------------------------------------
+Description:
+This is a dummy component create for:
+
+	1. Demonstration purpose
+	2. And nothing else
+> Notes without formating and new lines
+> --------------------------------------
+Description: This is a dummy component create for:  1. Demonstration purpose 2. And nothing else
+-- PLAIN_TEXT end --------------------------------------------------------------

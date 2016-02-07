@@ -64,6 +64,8 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	/* Static section  
 	 **************************************************************************/
 	private static final String BREAK = "___BREAK___";
+	private static final String NL = "\n";
+	private static final String CR = "\r";
 	
 	private static String 		templateExtention;
 	private static String		outputFolder;
@@ -484,6 +486,13 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			
 		} else if (function.equalsIgnoreCase("%PLAIN_TEXT(") ) {
 			value = EA_Model.GetFormatFromField("TXT", firstParameter);
+			if (parmCount > 1 ) {
+				String removeNewLines = calcExpression(ctx.parameters().expression(1));
+				debug( "\tSecond parameter = [%s]", removeNewLines);
+				if ( removeNewLines.equalsIgnoreCase("true") ) {
+					value = value.replaceAll(CR, "").replaceAll(" *\n[ |\t]*", " ");
+				}
+			}
 			
 		} else if (function.equalsIgnoreCase("%WRAP_TEXT(") ) {
 			if (parmCount < 2) {
