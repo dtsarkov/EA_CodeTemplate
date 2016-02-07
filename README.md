@@ -24,8 +24,8 @@ What's new
     %PLAIN_TEXT(<notes> [,<remove new lines>])%
     ~~~~
     Where:
-	* <notes> - element notes
-	* <remove new lines>  - expression returning "true" or "false"
+	- \<**notes**\> - element notes
+	- \<**remove new lines**\>  - (optional) expression returning "*true*" or "*false*"
 
 -   Added a new command line parameter **-D** | **--variable**. The parameter allows
     define global variables (**$$**) from command line.   E.g. the below command
