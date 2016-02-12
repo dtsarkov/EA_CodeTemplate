@@ -35,7 +35,7 @@ Override	: '@mode='
 // ============================================================================
 assignment	: variable (op=EQ|op=AEQ) expression
 ;
-expression	: expr ('+' expr)*
+expression	: expr (ADD expr)*
 ;
 expr		: stringLiteral 
 		| variable 
@@ -188,7 +188,7 @@ Delimiter       : '@delimiter=';
 // ============================================================================
 freeText	: FreeText | Pred_op | COMA | OBR | CBR | DOT
 ;
-FreeText	: [a-zA-Z0-9_{}\.+\-\*\:\/\[\]<>\~!?@#^&\|'`;]+
+FreeText	: [a-zA-Z0-9_{}\.\+\-\*\:\/\[\]<>\~!?@#^&\|'`;]+
 ;
 
 //string 		: StringLiteral
@@ -226,7 +226,7 @@ PC	: '%';
 EQ	: '=';
 EQQ	: '==';
 AEQ	: '+=';
-//ADD	: '+';
+ADD	: '+';
 COMA	: ',';
 OBR	: '(';
 CBR	: ')';

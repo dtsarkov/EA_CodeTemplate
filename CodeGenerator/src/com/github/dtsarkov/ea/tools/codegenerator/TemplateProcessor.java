@@ -949,17 +949,20 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			error(ctx,"Cannot close output file!");
 		}
 		
-		if ( !(mode.equalsIgnoreCase("new") && file.exists()) ) {
+		if ( (mode.equalsIgnoreCase("new") && file.exists()) ) {
+			//Prevent file from to be overwritten 
+			setOutput(null);
+		} else {
 			try {
-				FileWriter fw = new FileWriter(file, mode.equalsIgnoreCase("append"));
+				FileWriter fw = new FileWriter(file
+					, file.exists() && mode.equalsIgnoreCase("append") //Append mode
+				);
 				
 				setOutput(fw);
 				fileCounter++;
 			} catch (IOException e) {
 				error(ctx,"Cannot open file ["+fileName+"]");
 			}
-		} else {
-			setOutput(null);
 		}
 	}
 	

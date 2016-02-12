@@ -12,7 +12,6 @@ public class UnitTesting {
 	public static void main(String[] args) throws Exception {
 		String[] testArgs = new String[] {
 				 "--model", "..\\CodeGeneratorDemo.EAP"
-				,"-v" 
 				, "--variable", "CMD_VAR_1=Global variable CMD_VAR_1 value" 
 				, "-D", "CMD_VAR_2=Global variable CMD_VAR_2 value" 
 				,"-b", "TestCases\\TestCases.lst", "-f", "TestCases", "-x", "template"

@@ -8,10 +8,14 @@ Links:
 ANTLR Parser http://www.antlr.org/download.html EA Code Template Syntax
 http://sparxsystems.com/enterprise\_architect\_user\_guide/12.1/software\_engineering/codetemplatesyntax.html
 
- 
-
 What's new
 ----------
+
+### Version 0.38
+
+-   Fixed bug when parser did not recognise '**+**' character in free text.
+
+-   Fixed bug when **%file%** macro called in "*append*" mode throwed an exception.
 
 ### Version 0.37
 
