@@ -186,9 +186,9 @@ Delimiter       : '@delimiter=';
 // ============================================================================
 // =
 // ============================================================================
-freeText	: FreeText | Pred_op | COMA | OBR | CBR | DOT
+freeText	: FreeText | Pred_op | COMA | OBR | CBR | DOT | ADD
 ;
-FreeText	: [a-zA-Z0-9_{}\.\+\-\*\:\/\[\]<>\~!?@#^&\|'`;]+
+FreeText	: [a-zA-Z0-9_{}\.\-\*\:\/\[\]<>\~!?@#^&\|'`;]+
 ;
 
 //string 		: StringLiteral

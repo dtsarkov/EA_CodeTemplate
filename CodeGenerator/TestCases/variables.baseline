@@ -22,3 +22,6 @@ Global variable = [Global Variable Value]
 CMD_VAR_1	= [new value set in template "variables_1"]
 CMD_VAR_2	= [New Value]
 ################################################################################
+Assignment expression test:
+aaanew value set in template "variables_1"
+################################################################################

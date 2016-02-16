@@ -16,4 +16,7 @@ Global variable %eq% [$$globalVariable]
 CMD_VAR_1	%eq% [$$CMD_VAR_1]
 CMD_VAR_2	%eq% [$$CMD_VAR_2]
 ################################################################################
- 
+Assignment expression test:
+$var1 = "aaa" + $$CMD_VAR_1
+$var1 
+################################################################################
