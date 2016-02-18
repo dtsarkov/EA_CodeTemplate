@@ -427,6 +427,10 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 				StringWriter sw = new StringWriter(255);
 				executeListMacro((ListMacroContext)c, sw);
 				v = sw.toString();
+			} else if ( c instanceof SplitMacroContext ) {
+				StringWriter sw = new StringWriter(255);
+				executeSplitMacro((SplitMacroContext)c, sw);
+				v = sw.toString();
 			} else {
 				debug(">> Unknown Expression context [%]",c.getClass().toString()); 
 			}

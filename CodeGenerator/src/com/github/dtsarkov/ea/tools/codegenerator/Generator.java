@@ -24,7 +24,7 @@ public class Generator {
 
 	
 	public static void main(String[] args) throws Exception {
-		System.out.println("EACodeGenerator v 0.38");
+		System.out.println("EACodeGenerator v 0.39");
 
 		CommandLine cmd = parseCommandLine(args);
 		if ( cmd == null ) return;

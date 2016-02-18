@@ -44,7 +44,8 @@ expr		: stringLiteral
 		| functions
 		| parameter
 		| callMacro
-		| listMacro 
+		| listMacro
+		| splitMacro 
 ;
 
 variable	: VAR
