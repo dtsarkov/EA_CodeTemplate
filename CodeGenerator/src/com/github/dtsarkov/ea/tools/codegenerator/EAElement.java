@@ -279,8 +279,17 @@ public class EAElement {
 				TemplateProcessor.debug("\tgetting tagged values for element...");
 				tags = executeGetMethod(obj.element, "TaggedValues");
 			}
-			if ( tags != null )
-				tag = (TaggedValue)(((Collection)tags).GetByName(tagName));
+			if ( tags != null ) {
+				//GetByName is case-sensitive. 
+				//tag = (TaggedValue)(((Collection)tags).GetByName(tagName));
+				//Replaced by non case-sensitive version.
+				short count = ((Collection)tags).GetCount();
+				for ( short i = 0; i < count; i++ ) {
+					tag = (TaggedValue)((Collection)tags).GetAt(i);
+					if ( tag.GetName().equalsIgnoreCase(tagName) ) 
+						return tag;
+				}
+			}
 		}
 		return tag;
 	}

@@ -5,7 +5,7 @@
 ###: -- Test case #1 -- Element's attributes
 #01: Name	: $.Name	%eq% $this.Name
 #02: Alias	: $.Alias	%eq% $this.Alias
-#03: Tag	: $."Component::Tag1" %eq% $this."Component::Tag1"
+#03: Tag	: $."Component::Tag1" %eq% $this."component::tag1"
 $Var = $.Name
 #04: Var-Name	: $Var
 $Var = $."Component::Tag1"
