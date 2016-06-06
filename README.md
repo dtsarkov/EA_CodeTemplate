@@ -11,14 +11,18 @@ http://sparxsystems.com/enterprise\_architect\_user\_guide/12.1/software\_engine
 What's new
 ----------
 
+### Version 0.41
+
+-   Fixed bug when incorrect value was returning for unset tag. 
+
 ### Version 0.40
 
--    Made Tag attributes non case-sensitive. Now any of $."Tag1" or $."tag1" or $."TAG1" can be used
-     to retrive "Tag1" value
+-   Made Tag attributes non case-sensitive. Now any of $."Tag1" or $."tag1" or $."TAG1" can be used
+    to retrive "Tag1" value
 
 ### Version 0.39
 
--    Made "%split" macro availabe in expressions
+-   Made "%split" macro availabe in expressions
 
 ### Version 0.38
 

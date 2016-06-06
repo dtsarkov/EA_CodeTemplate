@@ -6,6 +6,7 @@
 #01: Name	: $.Name	%eq% $this.Name
 #02: Alias	: $.Alias	%eq% $this.Alias
 #03: Tag	: $."Component::Tag1" %eq% $this."component::tag1"
+#03: Unknown Tag: $."Tag::Does not exist"
 $Var = $.Name
 #04: Var-Name	: $Var
 $Var = $."Component::Tag1"

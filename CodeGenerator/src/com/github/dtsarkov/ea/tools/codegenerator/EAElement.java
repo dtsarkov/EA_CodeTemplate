@@ -289,6 +289,7 @@ public class EAElement {
 					if ( tag.GetName().equalsIgnoreCase(tagName) ) 
 						return tag;
 				}
+				tag = null;
 			}
 		}
 		return tag;
