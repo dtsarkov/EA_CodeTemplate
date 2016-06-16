@@ -24,7 +24,7 @@ public class Generator {
 
 	
 	public static void main(String[] args) throws Exception {
-		System.out.println("EACodeGenerator v 0.41");
+		System.out.println("EACodeGenerator v 0.42");
 
 		CommandLine cmd = parseCommandLine(args);
 		if ( cmd == null ) return;
@@ -140,9 +140,9 @@ public class Generator {
 	    				,"------------------------------"
 	    		);
     		}
-    		tp = new TemplateProcessor(pe.template);
+    		tp = new TemplateProcessor(pe.template,templateFolder);
     		
-    		tp.setTemplateFolder(templateFolder);
+    		//tp.setTemplateFolder(templateFolder);
     		tp.setOutput(fw);
     		tp.setElement(element);
     		tp.execute();
