@@ -43,6 +43,7 @@ import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.Ex
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.ExpressionContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.FileContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.FileMacroContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.FilterMacroContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.FreeTextContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.FunctionsContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.If_stmtContext;
@@ -74,6 +75,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	
 	private static Map<String,String> TextMacros;
 	private static Map<String,String> globalVariables;
+	private static Compare_exprContext globalFilter = null;
 	
 	private	static int			errorCounter 	= 0;
 	private static int			warningCounter 	= 0;
@@ -379,24 +381,33 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			}
 			
 			
-			String value = "";
-			if ( ctx.op.getType() == EACodeTemplateParser.AEQ ) {
-				value = scope.get(variable);
+			String value = calcExpression(ctx.expression());
+			if ( value != null && ctx.op.getType() == EACodeTemplateParser.AEQ ) {
+				//get variable value for '+=' assignment
+				String curentValue = scope.get(variable);
+				if ( curentValue != null ) //variable was defined before 
+					value = curentValue + value;
 			}
-			value += calcExpression(ctx.expression());
 			debug("Assignment (%d): %s=%s",textLevel, variable,value);
-		scope.put(variable, value);
+			scope.put(variable, value);
 		}
 		inAssignmentMode = false;
 	}
 
 	private String calcExpression(ExpressionContext ctx ) {
 		String value = "";
+		String v;
 		ExprContext c;
 		for ( int i = 0; i < ctx.getChildCount(); i++ ) {
 			c = ctx.expr(i);
-			if ( c != null )
-				value += calcExpression(c);
+			if ( c != null ) {
+				v = calcExpression(c); 
+				if ( v == null ) { 
+					value = null;
+					break;
+				}
+				value += v;
+			}
 		}
 		return value;
 	}
@@ -436,6 +447,8 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			}
 			if ( v == null ) {
 				s = null;
+				//Fixed bug. Loop should be broken here because of the null value.
+				break;
 			} else {
 				s += v;
 			}
@@ -518,6 +531,8 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			message(firstParameter);
 		} else if (function.equalsIgnoreCase("%EXIST(") ) {
 			value = Boolean.toString(existTemplate(firstParameter));
+		} else if (function.equalsIgnoreCase("%DEFINED(") ) {
+			value = Boolean.toString(firstParameter != null);
 		} else {
 			error(ctx, "Unknown function "+function+")%");
 		}
@@ -645,22 +660,28 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	}
 
 	private boolean evalPredicate( PredicateContext ctx ) {
-		String exp1 = calcExpression(ctx.expr(0));
-		String exp2 = calcExpression(ctx.expr(1));
-		String op   = ctx.test_op().getText();
-		
 		boolean equal = false;
-		if ( exp1 != null && exp2 != null ) {
-			if ( op.compareTo("~=") == 0 ) {
-				equal = exp1.matches(exp2);
-			} else {
-				equal = (exp1.compareTo(exp2) == 0);
-				if ( op.compareTo("!=") == 0 ) {
-					equal = !equal;
+		String exp1 = calcExpression(ctx.expr(0));
+		ExprContext expc2 = ctx.expr(1);
+		if ( expc2 == null ) {
+			equal = exp1.equalsIgnoreCase("true");
+			debug("Eval([%s]) is %s",exp1,equal);
+		} else {
+			String exp2 = calcExpression(ctx.expr(1));
+			String op   = ctx.test_op().getText();
+			
+			if ( exp1 != null && exp2 != null ) {
+				if ( op.compareTo("~=") == 0 ) {
+					equal = exp1.matches(exp2);
+				} else {
+					equal = (exp1.compareTo(exp2) == 0);
+					if ( op.compareTo("!=") == 0 ) {
+						equal = !equal;
+					}
 				}
 			}
+			debug("Eval([%s] %s [%s]) is %s",exp1,op,exp2,equal);
 		}
-		debug("Eval([%s] %s [%s]) is %s",exp1,op,exp2,equal);
 		return equal;
 	}
 
@@ -695,7 +716,10 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		TemplateProcessor tp 	= new TemplateProcessor(templateName,getTemplateFolder());
 		
 		EAElement elementInScope = getElementInScope(ctx.elementInScope(0));
-		if ( elementInScope == null ) elementInScope = element;
+		//TODO: Add element filter
+		if ( elementInScope == null ) {
+			elementInScope = element;
+		}
 
 		tp.setElement(elementInScope);
 
@@ -784,6 +808,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		EAElement currentElement = this.element;
 		for ( short i = 0; i < ecCount; i++ ) {
 			obj = ec.GetAt(i);
+			//TODO: Add element filter
 			this.setElement(obj);
 			if ( conditions == null || evalCompareExpr(conditions) ) {
 				elements.add(obj);
@@ -848,6 +873,26 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	 * Functions section
 	 **************************************************************************/
 
+	/*
+	 * Filter section
+	 **************************************************************************/
+	@Override
+	public void exitFilterMacro(FilterMacroContext ctx) {
+		setFilter(ctx.compare_expr());
+	}
+
+	public void setFilter(Compare_exprContext ctx) {
+		globalFilter = ctx;
+	}
+	
+	public boolean evalFilter() {
+		boolean eval = true;
+		if ( globalFilter != null ) {
+			
+		}
+		
+		return eval;
+	}
 	/*
 	 * Text section
 	 **************************************************************************/
@@ -1076,7 +1121,10 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		tp.enableRedirectOutput(!this.inAssignmentMode && this.isRedirectOutputEnabled());
 
 		EAElement e = getElementInScope(ctx.elementInScope(0));
-		if ( e == null ) e = element;
+		//TODO: Add element filter
+		if ( e == null ) {
+			e = element;
+		}
 		
 		tp.setElement(e);
 

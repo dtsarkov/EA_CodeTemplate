@@ -146,3 +146,42 @@ $expression = ".*expression[0-9]+"
 %else%
 		Test 18 : PASS
 %endif%				
+
+%if $v1 == $v2%
+		Test 19	 : FAIL
+%else%
+		Test 19 : PASS
+%endif%				
+
+$v1 = "1"
+%if $v1 == $v2%
+		Test 20	 : FAIL
+%else%
+		Test 20 : PASS
+%endif%				
+
+$v2 = "1"
+%if $v1 == $v2%
+		Test 21	 : PASS
+%else%
+		Test 21 : FAIL
+%endif%				
+
+$v1 = "2"
+%if $v1 == $v2%
+		Test 22	 : FAIL
+%else%
+		Test 22 : PASS
+%endif%				
+
+%if %DEFINED($v1)% == "true" %
+		Test 23	 : PASS
+%else%
+		Test 23 : FAIL
+%endif%				
+
+%if %DEFINED($v3)% %
+		Test 24 : FAIL
+%else%
+		Test 24	 : PASS
+%endif%				

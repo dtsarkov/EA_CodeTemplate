@@ -53,3 +53,7 @@ This is a dummy component create for:
 > --------------------------------------
 Description: This is a dummy component create for:  1. Demonstration purpose 2. And nothing else
 -- PLAIN_TEXT end --------------------------------------------------------------
+-- DEFINED start ---------------------------------------------------------------
+true
+false
+-- DEFINED end -----------------------------------------------------------------

@@ -7,6 +7,8 @@ Local  variable %eq% [$localVariable]
 Global variable %eq% [$$globalVariable]
 CMD_VAR_1	%eq% [$$CMD_VAR_1]
 CMD_VAR_2	%eq% [$$CMD_VAR_2]
+Undefined	%eq% [$Undefined]
+
 $$CMD_VAR_2 = "New Value"
 --------------------------------------------------------------------------------
 %call @template="variables_1"%
@@ -18,5 +20,14 @@ CMD_VAR_2	%eq% [$$CMD_VAR_2]
 ################################################################################
 Assignment expression test:
 $var1 = "aaa" + $$CMD_VAR_1
-$var1 
+var1		%eq% [$var1]
+ 
+$var1 = "aaa" + $Undefined + "bbb"
+var1		%eq% [$var1]
+
+$Undefined = "zzz" + $var1 
+Undefined	%eq% [$Undefined]
+
+$Undefined += "zzz" + $$CMD_VAR_2
+Undefined	%eq% [$Undefined]
 ################################################################################

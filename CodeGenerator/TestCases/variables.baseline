@@ -5,6 +5,7 @@ Local  variable = [Local Variable Value]
 Global variable = [Global Variable Value]
 CMD_VAR_1	= [Global variable CMD_VAR_1 value]
 CMD_VAR_2	= [Global variable CMD_VAR_2 value]
+Undefined	= []
 --------------------------------------------------------------------------------
 ################################################################################
 Template variables_1
@@ -23,5 +24,8 @@ CMD_VAR_1	= [new value set in template "variables_1"]
 CMD_VAR_2	= [New Value]
 ################################################################################
 Assignment expression test:
-aaanew value set in template "variables_1"
+var1		= [aaanew value set in template "variables_1"]
+var1		= []
+Undefined	= []
+Undefined	= [zzzNew Value]
 ################################################################################

@@ -4,6 +4,7 @@
 // ------------	---------------------------------------------------------------
 // 0.21		Added Pred_op to freeText rule to fix the bug when parser did not
 //		recognized and/or as a free text.
+// 0.22		Added %filter% macro, %DEFINED(<expr>)% function
 // ----------------------------------------------------------------------------
 grammar EACodeTemplate;
 
@@ -17,11 +18,18 @@ line_text: line NL
 emptyLine	: NL
 ;
 line 		: fileMacro
+		| filterMacro
 		| assignment 
 		| branching
 		| text 
 ;
 
+//
+// ============================================================================
+filterMacro	: FilterMacro (compare_expr)? '%'
+;
+FilterMacro	: '%filter'
+;
 //
 // ============================================================================
 fileMacro	: FileMacro expr (override)?'%'
@@ -98,7 +106,7 @@ endtempalte_stmt: EXIT | BREAK
 compare_expr	: predicate (pred_op predicate)*
 ;
 predicate	: expr test_op expr
-		//| expr RegEx_op stringLiteral
+		| expr 
 ;
 pred_op     	: Pred_op;
 test_op		: Test_op;
@@ -177,6 +185,7 @@ Function        : '%UPPER(' | '%LOWER(' | '%REPLACE(' | '%TRIM('  | '%MID('
 		| '%WRAP_TEXT(' | '%PLAIN_TEXT('
 		| '%MESSAGE(' | '%WARNING(' | '%ERROR(' | '%DEBUG('
 		| '%EXIST('
+		| '%DEFINED('
 ;
 
 TemplateName    : '@template=';
