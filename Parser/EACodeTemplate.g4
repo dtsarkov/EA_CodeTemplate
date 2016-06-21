@@ -4,7 +4,8 @@
 // ------------	---------------------------------------------------------------
 // 0.21		Added Pred_op to freeText rule to fix the bug when parser did not
 //		recognized and/or as a free text.
-// 0.22		Added %filter% macro, %DEFINED(<expr>)% function
+// 0.22		Added %filter% macro
+// 		//, %DEFINED(<expr>)% function
 // ----------------------------------------------------------------------------
 grammar EACodeTemplate;
 
@@ -185,7 +186,7 @@ Function        : '%UPPER(' | '%LOWER(' | '%REPLACE(' | '%TRIM('  | '%MID('
 		| '%WRAP_TEXT(' | '%PLAIN_TEXT('
 		| '%MESSAGE(' | '%WARNING(' | '%ERROR(' | '%DEBUG('
 		| '%EXIST('
-		| '%DEFINED('
+//		| '%DEFINED('
 ;
 
 TemplateName    : '@template=';

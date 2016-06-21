@@ -402,11 +402,9 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			c = ctx.expr(i);
 			if ( c != null ) {
 				v = calcExpression(c); 
-				if ( v == null ) { 
-					value = null;
-					break;
+				if ( v != null ) { 
+					value += v;
 				}
-				value += v;
 			}
 		}
 		return value;
@@ -445,11 +443,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			} else {
 				debug(">> Unknown Expression context [%]",c.getClass().toString()); 
 			}
-			if ( v == null ) {
-				s = null;
-				//Fixed bug. Loop should be broken here because of the null value.
-				break;
-			} else {
+			if ( v != null ) {
 				s += v;
 			}
 		}
@@ -662,22 +656,22 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	private boolean evalPredicate( PredicateContext ctx ) {
 		boolean equal = false;
 		String exp1 = calcExpression(ctx.expr(0));
+		exp1 = (exp1 == null ) ? "" : exp1;
 		ExprContext expc2 = ctx.expr(1);
 		if ( expc2 == null ) {
 			equal = exp1.equalsIgnoreCase("true");
 			debug("Eval([%s]) is %s",exp1,equal);
 		} else {
 			String exp2 = calcExpression(ctx.expr(1));
+			exp2 = (exp2 == null ) ? "" : exp2;
 			String op   = ctx.test_op().getText();
 			
-			if ( exp1 != null && exp2 != null ) {
-				if ( op.compareTo("~=") == 0 ) {
-					equal = exp1.matches(exp2);
-				} else {
-					equal = (exp1.compareTo(exp2) == 0);
-					if ( op.compareTo("!=") == 0 ) {
-						equal = !equal;
-					}
+			if ( op.compareTo("~=") == 0 ) {
+				equal = exp1.matches(exp2);
+			} else {
+				equal = (exp1.compareTo(exp2) == 0);
+				if ( op.compareTo("!=") == 0 ) {
+					equal = !equal;
 				}
 			}
 			debug("Eval([%s] %s [%s]) is %s",exp1,op,exp2,equal);

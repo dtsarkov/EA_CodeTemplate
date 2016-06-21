@@ -25,7 +25,7 @@ CMD_VAR_2	= [New Value]
 ################################################################################
 Assignment expression test:
 var1		= [aaanew value set in template "variables_1"]
-var1		= []
-Undefined	= []
-Undefined	= [zzzNew Value]
+var1		= [aaabbb]
+Undefined	= [zzzaaabbb]
+Undefined	= [zzzaaabbbzzzNew Value]
 ################################################################################

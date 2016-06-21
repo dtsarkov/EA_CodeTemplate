@@ -6,9 +6,8 @@ This text will go to file1
 #02: Alias	: 	= 
 #03: Tag	: =
 #03: Unknown Tag:
-#03: Unknown Tag: false
 #04: Var-Name	: Activity2
-#05: Var-Tag	:
+#05: Var-Tag	: []
 #06: Notes	: 
 #07:                                     
 
@@ -18,14 +17,14 @@ This text will go to file1
 #11: Name	:
 #12: Alias	:
 #13: Tag  	:
-#14: Var-Name	:
-#15: Var-Tag	:
+#14: Var-Name	: 
+#15: Var-Tag	: 
 
 ###: -- Test case #3 -- Package's attributes
 #21: Name	: List Demo
 #22: Alias	: 
 #23: Tag	:
 #14: Var-Name	: List Demo
-#15: Var-Tag	:
+#15: Var-Tag	: 
 
 ################################################################################
