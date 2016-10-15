@@ -1,6 +1,7 @@
 package com.github.dtsarkov.ea.tools.codegenerator;
 
 import java.util.Arrays;
+import java.util.regex.Matcher;
 
 public class Utils {
 
@@ -84,6 +85,22 @@ public class Utils {
 			}
 		}
 		return buffer.toString();
+	}
+
+	static private final String escapes[][] = {
+			 {Matcher.quoteReplacement("\\t"), 	"\t"}
+			,{Matcher.quoteReplacement("\\n"), 	"\n"}
+			,{Matcher.quoteReplacement("\\f"), 	"\f"}
+			,{Matcher.quoteReplacement("\\r"), 	"\r"}
+			,{Matcher.quoteReplacement("\\\""), "\""}
+			,{Matcher.quoteReplacement("\\'"), 	"'" }
+			,{Matcher.quoteReplacement("\\\\"), Matcher.quoteReplacement("\\")}
+	};
+	public static String translateStringLiteral( String s ) {
+		String s1 = s.substring(1,s.length()-1); //remove leading and trailing double quotes
+		for ( int i = 0; i < escapes.length; i++ )
+			s1 = s1.replaceAll(escapes[i][0], escapes[i][1]);
+		return s1; 
 	}
 
 }

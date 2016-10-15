@@ -11,7 +11,17 @@
 			<arguments>
 				<dictionary>
 					<key>LaunchConfigHandle</key>
-					<value>&lt;project&gt;/.externalToolBuilders/ANTLR.launch</value>
+					<value>&lt;project&gt;/.externalToolBuilders/ANTLR-CodeGenerator.launch</value>
+				</dictionary>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.ui.externaltools.ExternalToolBuilder</name>
+			<triggers>full,incremental,</triggers>
+			<arguments>
+				<dictionary>
+					<key>LaunchConfigHandle</key>
+					<value>&lt;project&gt;/.externalToolBuilders/ANTLR-JSON.launch</value>
 				</dictionary>
 			</arguments>
 		</buildCommand>
@@ -39,6 +49,11 @@
 			<name>EACodeTemplate.g4</name>
 			<type>1</type>
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Parser/EACodeTemplate.g4</locationURI>
+		</link>
+		<link>
+			<name>JSON.g4</name>
+			<type>1</type>
+			<location>C:/Work/Development/EA/EA_CodeTemplate/Parser/JSON.g4</location>
 		</link>
 	</linkedResources>
 	<variableList>

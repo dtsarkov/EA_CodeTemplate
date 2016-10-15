@@ -12,8 +12,6 @@ import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser;
 public class GlobalFilter_test {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
 	}
 	
 	

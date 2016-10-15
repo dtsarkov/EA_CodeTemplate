@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 
+//TODO: Remove this class and replace it by ea.tools.ParserErrorListener
 public class ErrorListener extends BaseErrorListener {
 	
 	@Override

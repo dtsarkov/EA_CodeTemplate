@@ -534,7 +534,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		return value;
 	}
 	
-	
+	//TODO: Remove this code and replace function calls by Utils.translateStringLiteral 
 	static private String escapes[][] = {
 			 {Matcher.quoteReplacement("\\t"), 	"\t"}
 			,{Matcher.quoteReplacement("\\n"), 	"\n"}
