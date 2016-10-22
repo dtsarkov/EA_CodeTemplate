@@ -1,7 +1,7 @@
 // The grammar file was taken from book "The Definitive ANTLR 4 Reference" 
 // by Terence Parr and slightly modified to work with EA object model
 // Modifications made for standard JSON syntax are:
-// 	M-1. File may contain multiple objects and only objects.
+// 	M-1. File may contain only one object.
 //	M-2. Object cannot be empty 
 //	M-3. Added BOOLEAN
 //	M-4. Split NUMBER by INTEGER and DOUBLE
@@ -16,7 +16,7 @@
 // Derived from http://json.org
 grammar JSON;
 
-file:   object+ 
+file:   object 
 //M-1//    |   array
 ;
 

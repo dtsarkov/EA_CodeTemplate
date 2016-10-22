@@ -326,7 +326,7 @@ public final class EA {
 		
 		org.sparx.Element element 	= null;
 		String query 	= "";
-		if ( name.indexOf("::") != -1 ) { //References uses element Stereotype e.g. "Stereotype".<Element Name>
+		if ( name.indexOf("::") != -1 ) { //References uses element Stereotype e.g. "Stereotype"::<Element Name>
 			query = "'\"'+o.Stereotype+'\"::'+";
 		}
 		if ( name.indexOf('.') != -1 ) {

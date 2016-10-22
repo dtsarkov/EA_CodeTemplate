@@ -6,14 +6,14 @@ public final class UnitTesting {
 		String[] testArgs = new String[] {""
 				,"--model", "..\\CodeGeneratorDemo.EAP"
 				//,"-e","GDW 2.0 Databases"
-				,"-e","ImportTest"
+				,"-e","Component1"
 				//,"-v"
 				//,"-d"
-				//,"C:\\Work\\Development\\EA\\EA_CodeTemplate\\CodeGenerator\\TestCases\\Classes.json"
+				,"C:\\Work\\Development\\EA\\EA_CodeTemplate\\CodeGenerator\\TestCases\\Classes.json"
 				,""
-				,"C:\\Work\\Development\\EA\\EA_CodeTemplate\\CodeGenerator\\Stream_865_1.json"
-				,"C:\\Work\\Development\\EA\\EA_CodeTemplate\\CodeGenerator\\Stream_865_2.json"
-				,"C:\\Work\\Development\\EA\\EA_CodeTemplate\\CodeGenerator\\Stream_865_3.json"
+				//,"C:\\Work\\Development\\EA\\EA_CodeTemplate\\CodeGenerator\\Stream_865_1.json"
+				//,"C:\\Work\\Development\\EA\\EA_CodeTemplate\\CodeGenerator\\Stream_865_2.json"
+				//,"C:\\Work\\Development\\EA\\EA_CodeTemplate\\CodeGenerator\\Stream_865_3.json"
 			};
 //		String flag;
 //		for ( Method method : org.sparx.Element.class.getDeclaredMethods() ) {

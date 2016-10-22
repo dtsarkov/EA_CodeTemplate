@@ -48,9 +48,10 @@ public class JSONProcessor extends JSONBaseListener implements IImportFileParser
 			//parser.addParseListener(this);
 			
 			FileContext file = parser.file();
-			for (int i = 0; i < file.object().size(); i++ ) {
-				elements.add(processObject(file.object(i)));
-			}
+//			for (int i = 0; i < file.o.object().size(); i++ ) {
+//				elements.add(processObject(file.object(i)));
+//			}
+			elements.add(processObject(file.object()));
 			
 		} catch ( FileNotFoundException e ) {
 			Logger.error("Could not find file [%s]",fileName);

@@ -75,7 +75,7 @@ public class Logger {
 	}
 	
 	public static void Summary() {
-		message("Warnings\t: %d\nErrors\t: %d",warningCounter,errorCounter);
+		message("Warnings: %d\nErrors\t: %d",warningCounter,errorCounter);
 	}
 
 }

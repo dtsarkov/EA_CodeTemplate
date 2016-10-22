@@ -1,49 +1,16 @@
-{"Type":"Package", "Stereotype":"database","Name":"P_V_INP_001_STD_0","Elements":[
- {"Type":"Class","Stereotype":"view","Name":"SB_125_40_OPOR_ITEM_MSUR_DT","Connectors":[
- {"Type":"Dependency", "Name":"","ClientID" : "@P_D_INP_001_STD_0.SB_125_40_OPOR_ITEM_MSUR_DT"}
-]}
-,{"Type":"Class","Stereotype":"view","Name":"SB_125_40_OPOR_ITEM_PRTF_DEPT","Connectors":[
- {"Type":"Dependency", "Name":"","ClientID" : "@P_D_INP_001_STD_0.SB_125_40_OPOR_ITEM_PRTF_DEPT"}
-]}
-,{"Type":"Class","Stereotype":"view","Name":"TX_125_40_BRDG_DEPT_PRFM","Connectors":[
- {"Type":"Dependency", "Name":"","ClientID" : "@P_V_BUS_001_STD_0.S_EMPL_DETL"}
-,{"Type":"Dependency", "Name":"","ClientID" : "@P_V_BUS_001_STD_0.S_EMPL_JOB"}
-,{"Type":"Dependency", "Name":"","ClientID" : "@P_V_BUS_001_STD_0.S_MSUR_DEPT"}
-,{"Type":"Dependency", "Name":"","ClientID" : "@P_V_BUS_001_STD_0.S_MSUR_EMPL"}
-,{"Type":"Dependency", "Name":"","ClientID" : "@P_V_BUS_001_STD_0.S_OPOR_ITEM_GRD_PDCT"}
-,{"Type":"Dependency", "Name":"","ClientID" : "@P_V_INP_001_STD_0.SB_125_40_OPOR_ITEM_PRTF_DEPT"}
-,{"Type":"Dependency", "Name":"","ClientID" : "@P_V_SHR_001_STD_0.L_EMPL_JOB"}
-,{"Type":"Dependency", "Name":"","ClientID" : "@P_V_SHR_001_STD_0.L_MSUR_DEPT"}
-,{"Type":"Dependency", "Name":"","ClientID" : "@P_V_SHR_001_STD_0.L_MSUR_EMPL"}
-,{"Type":"Dependency", "Name":"","ClientID" : "@P_V_SHR_001_STD_0.L_OPOR_ITEM_GRD_PDCT"}
-]}
-,{"Type":"Class","Stereotype":"view","Name":"TX_125_40_L_MSUR_DEPT","Connectors":[
- {"Type":"Dependency", "Name":"","ClientID" : "@P_V_INP_001_STD_0.SB_125_40_OPOR_ITEM_PRTF_DEPT"}
-]}
-,{"Type":"Class","Stereotype":"view","Name":"TX_125_40_OPOR_ITM_MSUR_DT","Connectors":[
- {"Type":"Dependency", "Name":"","ClientID" : "@PVGENTCF.CTLFW_Stream_BusDate"}
-,{"Type":"Dependency", "Name":"","ClientID" : "@P_V_BUS_001_STD_0.S_MSUR_DALY_SNAP"}
-,{"Type":"Dependency", "Name":"","ClientID" : "@P_V_SHR_001_STD_0.H_OPOR_ITEM"}
-,{"Type":"Dependency", "Name":"","ClientID" : "@P_V_SHR_001_STD_0.L_MSUR_OPOR_ITEM"}
-]}
-,{"Type":"Class","Stereotype":"view","Name":"TX_125_40_OPOR_ITM_PTF_DPT","Connectors":[
- {"Type":"Dependency", "Name":"","ClientID" : "@P_V_BUS_001_STD_0.S_MSUR_DEPT"}
-,{"Type":"Dependency", "Name":"","ClientID" : "@P_V_BUS_001_STD_0.S_OPOR_ITEM_PATY"}
-,{"Type":"Dependency", "Name":"","ClientID" : "@P_V_BUS_001_STD_0.S_PATY_PRTF"}
-,{"Type":"Dependency", "Name":"","ClientID" : "@P_V_BUS_001_STD_0.S_PRTF_DEPT"}
-,{"Type":"Dependency", "Name":"","ClientID" : "@P_V_INP_001_STD_0.SB_125_40_OPOR_ITEM_MSUR_DT"}
-,{"Type":"Dependency", "Name":"","ClientID" : "@P_V_SHR_001_STD_0.H_DEPT"}
-,{"Type":"Dependency", "Name":"","ClientID" : "@P_V_SHR_001_STD_0.H_MSUR_NEW"}
-,{"Type":"Dependency", "Name":"","ClientID" : "@P_V_SHR_001_STD_0.L_MSUR_DEPT"}
-,{"Type":"Dependency", "Name":"","ClientID" : "@P_V_SHR_001_STD_0.L_OPOR_ITEM_PATY"}
-,{"Type":"Dependency", "Name":"","ClientID" : "@P_V_SHR_001_STD_0.L_PATY_PRTF"}
-,{"Type":"Dependency", "Name":"","ClientID" : "@P_V_SHR_001_STD_0.L_PRTF_DEPT"}
-]}
-,{"Type":"Class","Stereotype":"view","Name":"TX_125_40_S_MSUR_DEPT","Connectors":[
- {"Type":"Dependency", "Name":"","ClientID" : "@P_V_INP_001_STD_0.SB_125_40_OPOR_ITEM_PRTF_DEPT"}
-]}
-,{"Type":"Class","Stereotype":"view","Name":"TX_125_40_S_MSUR_DEPT_BT","Connectors":[
- {"Type":"Dependency", "Name":"","ClientID" : "@P_V_INP_001_STD_0.TX_125_40_S_MSUR_DEPT"}
-,{"Type":"Dependency", "Name":"","ClientID" : "@P_V_OUT_001_STD_0.TX_125_40_S_MSUR_DEPT"}
-]}
-]}
+{ "Alias" : "TEST1"
+ ,"Packages":[
+	{"Type":"Package", "Stereotype":"database","Name":"P_V_INP_001_STD_0"
+	,"Elements":[
+		 {"Type":"Class","Stereotype":"view","Name":"SB_125_40_OPOR_ITEM_MSUR_DT"}
+		,{"Type":"Class","Stereotype":"view","Name":"SB_125_40_OPOR_ITEM_PRTF_DEPT"}
+		,{"Type":"Class","Stereotype":"view","Name":"TX_125_40_BRDG_DEPT_PRFM"}
+		,{"Type":"Class","Stereotype":"view","Name":"TX_125_40_L_MSUR_DEPT"}
+		,{"Type":"Class","Stereotype":"view","Name":"TX_125_40_OPOR_ITM_MSUR_DT"}
+		,{"Type":"Class","Stereotype":"view","Name":"TX_125_40_OPOR_ITM_PTF_DPT"}
+		,{"Type":"Class","Stereotype":"view","Name":"TX_125_40_S_MSUR_DEPT"}
+		,{"Type":"Class","Stereotype":"view","Name":"TX_125_40_S_MSUR_DEPT_BT"}
+		]
+	}
+ ]
+}   
