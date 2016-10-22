@@ -1,0 +1,1 @@
+%list=$.Attributes @template="table01" @separator="\t,"%

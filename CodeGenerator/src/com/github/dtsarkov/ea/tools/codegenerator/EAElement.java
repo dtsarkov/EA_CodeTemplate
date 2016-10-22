@@ -7,6 +7,8 @@ import org.sparx.Collection;
 import org.sparx.Element;
 import org.sparx.TaggedValue;
 
+import com.github.dtsarkov.ea.tools.Logger;
+
 public class EAElement {
 	private Object 		element;
 	private Object		package_element;
@@ -26,7 +28,7 @@ public class EAElement {
 		this.element 		= element;
 
 		if ( this.element != null ) {
-	        TemplateProcessor.debug("Created new EA Element for: %s"
+	        Logger.debug("Created new EA Element for: %s"
 	        		,element.getClass().getName()
 			);
 			if ( element instanceof org.sparx.Element ) {
@@ -40,7 +42,7 @@ public class EAElement {
 				this.element = ((org.sparx.Package)element).GetElement();
 			}
 		} else {
-	        TemplateProcessor.debug("Created new NULL EA Element");
+	        Logger.debug("Created new NULL EA Element");
 	        this.elementHasParent 	= false;
 	        this.elementHasPackage	= false;
 	        this.elementHasSource	= false;
@@ -51,11 +53,11 @@ public class EAElement {
 	public EAElement getParent() {
 		if ( elementParent == null && elementHasParent ) {
 			//try to get element's parent
-			TemplateProcessor.debug("Getting parent for elelment %s",element.getClass());
+			Logger.debug("Getting parent for elelment %s",element.getClass());
 			try {
 				Method m = element.getClass().getMethod("GetParentID");
                 int parentID = Integer.parseInt(m.invoke(element).toString());
-                TemplateProcessor.debug("\t\tParentID = %d",parentID);
+                Logger.debug("\t\tParentID = %d",parentID);
                 if ( parentID != 0 ) {
                     Object p = TemplateProcessor.getEAModel().GetElementByID(parentID);
                     elementHasParent = ( p != null );
@@ -63,7 +65,7 @@ public class EAElement {
                     	elementParent = new EAElement(p);
                 }
 			} catch (NoSuchMethodException e ) {
-				TemplateProcessor.debug("\t\t No Such Method Exception");
+				Logger.debug("\t\t No Such Method Exception");
 				elementHasParent = false;
 			} catch (Exception e ) {
 				elementHasParent = false;
@@ -76,11 +78,11 @@ public class EAElement {
 	public EAElement getPackage() {
 		if ( elementPackage == null && elementHasPackage ) {
 			//try to get element's package
-			TemplateProcessor.debug("getPackage() for element hashCode = %d", element.hashCode());
+			Logger.debug("getPackage() for element hashCode = %d", element.hashCode());
 			try {
 				Method m = element.getClass().getMethod("GetPackageID");
 				int packageID = Integer.parseInt(m.invoke(element).toString()); 
-                TemplateProcessor.debug("\t\tPackageID = %d",packageID);
+                Logger.debug("\t\tPackageID = %d",packageID);
 				Object p = TemplateProcessor.getEAModel().GetPackageByID(
 						packageID
 				);
@@ -89,7 +91,7 @@ public class EAElement {
 					elementPackage = new EAElement(p);
 				
 			} catch (NoSuchMethodException e ) {
-				TemplateProcessor.debug("\t\t getPackage(): No Such Method Exception");
+				Logger.debug("\t\t getPackage(): No Such Method Exception");
 				elementHasPackage = false;
 			} catch (Exception e ) {
 				elementHasPackage = false;
@@ -112,7 +114,7 @@ public class EAElement {
 				if ( elementHasSource ) 
 					elementSource = new EAElement(s);
 			} catch (NoSuchMethodException e ) {
-				TemplateProcessor.debug("\t\t No Such Method Exception");
+				Logger.debug("\t\t No Such Method Exception");
 				elementHasSource = false;
 			} catch (Exception e ) {
 				elementHasSource = false;
@@ -145,7 +147,7 @@ public class EAElement {
 					elementTarget = new EAElement(t);
 				
 			} catch (NoSuchMethodException e ) {
-				TemplateProcessor.debug("\t\t No Such Method Exception");
+				Logger.debug("\t\t No Such Method Exception");
 				elementHasTarget = false;
 			} catch (Exception e ) {
 				elementHasTarget = false;
@@ -170,11 +172,11 @@ public class EAElement {
 		if ( element != null ) {
 			if ( element.package_element != null ) {
 				//Try to get attribute from package element
-				TemplateProcessor.debug("\tfrom package_element");
+				Logger.debug("\tfrom package_element");
 				attribute = executeGetMethod(element.package_element,attributeName);
 			}
 			if ( attribute == null ) {
-				TemplateProcessor.debug("\tfrom element");
+				Logger.debug("\tfrom element");
 				attribute = executeGetMethod(element.element,attributeName);
 			}
 		}
@@ -197,7 +199,7 @@ public class EAElement {
 		Object attribute 		= null;
 		String name[] 			= attributeFullName.split("\\.");
 		
-		TemplateProcessor.debug("getAttribute(%s) => [%s] [%s]"
+		Logger.debug("getAttribute(%s) => [%s] [%s]"
 				,attributeFullName, name[0],name[1]
 		);
 
@@ -216,13 +218,13 @@ public class EAElement {
 		} else if ( name[0].equalsIgnoreCase("$targetRole") ) {
 			elementInScope = getTargetRole();
 		} else {
-			TemplateProcessor.error(ctx, "Invalid scope modifier \""+name[0]+"\"!");
+			Logger.error(ctx, "Invalid scope modifier \""+name[0]+"\"!");
 		}
 
 		if (elementInScope != null ) {
 			attribute = getAttribute(elementInScope,name[1]);
 			if ( attribute == null && ctx != null ) {
-				TemplateProcessor.error(ctx, "Attribute \""+name[1]+"\" does not exist!");
+				Logger.error(ctx, "Attribute \""+name[1]+"\" does not exist!");
 			}
 		}
 		return attribute;
@@ -236,47 +238,43 @@ public class EAElement {
 		String name[] = tagName.split("\\.");
 		name[1] = name[1].substring(1, name[1].length()-1);
 
-		TemplateProcessor.debug("getTagValue(%s) => [%s] [%s]"
+		Logger.debug("getTagValue(%s) => [%s] [%s]"
 				,tagName
 				,name[0]
 				,name[1]
 				);
 
-		TaggedValue tag = null; 
 		if ( name[0].equalsIgnoreCase("$") || name[0].equalsIgnoreCase("$this") ) {
-			tag = getTag(this,name[1]);
+			value = getTag(this,name[1]);
 		} else if ( name[0].equalsIgnoreCase("$parent") ) {
-			tag = getTag(getParent(),name[1]);
+			value = getTag(getParent(),name[1]);
 		} else if ( name[0].equalsIgnoreCase("$package") ) {
-			tag = getTag(getPackage(),name[1]);
+			value = getTag(getPackage(),name[1]);
 		} else if ( name[0].equalsIgnoreCase("$source") ) {
-			tag = getTag(getSource(),name[1]);
+			value = getTag(getSource(),name[1]);
 		} else if ( name[0].equalsIgnoreCase("$sourceRole") ) {
-			tag = getTag(getSourceRole(),name[1]);
+			value = getTag(getSourceRole(),name[1]);
 		} else if ( name[0].equalsIgnoreCase("$target") ) {
-			tag = getTag(getTarget(),name[1]);
+			value = getTag(getTarget(),name[1]);
 		} else if ( name[0].equalsIgnoreCase("$targetRole") ) {
-			tag = getTag(getTargetRole(),name[1]);
+			value = getTag(getTargetRole(),name[1]);
 		} else {
-			TemplateProcessor.error("Invalid scope modifier \"%s\"!", name[1]);
-		}
-		if ( tag != null ) {
-			value = tag.GetValue();
+			Logger.error("Invalid scope modifier \"%s\"!", name[1]);
 		}
 		return value;
 	}
 
 	@SuppressWarnings("rawtypes")
-	private TaggedValue getTag(EAElement obj, String tagName) {
-		TaggedValue tag = null;
+	private String getTag(EAElement obj, String tagName) {
+		Object tag = null;
 		if ( obj != null ) {
 			Object tags = null;
 			if ( obj.package_element != null ) {
-				TemplateProcessor.debug("\tgetting tagged values for package...");
+				Logger.debug("\tgetting tagged values for package...");
 				tags = executeGetMethod(obj.package_element, "TaggedValues");
 			}
 			if ( tags == null ) {
-				TemplateProcessor.debug("\tgetting tagged values for element...");
+				Logger.debug("\tgetting tagged values for element...");
 				tags = executeGetMethod(obj.element, "TaggedValues");
 			}
 			if ( tags != null ) {
@@ -285,14 +283,20 @@ public class EAElement {
 				//Replaced by non case-sensitive version.
 				short count = ((Collection)tags).GetCount();
 				for ( short i = 0; i < count; i++ ) {
-					tag = (TaggedValue)((Collection)tags).GetAt(i);
-					if ( tag.GetName().equalsIgnoreCase(tagName) ) 
-						return tag;
+					tag = ((Collection)tags).GetAt(i);
+					if (tag instanceof org.sparx.TaggedValue ) { 
+						if ( ((TaggedValue)tag).GetName().equalsIgnoreCase(tagName) ) { 
+							return ((TaggedValue)tag).GetValue();
+						}
+					} else if ( tag instanceof org.sparx.AttributeTag ) {
+						if ( ((org.sparx.AttributeTag)tag).GetName().equalsIgnoreCase(tagName) ) { 
+							return ((org.sparx.AttributeTag)tag).GetValue();
+						}
+					}
 				}
-				tag = null;
 			}
 		}
-		return tag;
+		return null;
 	}
 	
 	private Object executeGetMethod(Object obj, String methodName) {
@@ -301,9 +305,9 @@ public class EAElement {
 			Method method = obj.getClass().getMethod("Get"+methodName);
 			result = method.invoke(obj);
 		} catch (NoSuchMethodException e) {
-			TemplateProcessor.debug("\t\tNo Such Method %s Exception!", methodName);
+			Logger.debug("\t\tNo Such Method %s Exception!", methodName);
 		} catch (Exception e) {
-			TemplateProcessor.debug("\t\t !!!Exception!!!");
+			Logger.debug("\t\t !!!Exception!!!");
 		}
 		return result;
 	}

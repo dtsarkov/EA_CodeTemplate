@@ -10,6 +10,8 @@ public class ParserErrorListener extends BaseErrorListener {
 			String msg, RecognitionException e) {
 		
 		Logger.error("Line (%d:%d) - %s", line, charPositionInLine,msg);
+		//System.out.println(recognizer.getInputStream().getClass());
+		//System.out.println(recognizer.getInputStream().getSourceName());
 	}
 	
 

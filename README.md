@@ -11,6 +11,19 @@ http://sparxsystems.com/enterprise\_architect\_user\_guide/12.1/software\_engine
 What's new
 ----------
 
+### Version 0.44
+-   Fixed problem with reference to attribute's tagged values
+-   Extended syntax of EACodeGenerator element (-e) parameter. Now you can also specify specify
+    element's parent and/or elemnet's stereotype using the following syntax:
+    ~~~~
+    [ParentName.][\"Stereotype\"::]ElementName
+    ~~~~
+    e.g.
+    ~~~~ 
+    EACodeGenerator.cmd ... -e Package1."TCF Job"::Job1
+    ~~~~
+
+
 ### Version 0.43
 
 -   Fixed "undefined" value bug. Now "undefined" variables, tags and attributes are treated 

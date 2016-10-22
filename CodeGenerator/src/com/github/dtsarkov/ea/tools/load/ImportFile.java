@@ -9,7 +9,6 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.sparx.Element;
 
 import com.github.dtsarkov.ea.tools.EA;
 import com.github.dtsarkov.ea.tools.IComparator;
@@ -148,7 +147,7 @@ public final class ImportFile {
     	EA.executeMethod(targetElement,"Update");
     }
     
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings("rawtypes")
 	private static void loadCollection(Object parentElement, org.sparx.Collection collection, ArrayList<ImportElement> elements) {
 
     	int		collectionCount = collection.GetCount();

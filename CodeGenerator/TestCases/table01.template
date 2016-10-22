@@ -1,0 +1,5 @@
+$Compress=$."Compress"
+%if $Compress != ""%
+	$Compress = "COMPRESS ("+$Compress+")"
+%endif%	 
+$.Name		$.Type	$Compress	

@@ -1,11 +1,13 @@
-Component 1.1.2.2,attributes,attributes.out
-Component 1.1.2.1,branching,branching.out
-Component 1.1.2.1,escapeCodes,escapeCodes.out
-Component 1.1.2.1,functions,functions.out
-Component 1.1.2.1,split,split.out
-Component 1.1.2.1,textMacros,textMacros.out
+Component 1\.1\.2.Component 1\.1\.2\.2,attributes,attributes.out
+Component 1\.1\.2\.1,branching,branching.out
+Component 1\.1\.2\.1,escapeCodes,escapeCodes.out
+Component 1\.1\.2\.1,functions,functions.out
+Component 1\.1\.2\.1,split,split.out
+Component 1\.1\.2\.1,textMacros,textMacros.out
 Activity2,list,list.out
 Activity2,call,call.out
 Activity2,multipleOutputFiles,file00.out
 Activity2,variables,variables.out
 Activity2,filter,filter.out
+Database1."table"::Table1,table,table.out
+List Demo,bugs,bugs.out

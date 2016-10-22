@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 import org.sparx.Repository;
 
-import com.github.dtsarkov.ea.tools.codegenerator.TemplateProcessor;
+import com.github.dtsarkov.ea.tools.codegenerator.Utils;
 import com.github.dtsarkov.ea.tools.load.ImportElement;
 
 public final class EA {
@@ -22,7 +22,7 @@ public final class EA {
 			Logger.error("Could not find model file \"%s\"",fileName);
 		} else try {
 			fileName = file.getCanonicalPath();
-			TemplateProcessor.message("Opening model file \"%s\"...", fileName);
+			Logger.message("Opening model file \"%s\"...", fileName);
 			model = new Repository();
 			if ( !model.OpenFile(fileName) ) {
 				model.Exit();
@@ -329,7 +329,10 @@ public final class EA {
 		if ( name.indexOf("::") != -1 ) { //References uses element Stereotype e.g. "Stereotype"::<Element Name>
 			query = "'\"'+o.Stereotype+'\"::'+";
 		}
-		if ( name.indexOf('.') != -1 ) {
+		String n = name.replaceAll("\\\\.", ""); //Remove dots '\.'
+		name = name.replaceAll("\\\\.", ".");
+		System.out.println(n + " = "+name);
+		if ( n.indexOf('.') != -1 ) {
 			query = String.format(queryParentChild, query, name);
 		} else {
 			query = String.format(queryByName, query, name);

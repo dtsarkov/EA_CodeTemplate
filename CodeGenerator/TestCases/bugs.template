@@ -1,0 +1,2 @@
+command: %dl%{scriptdir}/reset_jobs $JobPrefix%pc% %dl%AUTO_JOB_NAME %dl%{tokendir}/%UPPER($SubSystem)%%us%$StreamID
+ FLG

@@ -18,13 +18,15 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.sparx.Collection;
 import org.sparx.Element;
-import org.sparx.Repository;
+
+import com.github.dtsarkov.ea.tools.EA;
+import com.github.dtsarkov.ea.tools.Logger;
 
 public class Generator {
 
 	
 	public static void main(String[] args) throws Exception {
-		System.out.println("EACodeGenerator v 0.43");
+		System.out.println("EACodeGenerator v 0.44");
 
 		CommandLine cmd = parseCommandLine(args);
 		if ( cmd == null ) return;
@@ -63,7 +65,7 @@ public class Generator {
 			}
 		}
 		
-		String queryName = "Element Name";
+		String queryName = null;
 		if ( cmd.hasOption('q') ) {
 			queryName = cmd.getOptionValue('q');
 		}
@@ -77,15 +79,13 @@ public class Generator {
 			);
 		}
 		
-        Repository  		model   = null;
         Element     		element = null;
 		FileWriter 			fw 		= null;
 		TemplateProcessor 	tp		= null;
         
         if ( !modelFile.equalsIgnoreCase("not-required") ) {
-            model = openModel(modelFile);
-            if ( TemplateProcessor.getErrorCounter() > 0 )
-            	return;
+        	if ( !EA.openModel(modelFile) ) 
+        		return;
         }
 
 		if (cmd.hasOption("variable") ) {
@@ -100,41 +100,49 @@ public class Generator {
 			}
 		}
 		
-		TemplateProcessor.setDebug(cmd.hasOption('d'));
-		TemplateProcessor.setVerbose(verbose);
+		Logger.setDebug(cmd.hasOption('d'));
+		Logger.setVerbose(verbose);
 
 		TemplateProcessor.setTemplateExtention(templateExt);
-		TemplateProcessor.setEAModel(model);
+		TemplateProcessor.setEAModel(EA.model());
 		for ( int i=0; i < batch.size(); i++ ) {
 			pe = batch.get(i);
 			
-			TemplateProcessor.message(
+			Logger.message(
 					"Generate output file [%s] using template [%s] and element [%s] as an entry point..."
 					,pe.outputFile ,pe.template ,pe.element
 			);
 
-			if ( model != null ) {
-	            @SuppressWarnings("rawtypes")
-				Collection elements = model.GetElementsByQuery(queryName, pe.element);
-	            if ( elements.GetCount() == 0 ) {
-	            	TemplateProcessor.error("Could not find any elments using query \"%s\" and search term \"%s\"", queryName, pe.element);
-	                break;
-	            }
-	            element = (Element)elements.GetAt((short)0);
+			if ( EA.model() != null ) {
+				if ( queryName != null ) {
+		            @SuppressWarnings("rawtypes")
+					Collection elements = EA.model().GetElementsByQuery(queryName, pe.element);
+		            if ( elements.GetCount() == 0 ) {
+		            	Logger.error("Could not find any elments using query \"%s\" and search term \"%s\"", queryName, pe.element);
+		                break;
+		            }
+		            element = (Element)elements.GetAt((short)0);
+				} else {
+					element = EA.searchElementByName(pe.element);
+		            if ( element == null ) {
+		            	Logger.error("Could not find any elments using element name \"%s\"",pe.element);
+		                break;
+		            }
+				}
 			}
 
     		try { 
     			fw = new FileWriter(pe.outputFile);
     			TemplateProcessor.setOutputFolder(pe.outputFile.getAbsoluteFile().getParent());
     		} catch ( IOException e ) {
-    			TemplateProcessor.error("Could not create output file \"%s\"", pe.outputFile);
+    			Logger.error("Could not create output file \"%s\"", pe.outputFile);
                 break;
     		}
     		//System.out.printf("Output folder: [%s]\n",TemplateProcessor.getOutputFolder());
     		if ( verbose ) {		
-	    		TemplateProcessor.message("Processing Elements...");
-	    		TemplateProcessor.message("%-30s|%-20s|%-30s","Name","Type","Template");
-	    		TemplateProcessor.message("%-30s %-20s %-30s"
+    			Logger.message("Processing Elements...");
+	    		Logger.message("%-30s|%-20s|%-30s","Name","Type","Template");
+	    		Logger.message("%-30s %-20s %-30s"
 	    				,"------------------------------"
 	    				,"--------------------"
 	    				,"------------------------------"
@@ -151,24 +159,23 @@ public class Generator {
     		fw.close();
     		
     		if ( verbose ) {
-    			TemplateProcessor.message("-------------------------------------------------------------------------------");
+    			Logger.message("-------------------------------------------------------------------------------");
     		}
     		    		
 		}
-		TemplateProcessor.message("Warnings\t: %d",TemplateProcessor.getWarningCounter());
-		TemplateProcessor.message("Errors  \t: %d",TemplateProcessor.getErrorCounter());
-
-        if ( model != null )  {
-            element = null;
-            System.out.printf("Closing model file \"%s\"...", modelFile);
-            model.CloseFile();
-            model.Exit();
-            model = null;
-            System.out.println("done.");
-            
-            Runtime.getRuntime().runFinalization();
-            System.gc();
-        }
+		Logger.Summary();
+		EA.closeModel();
+//        if ( model != null )  {
+//            element = null;
+//            System.out.printf("Closing model file \"%s\"...", modelFile);
+//            model.CloseFile();
+//            model.Exit();
+//            model = null;
+//            System.out.println("done.");
+//            
+//            Runtime.getRuntime().runFinalization();
+//            System.gc();
+//        }
 
 	}
 
@@ -217,7 +224,13 @@ public class Generator {
 		
 		options.addOption(Option
 				.builder("e").longOpt("element")
-				.desc("use given element name as an entry point")
+				.desc("use given element name as an entry point.\n"
+					 +"The element name can be qualified with element's parent name\n"
+					 +"and/or elements stereotype using the following syntax:\n"
+					 +"\t\t[ParentName.][\"Stereotype\"::]ElementName\n"
+					 +"Dot symbols in the element name have to be prefixed by '\\'.\n"
+					 +"e.g. \"Package 1\\.1.Element 1\\.1\\.1\""
+					 )
 				.hasArg(true).argName("element name")
 				.build()
 		);
@@ -232,7 +245,7 @@ public class Generator {
 		
 		options.addOption(Option
 				.builder("q").longOpt("query")
-				.desc("select element using specified query name.\n Default: Simple")
+				.desc("select element using specified query name.")
 				.required(false)
 				.hasArg(true).argName("query name")
 				.build()
@@ -319,28 +332,6 @@ public class Generator {
 		return loaded;
 	}
 	
-	private static Repository openModel( String fileName ) {
-		File file = new File(fileName);
-		if ( !file.exists() ) {
-			TemplateProcessor.error("Could not find model file \"%s\"",fileName);
-			return null;
-		}
-		try {
-			fileName = file.getCanonicalPath();
-		} catch (IOException e) {
-			TemplateProcessor.error("Incorret path\"%s\"",fileName);
-			return null;
-		}
-		TemplateProcessor.message("Opening model file \"%s\"...", fileName);
-		Repository r = new Repository();
-		if ( !r.OpenFile(fileName) ) {
-			r.Exit();
-			TemplateProcessor.error("Could not open model file \"%s\"!\n", fileName);
-		}
-
-		return r;
-	}
-
 	private static class ProcessingEntry {
 		public String template;
 		public String element;

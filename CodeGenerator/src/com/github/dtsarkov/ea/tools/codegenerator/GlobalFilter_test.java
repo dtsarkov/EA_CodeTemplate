@@ -1,14 +1,5 @@
 package com.github.dtsarkov.ea.tools.codegenerator;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
-
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-
-import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateLexer;
-import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser;
-
 public class GlobalFilter_test {
 
 	public static void main(String[] args) {

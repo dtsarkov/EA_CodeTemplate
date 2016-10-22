@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-import java.util.regex.Matcher;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -27,6 +26,8 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.sparx.Collection;
 import org.sparx.Repository;
 
+import com.github.dtsarkov.ea.tools.Logger;
+import com.github.dtsarkov.ea.tools.ParserErrorListener;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateBaseListener;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateLexer;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser;
@@ -77,10 +78,6 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	private static Map<String,String> globalVariables;
 	private static Compare_exprContext globalFilter = null;
 	
-	private	static int			errorCounter 	= 0;
-	private static int			warningCounter 	= 0;
-	private static boolean		verbose			= false;
-	
 	static {
 		templateExtention 	= ".template";
 		outputFolder		= ".";
@@ -125,73 +122,6 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		return EA_Model;
 	}
 	
-	static public void setVerbose(boolean mode) {
-		verbose = mode;
-	}
-	static public boolean getVerbose() {
-		return verbose;
-	}
-
-	static public void message(String s) {
-		System.out.println(s);
-	}
-	static public void message(String format, Object... args) {
-		message(String.format(format, args));
-	}
-
-
-	static public void error(ParserRuleContext ctx, String message) {
-		error(ctx,message,true);
-	}
-	static public void error(ParserRuleContext ctx, String message,boolean printLine) {
-		if ( ctx != null ) {
-			error("Line (%d:%d) - %s"
-				 ,ctx.getStart().getLine()
-				 ,ctx.getStart().getCharPositionInLine()
-				 ,message
-			);
-			if ( printLine ) {
-				System.err.printf("   >%s\n",ctx.getText());
-			}
-		} else {
-			error("%s",message);
-		}
-	}
-	
-	static public void error(String format, Object...args) {
-		errorCounter++;
-		System.err.println("ERROR: "+String.format(format, args));
-	}
-
-	static public void warning(ParserRuleContext ctx, String message) {
-		warning("Line (%d:%d) - %s"
-			 ,ctx.getStart().getLine()
-			 ,ctx.getStart().getCharPositionInLine()
-			 ,message
-		);
-	}
-	static public void warning(String format, Object...args) {
-		warningCounter++;
-		System.err.println("WARNING: "+String.format(format, args));
-	}
-	
-	static private boolean debugMode = false;
-	static public void debug(String format, Object... args) {
-		if ( debugMode ) {
-			System.out.println(">>DBG :"+String.format(format, args));
-		}
-	}
-	static public void setDebug(boolean mode) {
-		debugMode = mode;
-	}
-	
-	public static int getErrorCounter() {
-		return errorCounter;
-	}
-	public static int getWarningCounter() {
-		return warningCounter;
-	}
-
 	public static void addVariable(String variable, String value) {
 		globalVariables.put(variable, value);
 	}
@@ -274,7 +204,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		} else if ( index >= 1 && index <= parameters.size() ) {
 			value = parameters.get(index-1);
 		}
-		debug(">> Get Template Parameter [%d] = [%s]", index, value);		
+		Logger.debug(">> Get Template Parameter [%d] = [%s]", index, value);		
 		return value;
 	}
 	
@@ -297,7 +227,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		return lineSeparator;
 	}
 	public void setLineSeparator(String lineSeparator) {
-		debug(">> Set Line separator [%s]", lineSeparator);
+		Logger.debug(">> Set Line separator [%s]", lineSeparator);
 		this.lineSeparator = lineSeparator;
 	}
 
@@ -318,9 +248,9 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			success = true;
 			
 		} catch ( FileNotFoundException e ) {
-			error("Could not find template file [%s]",fileName);
+			Logger.error("Could not find template file [%s]",fileName);
 		} catch ( IOException e ) {
-			error("Could not read from template file [%s]",fileName);
+			Logger.error("Could not read from template file [%s]",fileName);
 		}
 		return success;
 	}
@@ -330,8 +260,8 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			isOpen = openTemplateFile();
 			if ( !isOpen ) return;
 		}
-		if ( verbose ) {
-			message("%-30s|%-20s|%-30s"
+		if ( Logger.getVerbose() ) {
+			Logger.message("%-30s|%-20s|%-30s"
 					,element.getAttribute("$.Name",null)
 					,element.getAttribute("$.Type",null)
 					,this.templateName
@@ -339,7 +269,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		}
 		parser.addParseListener(this);
 		parser.removeErrorListeners();
-		parser.addErrorListener(new ErrorListener());
+		parser.addErrorListener(new ParserErrorListener());
 		parser.file();
 		parser.removeParseListeners();
 		parser.reset();
@@ -388,7 +318,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 				if ( curentValue != null ) //variable was defined before 
 					value = curentValue + value;
 			}
-			debug("Assignment (%d): %s=%s",textLevel, variable,value);
+			Logger.debug("Assignment (%d): %s=%s",textLevel, variable,value);
 			scope.put(variable, value);
 		}
 		inAssignmentMode = false;
@@ -415,9 +345,9 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		String 		s = "", v = null;
 		for ( int i = 0; i < ctx.getChildCount(); i++ ) {
 			c = ctx.getChild(i);
-			debug("Calc expression for class [%s]",c.getClass().toString());
+			Logger.debug("Calc expression for class [%s]",c.getClass().toString());
 			if ( c instanceof StringLiteralContext ) {
-				v = translateStringLiteral(c.getText());
+				v = Utils.translateStringLiteral(c.getText());
 			} else if ( c instanceof VariableContext ) {
 				v = getVariableValue(c.getText());
 			} else if ( c instanceof AttributeContext ) {
@@ -441,7 +371,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 				executeSplitMacro((SplitMacroContext)c, sw);
 				v = sw.toString();
 			} else {
-				debug(">> Unknown Expression context [%]",c.getClass().toString()); 
+				Logger.debug(">> Unknown Expression context [%]",c.getClass().toString()); 
 			}
 			if ( v != null ) {
 				s += v;
@@ -455,9 +385,9 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		String function = ctx.getChild(0).getText();
 		int parmCount = ctx.parameters().expression().size();
 		
-		debug("Function call [%s] with [%d] parameter(s)",function,parmCount);
+		Logger.debug("Function call [%s] with [%d] parameter(s)",function,parmCount);
 		if ( parmCount < 1 ) {
-			error(ctx,"Function call should have at lease one parameter");
+			Logger.error(ctx,"Function call should have at lease one parameter");
 			return value;
 		}
 		String firstParameter = calcExpression(ctx.parameters().expression(0)); 
@@ -472,7 +402,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			value = String.valueOf(firstParameter.length());
 		} else if (function.equalsIgnoreCase("%REPLACE(") ) {
 			if (parmCount < 3 ) {
-				error(ctx,"Incorrect function call %REPLACE(string, regexp, replacement )%");
+				Logger.error(ctx,"Incorrect function call %REPLACE(string, regexp, replacement )%");
 				return value;
 			}
 			value = firstParameter.replaceAll(
@@ -481,7 +411,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 					);
 		} else if (function.equalsIgnoreCase("%MID(") ) {
 			if (parmCount < 2) {
-				error(ctx,"Incorrect function call %MID(string, start [,count])%");
+				Logger.error(ctx,"Incorrect function call %MID(string, start [,count])%");
 				return value;
 			} 
 			int start	= Integer.valueOf(calcExpression(ctx.parameters().expression(1)))-1;
@@ -499,7 +429,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			value = EA_Model.GetFormatFromField("TXT", firstParameter);
 			if (parmCount > 1 ) {
 				String removeNewLines = calcExpression(ctx.parameters().expression(1));
-				debug( "\tSecond parameter = [%s]", removeNewLines);
+				Logger.debug( "\tSecond parameter = [%s]", removeNewLines);
 				if ( removeNewLines.equalsIgnoreCase("true") ) {
 					value = value.replaceAll(CR, "").replaceAll(" *\n[ |\t]*", " ");
 				}
@@ -507,7 +437,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			
 		} else if (function.equalsIgnoreCase("%WRAP_TEXT(") ) {
 			if (parmCount < 2) {
-				error(ctx,"Incorrect function call %WRAP_TEXT(string, length [,prefix [,sufix]])%");
+				Logger.error(ctx,"Incorrect function call %WRAP_TEXT(string, length [,prefix [,sufix]])%");
 				return value;
 			}
 			value = Utils.wrapText(firstParameter
@@ -516,39 +446,22 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 					,(parmCount > 3) ? calcExpression(ctx.parameters().expression(3)) : ""
 			);
 		} else if (function.equalsIgnoreCase("%DEBUG(") ) {
-			debug(firstParameter);
+			Logger.debug(firstParameter);
 		} else if (function.equalsIgnoreCase("%ERROR(") ) {
-			error(ctx,firstParameter,false);
+			Logger.error(ctx,firstParameter,false);
 		} else if (function.equalsIgnoreCase("%WARNING(") ) {
-			warning(ctx,firstParameter);
+			Logger.warning(ctx,firstParameter);
 		} else if (function.equalsIgnoreCase("%MESSAGE(") ) {
-			message(firstParameter);
+			Logger.message(firstParameter);
 		} else if (function.equalsIgnoreCase("%EXIST(") ) {
 			value = Boolean.toString(existTemplate(firstParameter));
 		} else if (function.equalsIgnoreCase("%DEFINED(") ) {
 			value = Boolean.toString(firstParameter != null);
 		} else {
-			error(ctx, "Unknown function "+function+")%");
+			Logger.error(ctx, "Unknown function "+function+")%");
 		}
-		debug("\t\t value = %s", value);
+		Logger.debug("\t\t value = %s", value);
 		return value;
-	}
-	
-	//TODO: Remove this code and replace function calls by Utils.translateStringLiteral 
-	static private String escapes[][] = {
-			 {Matcher.quoteReplacement("\\t"), 	"\t"}
-			,{Matcher.quoteReplacement("\\n"), 	"\n"}
-			,{Matcher.quoteReplacement("\\f"), 	"\f"}
-			,{Matcher.quoteReplacement("\\r"), 	"\r"}
-			,{Matcher.quoteReplacement("\\\""), "\""}
-			,{Matcher.quoteReplacement("\\'"), 	"'" }
-			,{Matcher.quoteReplacement("\\\\"), Matcher.quoteReplacement("\\")}
-	};
-	private String translateStringLiteral( String s ) {
-		String s1 = s.substring(1,s.length()-1); //remove leading and trailing double quotes
-		for ( int i = 0; i < escapes.length; i++ )
-			s1 = s1.replaceAll(escapes[i][0], escapes[i][1]);
-		return s1; 
 	}
 	
 	private boolean isGlobalVariable(String variable) {
@@ -564,7 +477,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			value = localVariables.get(variable);
 		}
 		if (value == null && this.isTextMode() )
-			warning("Variable \"%s\" is not defined", variable);
+			Logger.warning("Variable \"%s\" is not defined", variable);
 		
 		return value;
 	}
@@ -582,7 +495,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		executionState = new ExecutionState(executionState);
 		if ( executionState.canProcessBranch() ) {
 			executionState.setProcessBranch(evalCompareExpr(ctx.compare_expr()));
-			debug("IF > %s", executionState.toString());
+			Logger.debug("IF > %s", executionState.toString());
 		} else {
 			executionState.setBranchProcessed();
 		}
@@ -595,7 +508,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		} else {
 			executionState.setProcessBranch(evalCompareExpr(ctx.compare_expr()));
 		}
-		debug("ELSEIF > %s", executionState.toString());
+		Logger.debug("ELSEIF > %s", executionState.toString());
 	}
 
 	@Override
@@ -605,13 +518,13 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		} else if (!executionState.isBranchProcessed()){
 			executionState.setProcessBranch(true);
 		}
-		debug("ELSE > %s", executionState.toString());
+		Logger.debug("ELSE > %s", executionState.toString());
 	}
 
 	@Override
 	public void exitEndif_stmt(Endif_stmtContext ctx) {
 		executionState = executionStates.pop();
-		debug("ENDIF > %s", executionState.toString());
+		Logger.debug("ENDIF > %s", executionState.toString());
 	}
 	
 	private boolean evalCompareExpr( Compare_exprContext ctx ) {
@@ -631,12 +544,12 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 				} else if (op.compareTo("or") == 0 ) {
 					expressionValue = (expressionValue || evalPredicate(predicates.get(p)));
 				} else {
-					error(ctx,"Unsupported operator \""+op+"\"");
+					Logger.error(ctx,"Unsupported operator \""+op+"\"");
 				}
                 dbg += " ["+op+"] "+expressionValue;
 			}
 		}
-		debug("\tevalCompareExpr (%s) = %s",dbg,expressionValue);
+		Logger.debug("\tevalCompareExpr (%s) = %s",dbg,expressionValue);
 		return expressionValue;
 	}
 
@@ -644,7 +557,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	@Override
 	public void exitEndtempalte_stmt(Endtempalte_stmtContext ctx) {
 		if (executionState.canProcessBranch()) {
-			debug(">>Removing listener...");
+			Logger.debug(">>Removing listener...");
 			flashOutput();
 			parser.removeParseListener(this);
 			if ( ctx.BREAK() != null ) {
@@ -660,7 +573,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		ExprContext expc2 = ctx.expr(1);
 		if ( expc2 == null ) {
 			equal = exp1.equalsIgnoreCase("true");
-			debug("Eval([%s]) is %s",exp1,equal);
+			Logger.debug("Eval([%s]) is %s",exp1,equal);
 		} else {
 			String exp2 = calcExpression(ctx.expr(1));
 			exp2 = (exp2 == null ) ? "" : exp2;
@@ -674,7 +587,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 					equal = !equal;
 				}
 			}
-			debug("Eval([%s] %s [%s]) is %s",exp1,op,exp2,equal);
+			Logger.debug("Eval([%s] %s [%s]) is %s",exp1,op,exp2,equal);
 		}
 		return equal;
 	}
@@ -699,7 +612,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 
 		String[] parts 	= stringToSplit.split(delimiter);
 		
-		debug("Split macro: string=[%s] @template=[%s] @delimiter=[%s] @separator=[%s]> count %d"
+		Logger.debug("Split macro: string=[%s] @template=[%s] @delimiter=[%s] @separator=[%s]> count %d"
 			,stringToSplit
 			,templateName
 			,delimiter
@@ -723,7 +636,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			List<ExpressionContext> parms = ctx.templateParameters(0).parameters().expression();
 			for ( int i = 0; i < parms.size(); i++ ) {
 				value = calcExpression(parms.get(i));
-				debug("\tset parameter $%d = [%s]",i+1,value);
+				Logger.debug("\tset parameter $%d = [%s]",i+1,value);
 				tp.addParameter(value);
 			}
 		}
@@ -757,7 +670,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		if (writer != null ) try {
 			writer.write(txt);
 		} catch(IOException e){
-			error(ctx,"Split Macro: Cannot write to output stream!");
+			Logger.error(ctx,"Split Macro: Cannot write to output stream!");
 		}
 	}
 	 
@@ -770,16 +683,16 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		//String name = translateStringLiteral(ctx.templateName().stringLiteral().getText());
 		String templateName = calcExpression(ctx.templateName().expr());
 
-		debug("List macro: attribute=[%s] template=[%s]",attr,templateName);
+		Logger.debug("List macro: attribute=[%s] template=[%s]",attr,templateName);
 
 		Object attribute = element.getAttribute(attr,ctx.attribute());
 		if (attribute == null)  { 
 			return;
 		}
 
-		debug("\tattribute.Class = [%s]",attribute.getClass().getName());
+		Logger.debug("\tattribute.Class = [%s]",attribute.getClass().getName());
 		if ( !(attribute instanceof Collection) ) {
-			error(ctx,"Attribute \""+attr+"\" is not a Collection");
+			Logger.error(ctx,"Attribute \""+attr+"\" is not a Collection");
 			attribute = null;
 			return;
 		}
@@ -794,7 +707,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		Compare_exprContext conditions = null;
 		if (ctx.conditions(0) != null ) {
 			conditions = ctx.conditions(0).compare_expr();
-			debug("\tConditions=[%s]",conditions.getText());
+			Logger.debug("\tConditions=[%s]",conditions.getText());
 		}
 		
 		//Prepare list of elements
@@ -810,7 +723,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		}
 		this.setElement(currentElement);
 		int elementsCount = elements.size();
-		debug("\tElements: total count=[%d] for processing=[%d]",ecCount, elementsCount);
+		Logger.debug("\tElements: total count=[%d] for processing=[%d]",ecCount, elementsCount);
 			
 		//Set parameters
 		if ( ctx.templateParameters(0) != null ) {
@@ -818,7 +731,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			List<ExpressionContext> parms = ctx.templateParameters(0).parameters().expression();
 			for ( int i = 0; i < parms.size(); i++ ) {
 				value = calcExpression(parms.get(i));
-				debug("\tset parameter $%d = [%s]",i+1,value);
+				Logger.debug("\tset parameter $%d = [%s]",i+1,value);
 				tp.addParameter(value);
 			}
 		}
@@ -849,7 +762,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 					w++;
 				}
 			} catch (IOException e ) {
-				error(ctx,"Cannot write to output stream");
+				Logger.error(ctx,"Cannot write to output stream");
 				break;
 			}
 			obj = null;
@@ -930,7 +843,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		if ( writer != null ) try {
 			writer.write(text);
 		} catch(IOException e) {
-			error("Cannot write to output stream!");
+			Logger.error("Cannot write to output stream!");
 			parser.removeParseListener(this);
 		}
 	}
@@ -946,7 +859,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	@Override
 	public void exitPiMacro(PiMacroContext ctx) {
 		if ( executionState.canProcessBranch() ) {
-			setLineSeparator(translateStringLiteral(ctx.stringLiteral().getText()));
+			setLineSeparator(Utils.translateStringLiteral(ctx.stringLiteral().getText()));
 		}
 	}
 
@@ -957,7 +870,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	public void exitFileMacro(FileMacroContext ctx) {
 		if ( !executionState.canProcessBranch()) return;
 
-		debug("Executing exitFileMacro : canRedirectOutput = [%s], Context = [%s]"
+		Logger.debug("Executing exitFileMacro : canRedirectOutput = [%s], Context = [%s]"
 				,isRedirectOutputEnabled() 
 				,ctx.toString()
 		);
@@ -971,25 +884,25 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		if ( !file.isAbsolute() ) {
 			file = new File(TemplateProcessor.getOutputFolder()+"/"+fileName);
 		}
-		debug("\tNew output file = [%s], Exist = %s",file.getAbsolutePath(), file.exists());
+		Logger.debug("\tNew output file = [%s], Exist = %s",file.getAbsolutePath(), file.exists());
 		
 		String mode = "override";
 		OverrideContext octx = ctx.override();
 		if (octx != null ) {
 			mode = calcExpression(octx.expr()).toLowerCase().trim();
 			if ( !MODES.contains(mode)) {
-				error(ctx,"Invalid file mode \""+mode+"\"");
+				Logger.error(ctx,"Invalid file mode \""+mode+"\"");
 				return;
 			}
 		}
-		debug("\tFile mode = %s", mode);
+		Logger.debug("\tFile mode = %s", mode);
 		
 		flashOutput();
 		if ( fileCounter > 0 && writer != null ) try {
 			//Close output file if it was open in this template
 			writer.close();
 		} catch ( IOException e ) {
-			error(ctx,"Cannot close output file!");
+			Logger.error(ctx,"Cannot close output file!");
 		}
 		
 		if ( (mode.equalsIgnoreCase("new") && file.exists()) ) {
@@ -1004,7 +917,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 				setOutput(fw);
 				fileCounter++;
 			} catch (IOException e) {
-				error(ctx,"Cannot open file ["+fileName+"]");
+				Logger.error(ctx,"Cannot open file ["+fileName+"]");
 			}
 		}
 	}
@@ -1020,12 +933,12 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	public void exitText(TextContext ctx) {
 		if ( !executionState.canProcessBranch() ) return;
 		
-		debug("exitText(%s) textMode = %s",ctx.getClass().getName(),this.isTextMode());
+		Logger.debug("exitText(%s) textMode = %s",ctx.getClass().getName(),this.isTextMode());
 		int childCount = ctx.getChildCount();
 		ParseTree c;
 		for ( int i = 0; i < childCount; i++ ) {
 			c = ctx.getChild(i);
-			//debug("\t(%d) %s => [%s])",i,c.getClass().getName(),c.getText());
+			//Logger.debug("\t(%d) %s => [%s])",i,c.getClass().getName(),c.getText());
 			if ( c instanceof FreeTextContext ) {
 				sendTextOut(c.getText(), (FreeTextContext)c);
 			} else if ( c instanceof VariableContext ) {
@@ -1037,7 +950,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			} else if ( c instanceof ParameterContext) {
 				sendTextOut(this.getParameter(c.getText()),(ParameterContext)c);
 			} else if ( c instanceof StringLiteralContext) {
-				sendTextOut(translateStringLiteral(c.getText()),(StringLiteralContext)c);
+				sendTextOut(Utils.translateStringLiteral(c.getText()),(StringLiteralContext)c);
 			} else if ( c instanceof MacrosContext) {
 				processMacros((MacrosContext)c);
 			}
@@ -1050,7 +963,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		StringWriter sw = new StringWriter();
 		for ( int i = 0; i < childCount; i++ ) {
 			c = ctx.getChild(0);
-			debug("\t\t(%d) %s)",i,c.getClass().getName());
+			Logger.debug("\t\t(%d) %s)",i,c.getClass().getName());
 			if ( c instanceof TextMacrosContext) {
 				sendTextOut(TextMacros.get(c.getText()),(TextMacrosContext)c);
 			} else if ( c instanceof ListMacroContext) {
@@ -1097,7 +1010,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 				en  = "parent";
 			}
 			if ( obj == null ) {
-				error(ctx,"Element does not have the \""+en+"\" property!");
+				Logger.error(ctx,"Element does not have the \""+en+"\" property!");
 			}
 		}
         return obj;
@@ -1108,7 +1021,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		//String name = translateStringLiteral(ctx.stringLiteral().getText());
 		String templateName = calcExpression(ctx.templateName().expr());;
 
-		debug(">> Opening template [%s]...", templateName);
+		Logger.debug(">> Opening template [%s]...", templateName);
 		
 		TemplateProcessor tp = new TemplateProcessor(templateName, getTemplateFolder());
 		tp.setOutput(writer);
@@ -1127,7 +1040,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			List<ExpressionContext> parms = ctx.templateParameters(0).parameters().expression();
 			for ( int i = 0; i < parms.size(); i++ ) {
 				value = calcExpression(parms.get(i));
-				debug("\t\tset parameter $%d = [%s]",i,value);
+				Logger.debug("\t\tset parameter $%d = [%s]",i,value);
 				tp.addParameter(value);
 			}
 		}
