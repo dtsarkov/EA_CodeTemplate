@@ -910,6 +910,11 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			setOutput(null);
 		} else {
 			try {
+				File folder = file.getParentFile();
+				if ( folder != null && !folder.exists()) {
+					//create destination folder
+					folder.mkdirs();
+				}
 				FileWriter fw = new FileWriter(file
 					, file.exists() && mode.equalsIgnoreCase("append") //Append mode
 				);

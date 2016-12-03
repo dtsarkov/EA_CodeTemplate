@@ -26,7 +26,7 @@ public class Generator {
 
 	
 	public static void main(String[] args) throws Exception {
-		System.out.println("EACodeGenerator v 0.44");
+		System.out.println("EACodeGenerator v 0.45");
 
 		CommandLine cmd = parseCommandLine(args);
 		if ( cmd == null ) return;
@@ -105,6 +105,7 @@ public class Generator {
 
 		TemplateProcessor.setTemplateExtention(templateExt);
 		TemplateProcessor.setEAModel(EA.model());
+		String query;
 		for ( int i=0; i < batch.size(); i++ ) {
 			pe = batch.get(i);
 			
@@ -113,22 +114,19 @@ public class Generator {
 					,pe.outputFile ,pe.template ,pe.element
 			);
 
-			if ( EA.model() != null ) {
-				if ( queryName != null ) {
-		            @SuppressWarnings("rawtypes")
-					Collection elements = EA.model().GetElementsByQuery(queryName, pe.element);
-		            if ( elements.GetCount() == 0 ) {
-		            	Logger.error("Could not find any elments using query \"%s\" and search term \"%s\"", queryName, pe.element);
-		                break;
-		            }
-		            element = (Element)elements.GetAt((short)0);
-				} else {
-					element = EA.searchElementByName(pe.element);
-		            if ( element == null ) {
-		            	Logger.error("Could not find any elments using element name \"%s\"",pe.element);
-		                break;
-		            }
-				}
+			query = (pe.query == null) ? queryName : pe.query;
+			if ( query != null ) {
+	            element = EA.searchElement(pe.element, query);
+	            if ( element == null ) {
+	            	Logger.error("Could not find any elments using query \"%s\" and search term \"%s\"", query, pe.element);
+	                break;
+	            }
+			} else {
+				element = EA.searchElementByName(pe.element);
+	            if ( element == null ) {
+	            	Logger.error("Could not find any elments using element name \"%s\"",pe.element);
+	                break;
+	            }
 			}
 
     		try { 
@@ -310,16 +308,21 @@ public class Generator {
 			String[] 	values		= null;
 
 			String 		line 		= lr.readLine();
+			ProcessingEntry pe;
 			while ( line != null ) {
 				lineNumber++;
 				values = line.split(",");
-				if ( values.length != 3 ) {
+				if ( values.length < 3 ) {
 					System.out.printf("%s line: %d - wrong number of parameters\n",
 							fileName, lineNumber
 					);
 					break;
 				}
-				batch.add(new ProcessingEntry(values[0], values[1], values[2]));
+				pe = new ProcessingEntry(values[0], values[1], values[2]);
+				if ( values.length > 3 ) {
+					pe.query = values[3];
+				}
+				batch.add(pe);
 				line 		= lr.readLine();
 			}
 			loaded = ( line == null );
@@ -336,6 +339,7 @@ public class Generator {
 		public String template;
 		public String element;
 		public File outputFile;
+		public String query		= null;
 		
 		ProcessingEntry(String element, String template, String outputFile) {
 			this.element 	= element.trim();

@@ -6,9 +6,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 
+import org.sparx.Element;
 import org.sparx.Repository;
 
-import com.github.dtsarkov.ea.tools.codegenerator.Utils;
 import com.github.dtsarkov.ea.tools.load.ImportElement;
 
 public final class EA {
@@ -120,7 +120,9 @@ public final class EA {
 		} catch (NoSuchMethodException e) {
 			Logger.error("Method \"%s.%s\" - No Such method exception", className,methodName);
 		} catch (Exception e) {
-			Logger.error("Method \"%s.%s\" - Exception", className, methodName);
+			Logger.error("Method \"%s.%s\" - Exception:\n\t\t%s"
+					, className, methodName, e.getMessage()
+			);
 		}
 	}
 	
@@ -311,6 +313,21 @@ public final class EA {
 			}
 		}
 	};
+	public static org.sparx.Element searchElement(String searchString, String query) {
+		org.sparx.Element element 	= null;
+		if ( query == null ) {
+			element = searchElementByName(searchString);
+		} else if (query.equalsIgnoreCase("GUID") ) {
+			element = model().GetElementByGuid(searchString);
+		} else {
+			@SuppressWarnings("rawtypes")
+			org.sparx.Collection elements = model().GetElementsByQuery(query, searchString);
+            if ( elements.GetCount() != 0 ) {
+                element = (Element)elements.GetAt((short)0);
+            }
+		}
+		return element;
+	}
 	
 	static private final String queryByName = 
 			 "select  o.Object_ID from t_object o "

@@ -11,10 +11,20 @@ http://sparxsystems.com/enterprise\_architect\_user\_guide/12.1/software\_engine
 What's new
 ----------
 
+### Version 0.45
+-   The Code Generator will create a folder referenced in the "file" macro if it does not exist
+-   Added search by GUID. Use the followign command line parameters to search the root element by its GUID:
+    ~~~~ 
+    EACodeGenerator.cmd ... -e {2BC0A085-F925-4628-A67E-0ECE7449F475} -q GUID
+    ~~~~
+-   Added optional "query" parameter in batch file. The Code Generator treats the fourth token 
+    in the batch file as  query name.
+
+
 ### Version 0.44
 -   Fixed problem with reference to attribute's tagged values
--   Extended syntax of EACodeGenerator element (-e) parameter. Now you can also specify specify
-    element's parent and/or elemnet's stereotype using the following syntax:
+-   Extended syntax of EACodeGenerator element (-e) parameter. Now you can also specify
+    element's parent and/or element's stereotype using the following syntax:
     ~~~~
     [ParentName.][\"Stereotype\"::]ElementName
     ~~~~

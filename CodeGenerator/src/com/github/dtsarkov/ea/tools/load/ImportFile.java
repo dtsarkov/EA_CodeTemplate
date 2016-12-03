@@ -18,7 +18,7 @@ import com.github.dtsarkov.ea.tools.load.json.JSONProcessor;
 public final class ImportFile {
 
 	public static void main(String[] args) {
-		System.out.println("EAImport v 0.01");
+		System.out.println("EAImport v 0.03");
 		
 		CommandLine cmd = parseCommandLine(args);
 		if ( cmd == null ) return;
