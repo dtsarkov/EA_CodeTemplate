@@ -10,6 +10,8 @@ http://sparxsystems.com/enterprise\_architect\_user\_guide/12.1/software\_engine
 
 What's new
 ----------
+### Version 0.46
+-   Fixed problem with reference to connector's tagged values
 
 ### Version 0.45
 -   The Code Generator will create a folder referenced in the "file" macro if it does not exist

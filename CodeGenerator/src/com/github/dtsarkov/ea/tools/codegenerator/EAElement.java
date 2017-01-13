@@ -282,6 +282,7 @@ public class EAElement {
 				//tag = (TaggedValue)(((Collection)tags).GetByName(tagName));
 				//Replaced by non case-sensitive version.
 				short count = ((Collection)tags).GetCount();
+				Logger.debug("\t\tthere are %d tags", count);
 				for ( short i = 0; i < count; i++ ) {
 					tag = ((Collection)tags).GetAt(i);
 					if (tag instanceof org.sparx.TaggedValue ) { 
@@ -292,8 +293,14 @@ public class EAElement {
 						if ( ((org.sparx.AttributeTag)tag).GetName().equalsIgnoreCase(tagName) ) { 
 							return ((org.sparx.AttributeTag)tag).GetValue();
 						}
+					} else if ( tag instanceof org.sparx.ConnectorTag ) {
+						if ( ((org.sparx.ConnectorTag)tag).GetName().equalsIgnoreCase(tagName) ) { 
+							return ((org.sparx.ConnectorTag)tag).GetValue();
+						}
 					}
 				}
+			} else {
+				Logger.debug("\t\t No tags found");
 			}
 		}
 		return null;

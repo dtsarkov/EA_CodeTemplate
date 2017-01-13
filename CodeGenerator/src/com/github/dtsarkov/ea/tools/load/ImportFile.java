@@ -18,13 +18,17 @@ import com.github.dtsarkov.ea.tools.load.json.JSONProcessor;
 public final class ImportFile {
 
 	public static void main(String[] args) {
-		System.out.println("EAImport v 0.03");
+		System.out.println("EAImport v 0.05");
 		
 		CommandLine cmd = parseCommandLine(args);
 		if ( cmd == null ) return;
 
 		String modelFile	 	= cmd.getOptionValue("m");
 		String rootElementName	= cmd.getOptionValue("e");
+		String queryName = null;
+		if ( cmd.hasOption('q') ) {
+			queryName = cmd.getOptionValue('q');
+		}
 	
 		Logger.setDebug(cmd.hasOption("d"));
 		Logger.setVerbose(cmd.hasOption("v"));
@@ -56,7 +60,7 @@ public final class ImportFile {
 			Logger.warning("There is nothing to import from specified file(s)!");
 		} else {
 			if ( EA.openModel(modelFile) ) {
-		        org.sparx.Element 	eaElement = EA.searchElementByName(rootElementName);
+		        org.sparx.Element 	eaElement = EA.searchElement(rootElementName,queryName);
 		        if ( eaElement != null ) {
 		    		Logger.message("Loading data into element [%s]...",rootElementName);
 		    		
@@ -240,6 +244,14 @@ public final class ImportFile {
 				.desc("package where elements will be imported")
 				.required(true)
 				.hasArg(true).argName("element name")
+				.build()
+		);
+
+		options.addOption(Option
+				.builder("q").longOpt("query")
+				.desc("select element using specified query name.")
+				.required(false)
+				.hasArg(true).argName("query name")
 				.build()
 		);
 		

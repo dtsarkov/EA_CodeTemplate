@@ -5,7 +5,7 @@ Type			:$.Type
 Subtype			:$.Subtype
 Stereotype		:$.Stereotype
 ConnectorGUID		:$.ConnectorGUID
-
+Tag Value		:$."EventType"
 --------------------------------------------------------------------------------
 Source Role properties
 --------------------------------------------------------------------------------

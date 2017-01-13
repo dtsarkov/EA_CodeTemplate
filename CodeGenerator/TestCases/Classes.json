@@ -1,16 +1,7 @@
 { "Alias" : "TEST1"
- ,"Packages":[
-	{"Type":"Package", "Stereotype":"database","Name":"P_V_INP_001_STD_0"
-	,"Elements":[
-		 {"Type":"Class","Stereotype":"view","Name":"SB_125_40_OPOR_ITEM_MSUR_DT"}
-		,{"Type":"Class","Stereotype":"view","Name":"SB_125_40_OPOR_ITEM_PRTF_DEPT"}
-		,{"Type":"Class","Stereotype":"view","Name":"TX_125_40_BRDG_DEPT_PRFM"}
-		,{"Type":"Class","Stereotype":"view","Name":"TX_125_40_L_MSUR_DEPT"}
-		,{"Type":"Class","Stereotype":"view","Name":"TX_125_40_OPOR_ITM_MSUR_DT"}
-		,{"Type":"Class","Stereotype":"view","Name":"TX_125_40_OPOR_ITM_PTF_DPT"}
-		,{"Type":"Class","Stereotype":"view","Name":"TX_125_40_S_MSUR_DEPT"}
-		,{"Type":"Class","Stereotype":"view","Name":"TX_125_40_S_MSUR_DEPT_BT"}
-		]
+ ,"TaggedValues":[
+	{"Name" :"TCF::Stream ID"
+	,"Value":"678"
 	}
  ]
 }   

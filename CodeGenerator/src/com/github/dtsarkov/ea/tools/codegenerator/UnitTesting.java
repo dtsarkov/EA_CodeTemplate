@@ -15,7 +15,7 @@ public class UnitTesting {
 				, "--variable", "CMD_VAR_1=Global variable CMD_VAR_1 value" 
 				, "-D", "CMD_VAR_2=Global variable CMD_VAR_2 value" 
 				,"-b", "TestCases\\TestCases.lst", "-f", "TestCases", "-x", "template"
-				//,"-t", "TestCases\\functions.template"	,"-e", "Component 1.1.2.1" ,"-o", "functions.out", "-v", //"-q", "Package:Element" //, "-d"
+				//,"-t", "TestCases\\list.template"	,"-e", "Activity2" ,"-o", "list.out" 
 				//,"-v"
 				//,"-d"
 			};
