@@ -345,6 +345,8 @@ public final class EA {
 		String query 	= "";
 		if ( name.indexOf("::") != -1 ) { //References uses element Stereotype e.g. "Stereotype"::<Element Name>
 			query = "'\"'+o.Stereotype+'\"::'+";
+		} else if ( name.indexOf("~") != -1 ) { //References uses element's Type e.g. Type~<Element Name>
+			query = "o.Object_Type+'~'+";
 		}
 		String n = name.replaceAll("\\\\.", ""); //Remove dots '\.'
 		name = name.replaceAll("\\\\.", ".");
