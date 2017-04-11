@@ -3,16 +3,25 @@ Case#1: List current element base properties
 ################################################################################
 %call @template="element_base_properties"%
 %nl%
+
+%PI="\n   | "%
+$lineSeparator = %PI%
 ################################################################################
 Case#2: List current element's package base properties
 ################################################################################
 %call @template="element_base_properties" @element=$package.%
 %nl%
+
+$lineSeparator=$lineSeparator+"   | "
+%PI=$lineSeparator%
 ################################################################################
 Case#3: Pass parameters
 ################################################################################
 %call @template="parameters" @parameters="A","B","C","D","E","F","H","G","J"%
 %nl%
+
+$lineSeparator+="   | "
+%PI=$lineSeparator%
 ################################################################################
 Case#4: Pass parameters and element
 ################################################################################

@@ -6,6 +6,9 @@
 //		recognized and/or as a free text.
 // 0.22		Added %filter% macro
 // 		//, %DEFINED(<expr>)% function
+// 0.23		%PI% macro
+//		* allowed expression to be used instead of 'stringLeteral'
+//		* added %PI% to the expression list  
 // ----------------------------------------------------------------------------
 grammar EACodeTemplate;
 
@@ -54,7 +57,8 @@ expr		: stringLiteral
 		| parameter
 		| callMacro
 		| listMacro
-		| splitMacro 
+		| splitMacro
+		| piMacro 
 ;
 
 variable	: VAR
@@ -174,13 +178,13 @@ functions		: Function parameters CBR '%'
 ;
 parameters		: expression (COMA expression)*
 ;
-piMacro			:  PI stringLiteral '%'
+piMacro			:  PI ('=' expr)* '%'
 ;
 
 Call            : '%call';
 List            : '%list=';
 Split           : '%split=';
-PI              : '%PI=';
+PI              : '%PI';
 Function        : '%UPPER(' | '%LOWER(' | '%REPLACE(' | '%TRIM('  | '%MID('
 		| '%LENGTH(' //| 'FIND('
 		| '%WRAP_TEXT(' | '%PLAIN_TEXT('

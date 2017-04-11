@@ -16,7 +16,6 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.sparx.Collection;
 import org.sparx.Element;
 
 import com.github.dtsarkov.ea.tools.EA;
@@ -26,7 +25,7 @@ public class Generator {
 
 	
 	public static void main(String[] args) throws Exception {
-		System.out.println("EACodeGenerator v 0.46");
+		System.out.println("EACodeGenerator v 0.47");
 
 		CommandLine cmd = parseCommandLine(args);
 		if ( cmd == null ) return;

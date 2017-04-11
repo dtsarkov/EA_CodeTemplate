@@ -370,6 +370,10 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 				StringWriter sw = new StringWriter(255);
 				executeSplitMacro((SplitMacroContext)c, sw);
 				v = sw.toString();
+			} else if ( c instanceof PiMacroContext ) {
+				StringWriter sw = new StringWriter(255);
+				executePiMacro((PiMacroContext)c, sw);
+				v = sw.toString();
 			} else {
 				Logger.debug(">> Unknown Expression context [%]",c.getClass().toString()); 
 			}
@@ -698,6 +702,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		}
 		
 		TemplateProcessor tp 	= new TemplateProcessor(templateName, getTemplateFolder());
+		tp.setLineSeparator(this.getLineSeparator());
 
 		Collection ec 	= (Collection)attribute;
 		short		ecCount	 	= ec.GetCount();
@@ -811,7 +816,8 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	private int		lineLength  = 0;
 	private void sendTextOut(String text, ParserRuleContext ctx) {
 			if (isTextMode() && text != null) {
-				newLineSent = (text.compareTo(System.lineSeparator()) == 0);
+				newLineSent = (text.compareTo(System.lineSeparator()) == 0)
+							||(text.compareTo(this.lineSeparator) 	  == 0);
 				Token token = ctx.getStart();
 				int   idx  = token.getTokenIndex();
 				List<Token> channel = tokens.getHiddenTokensToLeft(idx, 1);
@@ -856,10 +862,15 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		}
 	}
 	
-	@Override
-	public void exitPiMacro(PiMacroContext ctx) {
-		if ( executionState.canProcessBranch() ) {
-			setLineSeparator(Utils.translateStringLiteral(ctx.stringLiteral().getText()));
+	private void executePiMacro(PiMacroContext ctx, Writer writer ) {
+		//setLineSeparator(Utils.translateStringLiteral(ctx.stringLiteral().getText()));
+		if ( writer != null ) try {
+			writer.write(getLineSeparator());
+		} catch (IOException e) {
+			
+		}
+		if ( !ctx.expr().isEmpty() ) { 
+			setLineSeparator(calcExpression(ctx.expr(0)));
 		}
 	}
 
@@ -977,6 +988,8 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 				executeCallMacro((CallMacroContext)c, sw);
 			} else if ( c instanceof SplitMacroContext) {
 				executeSplitMacro((SplitMacroContext)c, sw);
+			} else if ( c instanceof PiMacroContext ) {
+				executePiMacro((PiMacroContext)c, null);
 			} else if ( c instanceof FunctionsContext) {
 				String value = calcFunction((FunctionsContext)c);
 				if ( value != null ) {
@@ -1029,6 +1042,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		Logger.debug(">> Opening template [%s]...", templateName);
 		
 		TemplateProcessor tp = new TemplateProcessor(templateName, getTemplateFolder());
+		tp.setLineSeparator(this.getLineSeparator());
 		tp.setOutput(writer);
 		tp.enableRedirectOutput(!this.inAssignmentMode && this.isRedirectOutputEnabled());
 
