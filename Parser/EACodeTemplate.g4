@@ -6,9 +6,10 @@
 //		recognized and/or as a free text.
 // 0.22		Added %filter% macro
 // 		//, %DEFINED(<expr>)% function
-// 0.23		%PI% macro
+// 0.47.1	%PI% macro
 //		* allowed expression to be used instead of 'stringLeteral'
-//		* added %PI% to the expression list  
+//		* added %PI% to the expression list
+// 0.47.2	Added %query% macro 
 // ----------------------------------------------------------------------------
 grammar EACodeTemplate;
 
@@ -58,6 +59,7 @@ expr		: stringLiteral
 		| callMacro
 		| listMacro
 		| splitMacro
+		| queryMacro
 		| piMacro 
 ;
 
@@ -118,7 +120,7 @@ test_op		: Test_op;
 
 Pred_op 	: 'and' | 'or';
 Test_op		: '=='	| '!=' | '~=';
-//RegEx_op	: '~=';
+
 //
 // ============================================================================
 text		: ( 
@@ -138,19 +140,27 @@ macros		: textMacros
 		| functions
 		| callMacro
 		| splitMacro
+		| queryMacro
 		| piMacro
 ;
 textMacros 		: '%dl%' | '%pc%' | '%eq%' | '%qt%' | '%us%' | '%nl%' //| '%sl%'
 			| '%DATE%' | '%TIME%' //| '%USER%' 
 ;
-listMacro		: List 	attribute templateName (
+callMacro		: Call templateName (templateParameters | elementInScope)*  '%'
+;
+listMacro		: List attribute templateName (
 					templateParameters
 				|	separator
 				|	conditions
 				)* 
 			'%'
 ;
-callMacro		: Call templateName (templateParameters | elementInScope)*  '%'
+queryMacro		: Query expr searchTerm templateName (
+					templateParameters
+				|	separator
+				|	conditions
+				)* 
+			'%'
 ;
 splitMacro		: Split expr templateName (
 					templateParameters 
@@ -160,7 +170,7 @@ splitMacro		: Split expr templateName (
 				)*
 			'%'
 ;				
-templateName 		: TemplateName expr //stringLiteral
+templateName 		: TemplateName expr
 ;
 templateParameters	: Parameters parameters
 ;
@@ -169,6 +179,8 @@ separator		: Separator expr
 conditions		: OBR compare_expr CBR
 ;
 delimiter		: Delimiter expr
+;
+searchTerm		: SearchTerm expr
 ;
 elementInScope		: ElementInScope (
 				THIS | PARN | PCKG | SRCE | TRGT | SROL | TROL 
@@ -183,6 +195,7 @@ piMacro			:  PI ('=' expr)* '%'
 
 Call            : '%call';
 List            : '%list=';
+Query		: '%query=';
 Split           : '%split=';
 PI              : '%PI';
 Function        : '%UPPER(' | '%LOWER(' | '%REPLACE(' | '%TRIM('  | '%MID('
@@ -193,11 +206,12 @@ Function        : '%UPPER(' | '%LOWER(' | '%REPLACE(' | '%TRIM('  | '%MID('
 //		| '%DEFINED('
 ;
 
-TemplateName    : '@template=';
-Parameters      : '@parameters=';
-Separator       : '@separator=';
+SearchTerm	: '@search=';
 ElementInScope  : '@element=';
+TemplateName    : '@template=';
 Delimiter       : '@delimiter=';
+Separator       : '@separator=';
+Parameters      : '@parameters=';
 // ============================================================================
 // =
 // ============================================================================

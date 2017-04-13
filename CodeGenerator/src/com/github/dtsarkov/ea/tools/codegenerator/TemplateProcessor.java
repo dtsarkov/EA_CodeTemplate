@@ -26,6 +26,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.sparx.Collection;
 import org.sparx.Repository;
 
+import com.github.dtsarkov.ea.tools.EA;
 import com.github.dtsarkov.ea.tools.Logger;
 import com.github.dtsarkov.ea.tools.ParserErrorListener;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateBaseListener;
@@ -35,6 +36,7 @@ import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.As
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.AttributeContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.CallMacroContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.Compare_exprContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.ConditionsContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.ElementInScopeContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.Else_stmtContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.Elseif_stmtContext;
@@ -55,9 +57,13 @@ import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.Ov
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.ParameterContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.PiMacroContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.PredicateContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.QueryMacroContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.SeparatorContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.SplitMacroContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.StringLiteralContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.TagContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.TemplateNameContext;
+import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.TemplateParametersContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.TextContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.TextMacrosContext;
 import com.github.dtsarkov.ea.tools.codegenerator.parser.EACodeTemplateParser.VariableContext;
@@ -369,6 +375,10 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			} else if ( c instanceof SplitMacroContext ) {
 				StringWriter sw = new StringWriter(255);
 				executeSplitMacro((SplitMacroContext)c, sw);
+				v = sw.toString();
+			} else if ( c instanceof QueryMacroContext ) {
+				StringWriter sw = new StringWriter(255);
+				executeQueryMacro((QueryMacroContext)c, sw);
 				v = sw.toString();
 			} else if ( c instanceof PiMacroContext ) {
 				StringWriter sw = new StringWriter(255);
@@ -682,12 +692,10 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	 * List section
 	 **************************************************************************/
 	@SuppressWarnings("rawtypes")
-	private void executeListMacro(ListMacroContext ctx, Writer writer ) {
+	private void executeListMacro( ListMacroContext ctx, Writer writer ) {
 		String attr = ctx.attribute().getText();
-		//String name = translateStringLiteral(ctx.templateName().stringLiteral().getText());
-		String templateName = calcExpression(ctx.templateName().expr());
 
-		Logger.debug("List macro: attribute=[%s] template=[%s]",attr,templateName);
+		Logger.debug("List macro: attribute=[%s]",attr);
 
 		Object attribute = element.getAttribute(attr,ctx.attribute());
 		if (attribute == null)  { 
@@ -701,25 +709,77 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			return;
 		}
 		
-		TemplateProcessor tp 	= new TemplateProcessor(templateName, getTemplateFolder());
-		tp.setLineSeparator(this.getLineSeparator());
-
-		Collection ec 	= (Collection)attribute;
-		short		ecCount	 	= ec.GetCount();
-		Object		obj			= null;
+		executeCollectionMacro(
+				(Collection)attribute
+				,ctx.templateName()
+				,ctx.templateParameters(0)
+				,ctx.conditions(0)
+				,ctx.separator(0)
+				,writer
+		);
 
 		
+	}
+
+	/*
+	 * Query macro
+	 **************************************************************************/
+	@SuppressWarnings("rawtypes")
+	private void executeQueryMacro(QueryMacroContext ctx, Writer writer ) {
+		String queryName  	= calcExpression(ctx.expr());
+		String searchValue 	= calcExpression(ctx.searchTerm().expr());
+		
+		Logger.debug("Query macro: queryName=[%s] searchValue= [%s]"
+				,queryName, searchValue
+		);
+
+		try {
+			Collection elementCollection = EA.model().GetElementsByQuery(queryName, searchValue);
+	
+			executeCollectionMacro(
+					 elementCollection
+					,ctx.templateName()
+					,ctx.templateParameters(0)
+					,ctx.conditions(0)
+					,ctx.separator(0)
+					,writer
+			);
+		} catch(Exception e) {
+			Logger.error(ctx, e.getMessage());
+		}
+	}
+
+	/*
+	 * Collection macro
+	 **************************************************************************/
+	@SuppressWarnings("rawtypes")
+	private void executeCollectionMacro(
+			 Collection 				elementCollection
+			,TemplateNameContext		ctxTemplateName
+			,TemplateParametersContext	ctxTemplateParameters
+			,ConditionsContext			ctxConditions
+			,SeparatorContext			ctxSeparator
+			,Writer 					writer 
+	) {
+
+		short		ecCount	 	= elementCollection.GetCount();
+		Logger.debug("\tFound=[%d] elements", ecCount);
+		
+		if (ecCount == 0) return;
+
 		Compare_exprContext conditions = null;
-		if (ctx.conditions(0) != null ) {
-			conditions = ctx.conditions(0).compare_expr();
+		if (ctxConditions != null ) {
+			conditions = ctxConditions.compare_expr();
 			Logger.debug("\tConditions=[%s]",conditions.getText());
 		}
 		
 		//Prepare list of elements
 		ArrayList<Object> elements = new ArrayList<Object>(ecCount);
 		EAElement currentElement = this.element;
+
+		Object obj = null;
 		for ( short i = 0; i < ecCount; i++ ) {
-			obj = ec.GetAt(i);
+			obj = elementCollection.GetAt(i);
 			//TODO: Add element filter
 			this.setElement(obj);
 			if ( conditions == null || evalCompareExpr(conditions) ) {
@@ -729,11 +789,18 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		this.setElement(currentElement);
 		int elementsCount = elements.size();
 		Logger.debug("\tElements: total count=[%d] for processing=[%d]",ecCount, elementsCount);
-			
+
+		if ( elementsCount == 0 )
+			return;
+		
+		String templateName = calcExpression(ctxTemplateName.expr());
+		TemplateProcessor tp 	= new TemplateProcessor(templateName, getTemplateFolder());
+		tp.setLineSeparator(this.getLineSeparator());
+
 		//Set parameters
-		if ( ctx.templateParameters(0) != null ) {
+		if ( ctxTemplateParameters != null ) {
 			String value = "";
-			List<ExpressionContext> parms = ctx.templateParameters(0).parameters().expression();
+			List<ExpressionContext> parms = ctxTemplateParameters.parameters().expression();
 			for ( int i = 0; i < parms.size(); i++ ) {
 				value = calcExpression(parms.get(i));
 				Logger.debug("\tset parameter $%d = [%s]",i+1,value);
@@ -743,8 +810,8 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		
 		//Set separator
 		String separator = getLineSeparator();
-		if (ctx.separator(0) != null ) {
-			separator = calcExpression(ctx.separator(0).expr());
+		if (ctxSeparator != null ) {
+			separator = calcExpression(ctxSeparator.expr());
 		}
 		
 		//Execute template for each element
@@ -767,7 +834,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 					w++;
 				}
 			} catch (IOException e ) {
-				Logger.error(ctx,"Cannot write to output stream");
+				Logger.error(ctxTemplateName,"Cannot write to output stream");
 				break;
 			}
 			obj = null;
@@ -776,11 +843,11 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 				break;
 			}
 		}
-		obj = null;
-		ec 	= null;
+		obj 				= null;
+		elementCollection 	= null;
 		System.gc();		
 	}
-
+	
 	/*
 	 * Functions section
 	 **************************************************************************/
@@ -988,6 +1055,8 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 				executeCallMacro((CallMacroContext)c, sw);
 			} else if ( c instanceof SplitMacroContext) {
 				executeSplitMacro((SplitMacroContext)c, sw);
+			} else if ( c instanceof QueryMacroContext) {
+				executeQueryMacro((QueryMacroContext)c, sw);
 			} else if ( c instanceof PiMacroContext ) {
 				executePiMacro((PiMacroContext)c, null);
 			} else if ( c instanceof FunctionsContext) {
