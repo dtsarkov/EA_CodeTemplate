@@ -1,0 +1,79 @@
+################################################################################
+Case#1: Perform Simple search
+################################################################################
+Name		:Component 1.1.1
+ElementID	:3
+Type		:Package
+Subtype		:20
+Stereotype	:Big Component
+ElementGUID	:{27173994-B5A1-41ed-9474-2503422A65CA}
+--------------------------------------------------------------------------------
+Name		:Component 1.1.2
+ElementID	:4
+Type		:Package
+Subtype		:20
+Stereotype	:Big Component
+ElementGUID	:{144087B0-3043-4142-B26E-002650BFD432}
+--------------------------------------------------------------------------------
+Name		:Component 1.1.2.2
+ElementID	:5
+Type		:Component
+Subtype		:0
+Stereotype	:
+ElementGUID	:{4A247390-1A03-47f0-B4E0-0EC11074A51C}
+--------------------------------------------------------------------------------
+Name		:Component 1.1.2.1
+ElementID	:6
+Type		:Component
+Subtype		:0
+Stereotype	:
+ElementGUID	:{2BC0A085-F925-4628-A67E-0ECE7449F475}
+--------------------------------------------------------------------------------
+Name		:Component 1.1.2.2
+ElementID	:901
+Type		:Component
+Subtype		:0
+Stereotype	:
+ElementGUID	:{3EE388DF-96D4-47f0-85AC-1DD4EB757487}
+--------------------------------------------------------------------------------
+
+################################################################################
+Case#2: Perform Simple search and filter out non-Package elements
+################################################################################
+Name		:Component 1.1.1
+ElementID	:3
+Type		:Package
+Subtype		:20
+Stereotype	:Big Component
+ElementGUID	:{27173994-B5A1-41ed-9474-2503422A65CA}
+--------------------------------------------------------------------------------
+Name		:Component 1.1.2
+ElementID	:4
+Type		:Package
+Subtype		:20
+Stereotype	:Big Component
+ElementGUID	:{144087B0-3043-4142-B26E-002650BFD432}
+--------------------------------------------------------------------------------
+
+################################################################################
+Case#3: Perform 'TargetTable' search
+################################################################################
+Name		:Table7
+ElementID	:20
+Type		:Class
+Subtype		:0
+Stereotype	:table
+ElementGUID	:{FA43C813-3A35-4495-BD62-D96E4AB905F1}
+--------------------------------------------------------------------------------
+
+################################################################################
+Case#4: Perform 'Parent:Element' search
+################################################################################
+Name		:Activity1
+ElementID	:22
+Type		:Activity
+Subtype		:0
+Stereotype	:
+ElementGUID	:{A2F9593A-7787-4442-8EBD-76B83BD74828}
+--------------------------------------------------------------------------------
+

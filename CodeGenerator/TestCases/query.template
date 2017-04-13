@@ -1,0 +1,20 @@
+################################################################################
+Case#1: Perform Simple search
+################################################################################
+%query="Simple" @search="Component 1." @template="element_base_properties"%
+%nl%
+################################################################################
+Case#2: Perform Simple search and filter out non-Package elements
+################################################################################
+%query="Simple" @search="Component 1." @template="element_base_properties" ($.Type == "Package")%
+%nl%
+################################################################################
+Case#3: Perform 'TargetTable' search 
+################################################################################
+%query="TargetTable" @search="Activity3" @template="element_base_properties"%
+%nl%
+################################################################################
+Case#4: Perform 'Parent:Element' search 
+################################################################################
+%query="Parent:Element" @search="List Demo:Activity1" @template="element_base_properties"%
+%nl%
