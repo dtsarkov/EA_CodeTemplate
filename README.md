@@ -12,7 +12,7 @@ What's new
 ----------
 
 ### Version 0.47.3
--   Changed **%PI% ** macro. 
+-   Changed **%PI%** macro. 
 	* %PI% value can be set using an expression. 
 	* %PI% macro cab be used in an expression
 -   Added **%query%** macro. Syntax:
