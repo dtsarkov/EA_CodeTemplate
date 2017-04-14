@@ -20,8 +20,7 @@ Case#3: Pass parameters
 %call @template="parameters" @parameters="A","B","C","D","E","F","H","G","J"%
 %nl%
 
-$lineSeparator+="   | "
-%PI=$lineSeparator%
+%PI=%PI%+"   | "%
 ################################################################################
 Case#4: Pass parameters and element
 ################################################################################

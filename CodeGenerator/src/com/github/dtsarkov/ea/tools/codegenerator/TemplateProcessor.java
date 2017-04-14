@@ -936,8 +936,8 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		} catch (IOException e) {
 			
 		}
-		if ( !ctx.expr().isEmpty() ) { 
-			setLineSeparator(calcExpression(ctx.expr(0)));
+		if ( !ctx.expression().isEmpty() ) { 
+			setLineSeparator(calcExpression(ctx.expression(0)));
 		}
 	}
 

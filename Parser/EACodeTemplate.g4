@@ -190,7 +190,7 @@ functions		: Function parameters CBR '%'
 ;
 parameters		: expression (COMA expression)*
 ;
-piMacro			:  PI ('=' expr)* '%'
+piMacro			:  PI ('=' expression)* '%'
 ;
 
 Call            : '%call';
