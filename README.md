@@ -10,6 +10,21 @@ http://sparxsystems.com/enterprise\_architect\_user\_guide/12.1/software\_engine
 
 What's new
 ----------
+
+### Version 0.47.3
+-   Changed **%PI% ** macro. 
+	* %PI% value can be set using an expression. 
+	* %PI% macro cab be used in an expression
+-   Added **%query%** macro. Syntax:
+    ~~~~ 
+    %query=<query name> @search=<search term> @template=<template name> 
+        [@parameters=<parameter 1..N] 
+        [@separator=<separator>]
+        [(<filtering condition>)]
+    %
+    ~~~~
+
+
 ### Version 0.46
 -   Fixed problem with reference to connector's tagged values
 
