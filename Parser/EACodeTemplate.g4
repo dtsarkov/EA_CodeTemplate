@@ -151,29 +151,32 @@ textMacros 		: '%dl%' | '%pc%' | '%eq%' | '%qt%' | '%us%' | '%nl%' //| '%sl%'
 ;
 callMacro		: Call templateName (templateParameters | elementInScope)*  '%'
 ;
-listMacro		: List attribute templateName (
+listMacro		: List attribute (templateName | evalExpression)  (
 					templateParameters
 				|	separator
 				|	conditions
 				)* 
 			'%'
 ;
-queryMacro		: Query expr searchTerm templateName (
+queryMacro		: Query expr searchTerm (templateName | evalExpression) (
 					templateParameters
 				|	separator
 				|	conditions
 				)* 
 			'%'
 ;
-splitMacro		: Split expr templateName (
+splitMacro		: Split expr (templateName | evalExpression) (
 					templateParameters 
 				| 	delimiter
 				|	separator
 				|	elementInScope
+				|	conditions
 				)*
 			'%'
 ;				
 templateName 		: TemplateName expr
+;
+evalExpression		: EvalExpression expression
 ;
 templateParameters	: Parameters parameters
 ;
@@ -212,6 +215,7 @@ Function        : '%UPPER(' | '%LOWER(' | '%REPLACE(' | '%TRIM('  | '%MID('
 SearchTerm	: '@search=';
 ElementInScope  : '@element=';
 TemplateName    : '@template=';
+EvalExpression 	: '@eval=';
 Delimiter       : '@delimiter=';
 Separator       : '@separator=';
 Parameters      : '@parameters=';

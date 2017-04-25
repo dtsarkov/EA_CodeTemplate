@@ -624,6 +624,13 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			delimiter = calcExpression(ctx.delimiter(0).expr());
 		}
 
+		ConditionsContext 	ctxConditions 	= ctx.conditions(0);
+		Compare_exprContext conditions 		= null;
+		if (ctxConditions != null ) {
+			conditions = ctxConditions.compare_expr();
+			Logger.debug("\tConditions=[%s]",conditions.getText());
+		}
+		
 		String[] parts 	= stringToSplit.split(delimiter);
 		
 		Logger.debug("Split macro: string=[%s] @template=[%s] @delimiter=[%s] @separator=[%s]> count %d"
@@ -667,18 +674,20 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			tp.setVariable("$PART",parts[i]);
 			tp.setVariable("$COUNT", Integer.toString(parts.length));
 			tp.setVariable("$CURRENT", Integer.toString(i+1));
+			
+			if ( conditions == null || tp.evalCompareExpr(conditions) ) { 
+				tp.execute();
+				sb = sw.getBuffer();
 
-			tp.execute();
-			sb = sw.getBuffer();
-
-			if ( sb.toString().trim().length() > 0 ) {
-				if ( w != 0 )	txt += separator;
-				txt += sb.toString();
-				w++;
-			}
-			breakLoop = tp.getVariableValue(BREAK);
-			if (breakLoop != null && breakLoop.equalsIgnoreCase("true")) {
-				break;
+				if ( sb.toString().trim().length() > 0 ) {
+					if ( w != 0 )	txt += separator;
+					txt += sb.toString();
+					w++;
+				}
+				breakLoop = tp.getVariableValue(BREAK);
+				if (breakLoop != null && breakLoop.equalsIgnoreCase("true")) {
+					break;
+				}
 			}
 		}
 		if (writer != null ) try {

@@ -27,3 +27,6 @@ $templateName = "split_x01"
 -- Test #07 ------------------------------------------------
 $var = %split="aaa:bbb:ccc" @template=$templateName @delimiter=":" @parameters="1","loop"%
 var %eq% $var
+%%DEBUG("=== Test #08 ========================")%
+-- Test #08 ------------------------------------------------
+%split="aaa:bbb:ccc" @template=$templateName @delimiter=":" ($PART == "ccc")%
