@@ -582,14 +582,14 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 
 	private boolean evalPredicate( PredicateContext ctx ) {
 		boolean equal = false;
-		String exp1 = calcExpression(ctx.expr(0));
+		String exp1 = calcExpression(ctx.expression(0));
 		exp1 = (exp1 == null ) ? "" : exp1;
-		ExprContext expc2 = ctx.expr(1);
+		ExpressionContext expc2 = ctx.expression(1);
 		if ( expc2 == null ) {
 			equal = exp1.equalsIgnoreCase("true");
 			Logger.debug("Eval([%s]) is %s",exp1,equal);
 		} else {
-			String exp2 = calcExpression(ctx.expr(1));
+			String exp2 = calcExpression(ctx.expression(1));
 			exp2 = (exp2 == null ) ? "" : exp2;
 			String op   = ctx.test_op().getText();
 			
@@ -829,7 +829,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			sb = sw.getBuffer();
 			if ( writer != null ) try {
 				if ( sb.toString().trim().length() > 0 ) {
-					if ( w != 0 )	writer.write(separator);
+					if ( w > 0 ) writer.write(separator);
 					writer.write(sb.toString());
 					w++;
 				}

@@ -112,8 +112,11 @@ endtempalte_stmt: EXIT | BREAK
 // ----------------------------------------------------------------------------
 compare_expr	: predicate (pred_op predicate)*
 ;
-predicate	: expr test_op expr
-		| expr 
+//predicate	: expr test_op expr
+//		| expr 
+//;
+predicate	: expression test_op expression
+		| expression 
 ;
 pred_op     	: Pred_op;
 test_op		: Test_op;

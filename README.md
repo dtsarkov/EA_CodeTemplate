@@ -23,6 +23,7 @@ What's new
         [(<filtering condition>)]
     %
     ~~~~
+    http://www.sparxsystems.com/enterprise_architect_user_guide/12.1/building_models/creating_filters.html
 
 
 ### Version 0.46
