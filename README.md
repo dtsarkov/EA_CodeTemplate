@@ -11,6 +11,10 @@ http://sparxsystems.com/enterprise\_architect\_user\_guide/12.1/software\_engine
 What's new
 ----------
 
+### Version 0.48.2
+-   added filtering conditions to %split macro
+-   enabled full expressions in %list, %split, and %query macros filtering conditions
+
 ### Version 0.47.3
 -   Changed **%PI%** macro. 
 	* %PI% value can be set using an expression. 
