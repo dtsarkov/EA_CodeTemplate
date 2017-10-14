@@ -145,6 +145,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	private int						textLevel 	= 0;
 	private Writer 					writer;
 	private boolean					canRedirectOutput = true;
+	private String					outputFileName;
 
 	private ArrayList<String>  parameters	  = new ArrayList<String>(9);
 	private Map<String,String> localVariables = new HashMap<String,String>();
@@ -217,11 +218,18 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	public void setOutput(Writer writer) {
 		this.writer = writer;
 	}
-	
 	public Writer getOutput() {
 		return writer;
 	}
 
+	public void setOutputFilename( String fileName ) {
+		this.outputFileName = fileName;
+	}
+	
+	public String getOutputFilename() {
+		return this.outputFileName;
+	}
+	
 	public boolean isRedirectOutputEnabled() {
 		return canRedirectOutput;
 	}
@@ -384,6 +392,8 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 				StringWriter sw = new StringWriter(255);
 				executePiMacro((PiMacroContext)c, sw);
 				v = sw.toString();
+			} else if ( c instanceof TextMacrosContext ) {
+				v = processTextMacro((TextMacrosContext)c);
 			} else {
 				Logger.debug(">> Unknown Expression context [%]",c.getClass().toString()); 
 			}
@@ -577,13 +587,16 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			if ( ctx.BREAK() != null ) {
 				this.setVariable(BREAK, "true");
 			}
+			executionStates.clear();
 		}
 	}
 
 	private boolean evalPredicate( PredicateContext ctx ) {
 		boolean equal = false;
+		
 		String exp1 = calcExpression(ctx.expression(0));
 		exp1 = (exp1 == null ) ? "" : exp1;
+		
 		ExpressionContext expc2 = ctx.expression(1);
 		if ( expc2 == null ) {
 			equal = exp1.equalsIgnoreCase("true");
@@ -603,6 +616,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			}
 			Logger.debug("Eval([%s] %s [%s]) is %s",exp1,op,exp2,equal);
 		}
+		if ( ctx.NOT(0) != null ) equal = !equal;
 		return equal;
 	}
 
@@ -789,6 +803,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		Object obj = null;
 		for ( short i = 0; i < ecCount; i++ ) {
 			obj = elementCollection.GetAt(i);
+			Logger.debug("\t get element class=[%s]", (obj==null) ? "null" : obj.getClass().getName());
 			//TODO: Add element filter
 			this.setElement(obj);
 			if ( conditions == null || evalCompareExpr(conditions) ) {
@@ -963,6 +978,8 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		);
 		
 		if ( !isRedirectOutputEnabled()) {
+			// Output redirect is disabled when macro is called as part of 
+			// an assignment statement
 			return;
 		} 
 		
@@ -996,6 +1013,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			//Prevent file from to be overwritten 
 			setOutput(null);
 		} else {
+			setOutputFilename(file.getAbsolutePath());
 			try {
 				File folder = file.getParentFile();
 				if ( folder != null && !folder.exists()) {
@@ -1049,6 +1067,18 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		}
 	}
 	
+	private String processTextMacro(TextMacrosContext ctx ) {
+		String macro = ctx.getText();
+		String text  = "";
+		if ( macro.equals("%FILE%") ) {
+			// not elegant but fastest way to implement FILE function
+			text = this.getOutputFilename();
+		} else {
+			text = TextMacros.get(macro);
+		}
+		return text;
+	}
+	
 	private void processMacros(MacrosContext ctx) {
 		int childCount = ctx.getChildCount();
 		ParseTree c;
@@ -1057,7 +1087,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			c = ctx.getChild(0);
 			Logger.debug("\t\t(%d) %s)",i,c.getClass().getName());
 			if ( c instanceof TextMacrosContext) {
-				sendTextOut(TextMacros.get(c.getText()),(TextMacrosContext)c);
+				sendTextOut(processTextMacro((TextMacrosContext)c),(TextMacrosContext)c);
 			} else if ( c instanceof ListMacroContext) {
 				executeListMacro((ListMacroContext)c, sw);
 			} else if ( c instanceof CallMacroContext) {
@@ -1146,6 +1176,11 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	}
 	
 	@Override
+	public void enterLine_text(Line_textContext ctx) {
+		//if ( ctx.NL() != null )
+		//	finishLine();
+	}
+	@Override
 	public void exitLine_text(Line_textContext ctx) {
 		if ( ctx.NL() != null )
 			finishLine();
@@ -1154,6 +1189,10 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	
 	@Override
 	public void exitFile(FileContext ctx) {
+		//System.out.println("Execution state stack is empyt = "+executionStates.empty());
 		flashOutput();
+		if ( !executionStates.empty()) {
+			Logger.error("Missing %s!", "%endif%");
+		}
 	}
 }

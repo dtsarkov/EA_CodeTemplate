@@ -2,4 +2,6 @@ Simple {text} with_characters. + just characters -*:/[]<>~!?@#^&\|'`;
 '%dl%'|'%pc%'|'%eq%'|'%qt%'|'%us%'
 %nl%
 '%dl%'|'%pc%'|'%eq%'|'%qt%'|'%us%'
+$var = %dl% +"|"+ %pc% +"|"+ %nl% +"|"+ %eq% +"|"+ %qt% +"|"+ %us%
+$var
 DATE: %DATE% TIME: %TIME%

@@ -2,6 +2,10 @@
 1. This text will go to file0
 2. This text will go to file0
 3. This is the output from multipleOutputFile_1 template
-	This text will go to file11. Mode = [assignment]
+	This text will go to file11 []. Mode = [assignment]
 
 ################################################################################
+Original file name = C:\Work\Development\EA\EA_CodeTemplate\CodeGenerator\file00.out
+################################################################################
+Text in the original output file [C:\Work\Development\EA\EA_CodeTemplate\CodeGenerator\file00.out]
+--------------------------------------------------------------------------------

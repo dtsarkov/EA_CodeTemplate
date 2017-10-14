@@ -10,6 +10,9 @@
 //		* allowed expression to be used instead of 'stringLeteral'
 //		* added %PI% to the expression list
 // 0.47.2	Added %query% macro 
+// 0.49.0	Added %FILE% text macro
+//		Added text macros to expressions
+//		Added 'not' to logical predicates
 // ----------------------------------------------------------------------------
 grammar EACodeTemplate;
 
@@ -61,6 +64,7 @@ expr		: stringLiteral
 		| splitMacro
 		| queryMacro
 		| piMacro 
+		| textMacros
 ;
 
 variable	: VAR
@@ -112,17 +116,16 @@ endtempalte_stmt: EXIT | BREAK
 // ----------------------------------------------------------------------------
 compare_expr	: predicate (pred_op predicate)*
 ;
-//predicate	: expr test_op expr
-//		| expr 
-//;
-predicate	: expression test_op expression
-		| expression 
+predicate	: NOT* ( expression test_op expression
+		| 	expression
+		) 
 ;
 pred_op     	: Pred_op;
 test_op		: Test_op;
 
 Pred_op 	: 'and' | 'or';
 Test_op		: '=='	| '!=' | '~=';
+NOT		: 'not';
 
 //
 // ============================================================================
@@ -147,7 +150,7 @@ macros		: textMacros
 		| piMacro
 ;
 textMacros 		: '%dl%' | '%pc%' | '%eq%' | '%qt%' | '%us%' | '%nl%' //| '%sl%'
-			| '%DATE%' | '%TIME%' //| '%USER%' 
+			| '%DATE%' | '%TIME%' | '%FILE%'//| '%USER%' 
 ;
 callMacro		: Call templateName (templateParameters | elementInScope)*  '%'
 ;
@@ -193,7 +196,8 @@ elementInScope		: ElementInScope (
 			)
 ;
 functions		: Function parameters CBR '%'
-;
+			| NoParmFunction
+;	
 parameters		: expression (COMA expression)*
 ;
 piMacro			:  PI ('=' expression)* '%'

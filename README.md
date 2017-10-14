@@ -11,6 +11,15 @@ http://sparxsystems.com/enterprise\_architect\_user\_guide/12.1/software\_engine
 What's new
 ----------
 
+### Version 0.49.0
+-   added **%FILE%** function
+-   added '**not**' to conditon predicates
+-   Code generator raises an erorr in case of missing %endif%
+-   Text Macros can be used in expressions e.g.
+    ~~~~ 
+    $variable = "test" + %nl%
+    ~~~~
+
 ### Version 0.48.2
 -   added filtering conditions to %split macro
 -   enabled full expressions in %list, %split, and %query macros filtering conditions

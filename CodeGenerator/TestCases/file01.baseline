@@ -1,5 +1,5 @@
 ################################################################################
-This text will go to file1
+This text will go to file1 [C:\Work\Development\EA\EA_CodeTemplate\CodeGenerator\file01.out]
 --------------------------------------------------------------------------------
 ###: -- Test case #1 -- Element's attributes
 #01: Name	: Activity2	= Activity2
@@ -8,10 +8,14 @@ This text will go to file1
 #03: Unknown Tag:
 #04: Var-Name	: Activity2
 #05: Var-Tag	: []
-#06: Notes	: 
-#07:                                     
+#06: Notes	: Job to populate <b>Table 6 </b>using data from <b>Table 1</b> and <b>Table 3</b>.
+Business logic is implemented in <b>View 4</b>.
+#07: Job to populate Table 6 using data  
+#07: from Table 1 and Table 3.           
+#07: Business logic is implemented in    
+#07: View 4.                             
 
-#08:
+#08: Job to populate Table 6 using data from Table 1 and Table 3.Business logic is implemented in View 4.
 
 ###: -- Test case #2 -- Parent's attributes
 #11: Name	:

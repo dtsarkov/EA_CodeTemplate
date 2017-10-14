@@ -175,14 +175,20 @@ $v1 = "2"
 		Test 22 : PASS
 %endif%				
 
-%% %if %DEFINED($v1)% == "true" %
-%% 		Test 23	 : PASS
-%% %else%
-%% 		Test 23 : FAIL
-%% %endif%				
+%if not $v1 == $v2 %
+ 		Test 23 : PASS
+%else%
+ 		Test 23 : FAIL
+%endif%				
 
-%% %if %DEFINED($v3)% %
-%% 		Test 24 : FAIL
-%% %else%
-%% 		Test 24	: PASS
-%% %endif%				
+%if not "a" != "a" and not "b" != "b"%
+		Test 24 : PASS
+%else%
+		Test 24 : FAIL
+%endif%
+
+%if not "a" == "a" and not "b" == "b"%
+		Test 25 : FAIL
+%else%
+		Test 25 : PASS
+%endif%

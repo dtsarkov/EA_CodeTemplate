@@ -8,5 +8,5 @@
 This text will go to file11-default. Mode %eq% [$1]
 %else%	
 	%file="file11.out" @mode=$mode%
-This text will go to file11. Mode %eq% [$1]
+This text will go to file11 [%FILE%]. Mode %eq% [$1]
 %endif%	

@@ -17,6 +17,8 @@ public class UnitTesting {
 				,"-b", "TestCases\\TestCases.lst", "-f", "TestCases", "-x", "template"
 				//,"-t", "TestCases\\query.template"	,"-e", "Activity2" ,"-o", "query.out" 
 				//,"-t", "TestCases\\multipleOutputFiles.template"	,"-e", "Activity2" ,"-o", "file00.out", "-d" 
+				
+				//,"-t", "TestCases\\listTemplateParameters.template","-e", "{93C85029-ED09-4f21-BBC1-6D21F6EA8A19}","-q", "GUID", "-o", "TemplateParameters.out", "-d" 
 				//,"-v"
 				//,"-d"
 			};

@@ -1,4 +1,4 @@
 %file="file21.out"%
-1. This text will go to file21
+1. This text will go to file21 [%FILE%]
 $txt = %call @template="multipleOutputFiles_1" @parameters="append"%
-2. This text will go to file21 [$txt]
+2. This text will go to file21 [%FILE%] [$txt] 

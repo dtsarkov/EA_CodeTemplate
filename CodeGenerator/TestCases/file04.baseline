@@ -1,5 +1,5 @@
 ################################################################################
-This text will go to file4
+This text will go to file4 [C:\Work\Development\EA\EA_CodeTemplate\CodeGenerator\file04.out]
 --------------------------------------------------------------------------------
 Test branching macros, ( and or ) conditions, nested ifs
 		Test 01 : PASS
@@ -24,5 +24,8 @@ Test branching macros, ( and or ) conditions, nested ifs
 		Test 20 : PASS
 		Test 21	: PASS
 		Test 22 : PASS
+ 		Test 23 : PASS
+		Test 24 : PASS
+		Test 25 : PASS
 
 ################################################################################

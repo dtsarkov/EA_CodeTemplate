@@ -2,43 +2,45 @@
 1. This text will go to file0
 %call @template="multipleOutputFiles_1"%
 2. This text will go to file0
-%DEBUG("=== Multiple output files: Test Case 1.3 =============================")%
+%MESSAGE("=== Multiple output files: Test Case 1.3 =============================")%
 $txt = %call @template="multipleOutputFiles_1" @parameters="assignment"%
 3. This is the output from multipleOutputFile_1 template
 	$txt
 %call @template="multipleOutputFiles_1" @parameters="override"%
 ################################################################################
+$originalFile = %FILE%
+Original file name %eq% %FILE%
 $mode="override"
 
 %file="file03.out" @mode=$mode%
 ################################################################################
-This text will go to file3
+This text will go to file3 [%FILE%]
 --------------------------------------------------------------------------------
 
 %file="file01.out"%
 ################################################################################
-This text will go to file1
+This text will go to file1 [%FILE%]
 --------------------------------------------------------------------------------
 %call @template="attributes"%
 ################################################################################
 
 %file="file02.out" @mode="append"%
 ################################################################################
-This text will go to file2
+This text will go to file2 [%FILE%]
 --------------------------------------------------------------------------------
 %call @template="branching"%
 ################################################################################
 
 %file="file03.out" @mode="new"%
 ################################################################################
-This text won't go to file3 as it's already exist
+This text won't go to file3 [%FILE%] as it's already exist
 --------------------------------------------------------------------------------
 %call @template="branching"%
 ################################################################################
 
 %file="file04.out" @mode=$mode%
 ################################################################################
-This text will go to file4
+This text will go to file4 [%FILE%]
 --------------------------------------------------------------------------------
 %call @template="branching"%
 ################################################################################
@@ -50,7 +52,11 @@ Appendix in file2
 
 %file="test/file31.out"%
 ################################################################################
-Text in file31
+Text in file31 [%FILE%]
 --------------------------------------------------------------------------------
 %call @template="multipleOutputFiles_2"%
 
+%file=$originalFile @mode="append"%
+################################################################################
+Text in the original output file [%FILE%]
+--------------------------------------------------------------------------------
