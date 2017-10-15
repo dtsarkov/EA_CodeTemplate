@@ -13,6 +13,8 @@
 // 0.49.0	Added %FILE% text macro
 //		Added text macros to expressions
 //		Added 'not' to logical predicates
+// 0.49.1	Enabled full expressions in "separator", "delimiter" and 
+//		"searchTerm" clauses 
 // ----------------------------------------------------------------------------
 grammar EACodeTemplate;
 
@@ -183,13 +185,13 @@ evalExpression		: EvalExpression expression
 ;
 templateParameters	: Parameters parameters
 ;
-separator		: Separator expr
+separator		: Separator expression
 ;
 conditions		: OBR compare_expr CBR
 ;
-delimiter		: Delimiter expr
+delimiter		: Delimiter expression
 ;
-searchTerm		: SearchTerm expr
+searchTerm		: SearchTerm expression
 ;
 elementInScope		: ElementInScope (
 				THIS | PARN | PCKG | SRCE | TRGT | SROL | TROL 

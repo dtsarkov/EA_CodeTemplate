@@ -630,12 +630,12 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 
 		String separator = getLineSeparator();
 		if (ctx.separator(0) != null ) {
-			separator = calcExpression(ctx.separator(0).expr());
+			separator = calcExpression(ctx.separator(0).expression());
 		}
 		
 		String delimiter     = ",";
 		if ( ctx.delimiter(0) != null ) {
-			delimiter = calcExpression(ctx.delimiter(0).expr());
+			delimiter = calcExpression(ctx.delimiter(0).expression());
 		}
 
 		ConditionsContext 	ctxConditions 	= ctx.conditions(0);
@@ -750,7 +750,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 	@SuppressWarnings("rawtypes")
 	private void executeQueryMacro(QueryMacroContext ctx, Writer writer ) {
 		String queryName  	= calcExpression(ctx.expr());
-		String searchValue 	= calcExpression(ctx.searchTerm().expr());
+		String searchValue 	= calcExpression(ctx.searchTerm().expression());
 		
 		Logger.debug("Query macro: queryName=[%s] searchValue= [%s]"
 				,queryName, searchValue
@@ -835,7 +835,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 		//Set separator
 		String separator = getLineSeparator();
 		if (ctxSeparator != null ) {
-			separator = calcExpression(ctxSeparator.expr());
+			separator = calcExpression(ctxSeparator.expression());
 		}
 		
 		//Execute template for each element
