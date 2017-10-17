@@ -11,6 +11,9 @@ http://sparxsystems.com/enterprise\_architect\_user\_guide/12.1/software\_engine
 What's new
 ----------
 
+### Version 0.49.2
+-   fixed problem when code generator does not recognise 'not' in a free text
+
 ### Version 0.49.1
 -   enabled full expressions in 'separator', 'delimiter' and 'searchTerm' clauses
 

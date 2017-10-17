@@ -616,7 +616,7 @@ public class TemplateProcessor extends EACodeTemplateBaseListener {
 			}
 			Logger.debug("Eval([%s] %s [%s]) is %s",exp1,op,exp2,equal);
 		}
-		if ( ctx.NOT(0) != null ) equal = !equal;
+		if ( ctx.not(0) != null ) equal = !equal;
 		return equal;
 	}
 

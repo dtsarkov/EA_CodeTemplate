@@ -15,6 +15,7 @@
 //		Added 'not' to logical predicates
 // 0.49.1	Enabled full expressions in "separator", "delimiter" and 
 //		"searchTerm" clauses 
+// 0.49.2 	Added 'not' keyword to freeText
 // ----------------------------------------------------------------------------
 grammar EACodeTemplate;
 
@@ -118,16 +119,17 @@ endtempalte_stmt: EXIT | BREAK
 // ----------------------------------------------------------------------------
 compare_expr	: predicate (pred_op predicate)*
 ;
-predicate	: NOT* ( expression test_op expression
+predicate	:  (not)* (  expression test_op expression
 		| 	expression
 		) 
 ;
 pred_op     	: Pred_op;
 test_op		: Test_op;
+not		: NOT;
 
 Pred_op 	: 'and' | 'or';
 Test_op		: '=='	| '!=' | '~=';
-NOT		: 'not';
+NOT 		: 'not';
 
 //
 // ============================================================================
@@ -198,7 +200,6 @@ elementInScope		: ElementInScope (
 			)
 ;
 functions		: Function parameters CBR '%'
-			| NoParmFunction
 ;	
 parameters		: expression (COMA expression)*
 ;
@@ -228,7 +229,7 @@ Parameters      : '@parameters=';
 // ============================================================================
 // =
 // ============================================================================
-freeText	: FreeText | Pred_op | COMA | OBR | CBR | DOT | ADD
+freeText	: FreeText | Pred_op | COMA | OBR | CBR | DOT | ADD | NOT
 ;
 FreeText	: [a-zA-Z0-9_{}\.\-\*\:\/\[\]<>\~!?@#^&\|'`;]+
 ;
